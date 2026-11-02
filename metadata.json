@@ -1,0 +1,6 @@
+{
+  "name": "Pulse Kids - Le Journal Animé des P'tits Curieux",
+  "description": "Application quotidienne pour enfants de 5 ans avec actualités présentées en dessins animés interactifs, sous-titres éducatifs, contrôle parental avec minuteur 15min et mode hors-ligne sans publicité.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
