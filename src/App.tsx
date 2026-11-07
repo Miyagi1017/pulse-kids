@@ -9,7 +9,7 @@ import { DailyVideo } from './components/DailyVideo';
 import type { Section } from './components/ui';
 import { CONTES } from './data/contes';
 import { CONTES_DU_SOIR } from './data/contesDuSoir';
-import { ACTIVITES } from './data/activites';
+import { ACTIVITES, CATEGORY_INFO } from './data/activites';
 import { purgeLegacyStorage, useDone, useProfile } from './lib/profile';
 import { cachedToday, fetchToday } from './lib/today';
 import { stopSpeaking } from './utils/soundEffects';
@@ -96,6 +96,7 @@ export default function App() {
           section={view.section}
           items={items}
           done={done}
+          categories={view.section === 'activites' ? CATEGORY_INFO : undefined}
           onBack={home}
           onPick={(id) => setView(view.section === 'activites' ? { name: 'activity', id } : { name: 'tale', section: view.section as 'contes' | 'soir', id })}
         />

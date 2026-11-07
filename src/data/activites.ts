@@ -7,10 +7,26 @@
  *  - intrus    : trouver celui qui n'est pas de la même famille (le dernier de la liste)
  */
 
-export type Activity =
-  | { id: string; kind: 'devinette'; emoji: string; title: string; question: string; choices: string[]; bravo: string }
-  | { id: string; kind: 'compte'; emoji: string; title: string; item: string; count: number; bravo: string }
-  | { id: string; kind: 'intrus'; emoji: string; title: string; items: string[]; bravo: string };
+import { JEUX, splitChoice, type Theme } from './jeux';
+
+export type Category = Theme | 'decouverte' | 'maths' | 'logique';
+
+interface Base {
+  id: string;
+  category: Category;
+  emoji: string;
+  title: string;
+  bravo: string;
+}
+
+export type Activity = Base &
+  (
+    | { kind: 'devinette'; question: string; choices: string[] }
+    | { kind: 'compte'; item: string; count: number }
+    | { kind: 'intrus'; items: string[] }
+    | { kind: 'vf'; statement: string; answer: boolean }
+    | { kind: 'ordre'; question: string; steps: string[] }
+  );
 
 type Row =
   | ['devinette', string, string, string[], string] // titre, question, [bonne, autres…], bravo
@@ -73,15 +89,57 @@ const ROWS: Row[] = [
 const titleEmoji = (row: Row): string =>
   row[0] === 'devinette' ? row[3][0] : row[0] === 'compte' ? row[2] : row[2][0];
 
-export const ACTIVITES: Activity[] = ROWS.map((row, i) => {
+const CLASSIQUES: Activity[] = ROWS.map((row, i): Activity => {
   const id = `activite-${String(i + 1).padStart(2, '0')}`;
   const emoji = titleEmoji(row);
   switch (row[0]) {
     case 'devinette':
-      return { id, kind: 'devinette', emoji, title: row[1], question: row[2], choices: row[3], bravo: row[4] };
+      return { id, category: 'decouverte', kind: 'devinette', emoji, title: row[1], question: row[2], choices: row[3], bravo: row[4] };
     case 'compte':
-      return { id, kind: 'compte', emoji, title: row[1], item: row[2], count: row[3], bravo: row[4] };
+      return { id, category: 'maths', kind: 'compte', emoji, title: row[1], item: row[2], count: row[3], bravo: row[4] };
     case 'intrus':
-      return { id, kind: 'intrus', emoji, title: row[1], items: row[2], bravo: row[3] };
+      return { id, category: 'logique', kind: 'intrus', emoji, title: row[1], items: row[2], bravo: row[3] };
   }
 });
+
+const APPRENTISSAGES: Activity[] = JEUX.map((j, i): Activity => {
+  const base = { id: `jeu-${String(i + 1).padStart(2, '0')}`, category: j.theme, title: j.title, bravo: j.bravo };
+  switch (j.kind) {
+    case 'qcm':
+      return { ...base, kind: 'devinette', emoji: splitChoice(j.choices[0]).emoji, question: j.question, choices: j.choices };
+    case 'vf':
+      return { ...base, kind: 'vf', emoji: j.emoji, statement: j.statement, answer: j.answer };
+    case 'ordre':
+      return { ...base, kind: 'ordre', emoji: splitChoice(j.steps[0]).emoji, question: j.question, steps: j.steps };
+  }
+});
+
+/** Mélange équilibré : on alterne les thèmes, puis on intercale avec les jeux classiques. */
+function interleave(groups: Activity[][]): Activity[] {
+  // Répartition régulière : chaque élément est placé à sa position relative (i + ½) / taille
+  // dans son groupe ; les grands groupes s'étalent donc sur toute la liste.
+  return groups
+    .flatMap((g, gi) => g.map((a, i) => ({ a, key: (i + 0.5) / g.length, gi })))
+    .sort((x, y) => x.key - y.key || x.gi - y.gi)
+    .map((x) => x.a);
+}
+
+const byCategory = (list: Activity[]) => {
+  const map = new Map<Category, Activity[]>();
+  for (const a of list) map.set(a.category, [...(map.get(a.category) ?? []), a]);
+  return [...map.values()];
+};
+
+/** 110 activités : 50 classiques + 60 jeux d'apprentissage, toutes catégories mêlées. */
+export const ACTIVITES: Activity[] = interleave(byCategory([...APPRENTISSAGES, ...CLASSIQUES]));
+
+export const CATEGORY_INFO: Record<Category, { label: string; emoji: string }> = {
+  langue: { label: 'Langue', emoji: '🗣️' },
+  etre: { label: 'Savoir-être', emoji: '💛' },
+  vivre: { label: 'Savoir-vivre', emoji: '🙏' },
+  ia: { label: 'Découvrir l’IA', emoji: '🤖' },
+  discipline: { label: 'Discipline', emoji: '⏰' },
+  decouverte: { label: 'Découverte', emoji: '🔎' },
+  maths: { label: 'Compter', emoji: '🔢' },
+  logique: { label: 'Logique', emoji: '🧠' }
+};

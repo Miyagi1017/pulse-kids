@@ -26,12 +26,13 @@ Simple, joyeux, personnalisé avec le prénom de l’enfant — sans publicité,
 |---|---|---|
 | 🎬 | **La vidéo du jour** | Un petit dessin animé narré et sous-titré, construit chaque jour à partir des vraies infos : date, saison, **météo en direct**, **photo NASA**, anecdote « Le savais-tu ? » et thème écrit par l’IA |
 | 📖 | **50 contes** | Histoires de journée, page par page, lues à voix haute |
-| 🧩 | **50 activités** | Devinettes, jeux pour compter, trouve l’intrus — jouables sans savoir lire |
+| 🧩 | **110 activités** | 50 jeux classiques (devinettes, compter, trouve l’intrus) **+ 60 jeux d’apprentissage** mélangés : 🗣️ langue · 💛 savoir-être · 🙏 savoir-vivre · 🤖 découvrir l’IA · ⏰ discipline — avec « Oui ou non ? » et « Remets dans l’ordre », jouables sans savoir lire |
 | 🌙 | **50 contes du soir** | Fond étoilé, voix lente, fin apaisante et petite berceuse |
 
 - 👋 **Personnalisé** : le prénom choisi au premier lancement apparaît dans les contes, la vidéo et les félicitations. Il reste **sur l’appareil**, il n’est jamais envoyé au serveur.
 - ✓ Une petite coche marque ce qui a déjà été lu ou réussi ; le bouton **Surprise !** propose un contenu pas encore découvert.
-- ✈️ **Hors ligne** : les 150 contenus sont embarqués ; la vidéo du jour a une version sans réseau.
+- 🎲 Les activités sont **mélangées** (jamais 3 du même thème d’affilée) ; des pastilles permettent de filtrer par thème.
+- ✈️ **Hors ligne** : les 210 contenus sont embarqués ; la vidéo du jour a une version sans réseau.
 - ♿ Gros boutons, tout est dit à voix haute, respect du réglage « réduire les animations ».
 
 ## 🏗️ Architecture
@@ -51,7 +52,7 @@ flowchart LR
 ```
 
 ```
-src/data/            50 contes · 50 contes du soir · 50 activités (+ tests)
+src/data/            50 contes · 50 contes du soir · 50 activités + 60 jeux d’apprentissage (+ tests)
 src/components/      Accueil, bibliothèque, lecteur de contes, activités, vidéo du jour
 src/lib/             Profil (prénom), vidéo du jour (cache + version hors ligne)
 shared/              Schémas zod + contenus du jour calculés (saison, anecdotes)

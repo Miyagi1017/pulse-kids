@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { CONTES } from './contes';
 import { CONTES_DU_SOIR } from './contesDuSoir';
 import { ACTIVITES } from './activites';
+import { JEUX } from './jeux';
 import { personalize } from './format';
 import { cleanName } from '../lib/profile';
 
@@ -38,19 +39,39 @@ test('nettoyage du prénom : lettres seulement, majuscule, 20 caractères max', 
   assert.ok(cleanName('a'.repeat(50)).length <= 20);
 });
 
-test('activités : exactement 50, ids uniques, jouables', () => {
-  assert.equal(ACTIVITES.length, 50);
-  assert.equal(new Set(ACTIVITES.map((a) => a.id)).size, 50);
+test('activités : 50 classiques + 60 jeux d’apprentissage = 110, ids uniques, jouables', () => {
+  assert.equal(ACTIVITES.length, 110);
+  assert.equal(new Set(ACTIVITES.map((a) => a.id)).size, 110);
+  assert.equal(ACTIVITES.filter((a) => a.id.startsWith('jeu-')).length, 60);
   for (const a of ACTIVITES) {
     if (a.kind === 'devinette') {
       assert.equal(a.choices.length, 3, a.id);
       assert.equal(new Set(a.choices).size, 3, `${a.id} : choix en double`);
     } else if (a.kind === 'compte') {
       assert.ok(a.count >= 1 && a.count <= 9, a.id);
-    } else {
+    } else if (a.kind === 'intrus') {
       assert.equal(a.items.length, 4, a.id);
       assert.equal(new Set(a.items).size, 4, `${a.id} : intrus en double`);
+    } else if (a.kind === 'ordre') {
+      assert.ok(a.steps.length >= 3 && a.steps.length <= 4, a.id);
+      assert.equal(new Set(a.steps).size, a.steps.length, `${a.id} : étapes en double`);
+    } else {
+      assert.ok(a.statement.length > 0, a.id);
     }
-    assert.ok(a.bravo.length > 0);
+    assert.ok(a.bravo.length > 0 && !FORBIDDEN.test(a.bravo), a.id);
   }
+});
+
+test('les 60 jeux couvrent les 5 thèmes (12 chacun) et sont bien mélangés', () => {
+  for (const t of ['langue', 'etre', 'vivre', 'ia', 'discipline'] as const) {
+    assert.equal(JEUX.filter((j) => j.theme === t).length, 12, t);
+  }
+  // Mélange : jamais 3 activités de la même catégorie d'affilée.
+  for (let i = 2; i < ACTIVITES.length; i++) {
+    const [a, b, c] = [ACTIVITES[i - 2], ACTIVITES[i - 1], ACTIVITES[i]].map((x) => x.category);
+    assert.ok(!(a === b && b === c), `trois « ${c} » d’affilée à la position ${i}`);
+  }
+  // Les vrai/faux ont des réponses des deux sortes (pas toujours « oui »).
+  const vf = JEUX.filter((j) => j.kind === 'vf');
+  assert.ok(vf.some((j) => j.kind === 'vf' && j.answer) && vf.some((j) => j.kind === 'vf' && !j.answer));
 });

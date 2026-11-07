@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Shuffle } from 'lucide-react';
 import { SECTION_STYLE, TopBar, type Section } from './ui';
@@ -7,11 +8,17 @@ export interface LibraryItem {
   id: string;
   emoji: string;
   title: string;
+  category?: string;
 }
 
+export type CategoryLabels = Record<string, { label: string; emoji: string }>;
+
 /** Grille des 50 contenus d'un espace : gros emojis, titre court, coche quand c'est fait. */
-export function Library({ section, items, done, onBack, onPick }: { section: Exclude<Section, 'video'>; items: LibraryItem[]; done: Set<string>; onBack: () => void; onPick: (id: string) => void }) {
+export function Library({ section, items: allItems, done, onBack, onPick, categories }: { section: Exclude<Section, 'video'>; items: LibraryItem[]; done: Set<string>; onBack: () => void; onPick: (id: string) => void; categories?: CategoryLabels }) {
   const st = SECTION_STYLE[section];
+  const [filter, setFilter] = useState<string | null>(null);
+  const items = filter ? allItems.filter((i) => i.category === filter) : allItems;
+  const present = categories ? Object.keys(categories).filter((c) => allItems.some((i) => i.category === c)) : [];
   const dark = section === 'soir';
   const pick = (id: string) => {
     soundEffects.playPop();
@@ -40,6 +47,28 @@ export function Library({ section, items, done, onBack, onPick }: { section: Exc
         <p className={`mb-4 ${dark ? 'text-white/70' : 'text-doux'}`}>
           {done.size ? `${[...done].filter((d) => items.some((i) => i.id === d)).length} sur ${items.length} déjà faits. ` : ''}Touche une image pour commencer !
         </p>
+        {categories && present.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-3 mb-2 -mx-4 px-4" role="tablist" aria-label="Thèmes">
+            {[null, ...present].map((c) => {
+              const active = filter === c;
+              const info = c ? categories[c] : { label: 'Tout mélangé', emoji: '🎲' };
+              return (
+                <button
+                  key={c ?? 'all'}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => {
+                    soundEffects.playPop();
+                    setFilter(c);
+                  }}
+                  className={`press shrink-0 rounded-full px-4 py-2 font-semibold whitespace-nowrap ${active ? `${st.strong} text-white shadow-bonbon` : 'bg-white text-encre'}`}
+                >
+                  {info.emoji} {info.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {items.map((item, i) => {
             const isDone = done.has(item.id);
