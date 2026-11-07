@@ -71,6 +71,7 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile }:
         <span className="inline-block bg-white/25 rounded-full px-3 py-1 text-sm font-semibold mb-3">🎬 La vidéo du jour</span>
         <span className="block text-2xl sm:text-3xl font-bold leading-tight max-w-[85%]">{today.title}</span>
         <span className="mt-4 inline-flex items-center gap-2 bg-white text-corail rounded-full px-5 py-2 text-lg font-bold">▶ Regarder</span>
+        <span className="block mt-2 text-sm font-semibold opacity-90">+ 50 vidéos à regarder à la suite</span>
       </motion.button>
 
       {/* Les 3 bibliothèques */}

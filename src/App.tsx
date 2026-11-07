@@ -5,7 +5,9 @@ import { Home } from './components/Home';
 import { Library } from './components/Library';
 import { TaleReader } from './components/TaleReader';
 import { ActivityPlayer } from './components/ActivityPlayer';
-import { DailyVideo } from './components/DailyVideo';
+import { VideoPlayer } from './components/DailyVideo';
+import { buildPlaylist, TODAY_ID } from './lib/playlist';
+import { VIDEO_THEMES } from './data/videos';
 import type { Section } from './components/ui';
 import { CONTES } from './data/contes';
 import { CONTES_DU_SOIR } from './data/contesDuSoir';
@@ -20,6 +22,7 @@ type View =
   | { name: 'home' }
   | { name: 'profile' }
   | { name: 'video' }
+  | { name: 'player'; index: number }
   | { name: 'library'; section: 'contes' | 'activites' | 'soir' }
   | { name: 'tale'; section: 'contes' | 'soir'; id: string }
   | { name: 'activity'; id: string };
@@ -58,6 +61,8 @@ export default function App() {
   };
   const home = () => setView({ name: 'home' });
 
+  const playlist = useMemo(() => buildPlaylist(today), [today]);
+
   const counts = useMemo(() => {
     const c = (ids: { id: string }[]) => ({ total: ids.length, done: ids.filter((i) => done.has(i.id)).length });
     return { contes: c(CONTES), activites: c(ACTIVITES), soir: c(CONTES_DU_SOIR) };
@@ -87,8 +92,40 @@ export default function App() {
 
   let screen: React.ReactNode;
   switch (view.name) {
-    case 'video':
-      screen = <DailyVideo today={today} name={profile.name} onBack={home} />;
+    case 'video': {
+      const [journal, ...videos] = playlist;
+      screen = (
+        <Library
+          section="video"
+          items={videos.map((v) => ({ id: v.id, emoji: v.emoji, title: v.title, image: v.thumb, category: v.category }))}
+          done={done}
+          categories={VIDEO_THEMES}
+          onBack={home}
+          onPick={(id) => setView({ name: 'player', index: playlist.findIndex((p) => p.id === id) })}
+          action={{ label: '▶ Tout regarder', onClick: () => setView({ name: 'player', index: 0 }) }}
+          intro={
+            <button
+              onClick={() => setView({ name: 'player', index: 0 })}
+              className="press shadow-bonbon w-full mb-5 rounded-[2rem] bg-corail text-white p-4 sm:p-5 flex items-center gap-4 text-left"
+            >
+              {journal.thumb ? (
+                <img src={journal.thumb} alt="" className="w-28 sm:w-36 aspect-[4/3] object-cover rounded-2xl border-4 border-white/60" />
+              ) : (
+                <span className="text-6xl">{journal.emoji}</span>
+              )}
+              <span className="flex-1">
+                <span className="block text-sm font-semibold opacity-90">📰 Le journal du jour {done.has(TODAY_ID) ? '✓' : ''}</span>
+                <span className="block text-xl sm:text-2xl font-bold leading-tight">{journal.title}</span>
+                <span className="block mt-1 opacity-90">Puis {videos.length} vidéos à la suite ▶</span>
+              </span>
+            </button>
+          }
+        />
+      );
+      break;
+    }
+    case 'player':
+      screen = <VideoPlayer playlist={playlist} startIndex={Math.max(0, view.index)} name={profile.name} onBack={() => setView({ name: 'video' })} onWatched={markDone} />;
       break;
     case 'library': {
       const items =

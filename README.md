@@ -24,7 +24,7 @@ Simple, joyeux, personnalisé avec le prénom de l’enfant — sans publicité,
 
 | | | |
 |---|---|---|
-| 🎬 | **La vidéo du jour** | Un petit dessin animé narré et sous-titré, construit chaque jour à partir des vraies infos : date, saison, **météo en direct**, **photo NASA**, anecdote « Le savais-tu ? » et thème écrit par l’IA |
+| 🎬 | **La vidéo du jour + 50 vidéos** | 50 mini-documentaires narrés (animaux, nature, espace, métiers, corps, monde), chacun avec **une vraie photo** sous licence libre, à regarder **à la suite** (enchaînement automatique). Et le journal du jour : Un petit dessin animé narré et sous-titré, construit chaque jour à partir des vraies infos : date, saison, **météo en direct**, **photo NASA**, anecdote « Le savais-tu ? » et thème écrit par l’IA |
 | 📖 | **50 contes** | Histoires de journée, page par page, lues à voix haute, **illustrées et animées** (zoom lent, particules selon le sujet) |
 | 🧩 | **110 activités** | 50 jeux classiques (devinettes, compter, trouve l’intrus) **+ 60 jeux d’apprentissage** mélangés : 🗣️ langue · 💛 savoir-être · 🙏 savoir-vivre · 🤖 découvrir l’IA · ⏰ discipline — avec « Oui ou non ? » et « Remets dans l’ordre », jouables sans savoir lire |
 | 🌙 | **50 contes du soir** | Fond étoilé, voix lente, fin apaisante et petite berceuse |
@@ -72,6 +72,7 @@ api/                 today · health · cron/daily
 | Thème du jour (IA) | **gpt-oss-20b** via Hugging Face (ou tout modèle ouvert : Qwen, Llama via Ollama…) | Apache 2.0 |
 | Météo | Open-Meteo | AGPL (données CC BY 4.0) |
 | Photos de l’espace | NASA APOD & Image Library | Domaine public |
+| Photos des 50 vidéos | **Openverse** (moteur open source, fondation WordPress) + NASA, relues une à une, crédits dans `src/data/videoCredits.json` | CC0, domaine public, CC BY, CC BY-SA |
 | Synthèse vocale | Web Speech API du navigateur | Standard W3C |
 
 Les illustrations sont générées **une seule fois** puis embarquées : l’enfant n’appelle jamais de service d’IA. Chaque image passe par une **relecture humaine** avant publication :
@@ -119,6 +120,7 @@ Tout fonctionne sans configuration. Options (voir `.env.example`) :
 | `npm run check` | Typecheck + tests + build |
 | `npm run db:migrate` | Crée les tables Neon |
 | `npm run illustrations` | Génère les illustrations manquantes (FLUX.1-schnell) |
+| `npm run video-images` | Cherche les photos des vidéos sur Openverse (`-- review` / `-- publish --reject=…`) |
 
 ## 🚢 Déploiement
 

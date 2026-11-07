@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion } from 'motion/react';
 import { Shuffle } from 'lucide-react';
 import { SECTION_STYLE, TopBar, type Section } from './ui';
@@ -15,7 +15,7 @@ export interface LibraryItem {
 export type CategoryLabels = Record<string, { label: string; emoji: string }>;
 
 /** Grille des 50 contenus d'un espace : gros emojis, titre court, coche quand c'est fait. */
-export function Library({ section, items: allItems, done, onBack, onPick, categories }: { section: Exclude<Section, 'video'>; items: LibraryItem[]; done: Set<string>; onBack: () => void; onPick: (id: string) => void; categories?: CategoryLabels }) {
+export function Library({ section, items: allItems, done, onBack, onPick, categories, intro, action }: { section: Section; items: LibraryItem[]; done: Set<string>; onBack: () => void; onPick: (id: string) => void; categories?: CategoryLabels; intro?: ReactNode; action?: { label: string; onClick: () => void } }) {
   const st = SECTION_STYLE[section];
   const [filter, setFilter] = useState<string | null>(null);
   const items = filter ? allItems.filter((i) => i.category === filter) : allItems;
@@ -39,15 +39,22 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
         onBack={onBack}
         dark={dark}
         right={
-          <button onClick={surprise} className={`press shadow-bonbon h-12 px-4 rounded-2xl ${st.strong} ${section === 'contes' ? 'text-encre' : 'text-white'} font-semibold flex items-center gap-2`}>
-            <Shuffle className="w-5 h-5" /> <span className="hidden sm:inline">Surprise !</span>
-          </button>
+          action ? (
+            <button onClick={action.onClick} className={`press shadow-bonbon h-12 px-4 rounded-2xl ${st.strong} text-white font-semibold flex items-center gap-2`}>
+              {action.label}
+            </button>
+          ) : (
+            <button onClick={surprise} className={`press shadow-bonbon h-12 px-4 rounded-2xl ${st.strong} ${section === 'contes' ? 'text-encre' : 'text-white'} font-semibold flex items-center gap-2`}>
+              <Shuffle className="w-5 h-5" /> <span className="hidden sm:inline">Surprise !</span>
+            </button>
+          )
         }
       />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pb-10 pt-2">
         <p className={`mb-4 ${dark ? 'text-white/70' : 'text-doux'}`}>
           {done.size ? `${[...done].filter((d) => items.some((i) => i.id === d)).length} sur ${items.length} déjà faits. ` : ''}Touche une image pour commencer !
         </p>
+        {intro}
         {categories && present.length > 1 && (
           <div className="flex gap-2 overflow-x-auto pb-3 mb-2 -mx-4 px-4" role="tablist" aria-label="Thèmes">
             {[null, ...present].map((c) => {
