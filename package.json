@@ -15,7 +15,9 @@
     "test": "tsx --test \"src/**/*.test.ts\" \"shared/**/*.test.ts\" \"server/**/*.test.ts\"",
     "check": "npm run typecheck && npm test && npm run build",
     "db:migrate": "tsx scripts/migrate.ts",
-    "illustrations": "tsx scripts/generate-illustrations.ts"
+    "illustrations": "tsx scripts/generate-illustrations.ts",
+    "illustrations:review": "tsx scripts/generate-illustrations.ts review",
+    "illustrations:publish": "tsx scripts/generate-illustrations.ts publish"
   },
   "dependencies": {
     "@fontsource/fredoka": "^5.3.0",

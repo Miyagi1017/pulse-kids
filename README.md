@@ -74,7 +74,16 @@ api/                 today · health · cron/daily
 | Photos de l’espace | NASA APOD & Image Library | Domaine public |
 | Synthèse vocale | Web Speech API du navigateur | Standard W3C |
 
-Les illustrations sont générées **une seule fois** (`npm run illustrations`) puis embarquées : l’enfant n’appelle jamais Hugging Face. Gemini reste possible mais uniquement en dernier recours, si aucun fournisseur ouvert n’est configuré.
+Les illustrations sont générées **une seule fois** puis embarquées : l’enfant n’appelle jamais de service d’IA. Chaque image passe par une **relecture humaine** avant publication :
+
+```bash
+npm run illustrations                           # Hugging Face (quota gratuit quotidien) → file d’attente
+npm run illustrations -- --source=pollinations   # option Pollinations.ai (compte requis, qualité variable)
+npm run illustrations:review                    # planche-contact à relire
+npm run illustrations:publish -- --reject=conte-05   # publie, sauf les images refusées
+```
+
+`src/assets/illustrations/sources.json` garde l’origine de chaque image. Une tâche planifiée génère chaque jour les images manquantes avec le quota gratuit Hugging Face ; tant qu’un conte n’a pas d’illustration, il s’affiche avec son emoji animé et ses particules d’ambiance. Gemini reste possible mais uniquement en dernier recours, si aucun fournisseur ouvert n’est configuré.
 
 ## 🔐 Sécurité & vie privée
 

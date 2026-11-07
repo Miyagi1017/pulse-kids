@@ -13,3 +13,7 @@ coverage/
 .vercel
 .aistudio/
 .neon
+
+# Planche-contact de relecture des illustrations
+illustrations-review.jpg
+src/assets/illustrations-pending/
