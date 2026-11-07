@@ -1,5 +1,6 @@
 import React from 'react';
 import { Volume2, Sparkles, Star, Award, Wifi, WifiOff } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface HeaderProps {
   currentTab: 'videos' | 'discoveries' | 'badges';
@@ -94,7 +95,19 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             <Star className="w-4 h-4 text-amber-700 fill-amber-500" />
-            <span>Étoiles ({starsCount}/5)</span>
+            <span>
+              Étoiles (
+              <motion.span
+                key={starsCount}
+                className="inline-block"
+                initial={{ scale: 1.8, rotate: -20 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 12 }}
+              >
+                {starsCount}
+              </motion.span>
+              /5)
+            </span>
           </button>
 
           <button

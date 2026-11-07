@@ -9,9 +9,10 @@ for (const file of ['.env.local', '.env']) {
   if (existsSync(file)) process.loadEnvFile(file);
 }
 
-const url = process.env.DATABASE_URL;
+// Migrations : connexion directe (non poolée), comme le recommande Neon.
+const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
 if (!url) {
-  console.error('❌ DATABASE_URL manquant. Lance d’abord : npx vercel env pull .env.local');
+  console.error('❌ DATABASE_URL manquant. Lance d’abord : neon env pull');
   process.exit(1);
 }
 

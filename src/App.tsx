@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
+import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/HeroBanner';
 import { CartoonPlayer } from './components/CartoonPlayer';
@@ -46,6 +47,38 @@ function useOffline() {
   }, []);
   return offline;
 }
+
+/**
+ * Carte d'activité animée : apparition douce au défilement, puis un petit « boing »
+ * de fête au moment où la mission est réussie.
+ */
+function ActivityReveal({ id, index, done, children }: { id: string; index: number; done: boolean; children: React.ReactNode }) {
+  return (
+    <motion.div
+      id={id}
+      initial={{ opacity: 0, y: 28, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18, delay: Math.min(index, 2) * 0.06 }}
+    >
+      <motion.div
+        key={done ? 'done' : 'todo'}
+        initial={done ? { scale: 1 } : false}
+        animate={done ? { scale: [1, 1.025, 0.995, 1] } : undefined}
+        transition={{ duration: 0.55, ease: 'easeOut' }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+const pageTransition = {
+  initial: { opacity: 0, y: 12 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.22, ease: 'easeOut' as const }
+};
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<'videos' | 'discoveries' | 'badges'>('videos');
@@ -126,9 +159,12 @@ export default function App() {
   };
 
   const handleSelectActivity = (actNum: number) => {
+    const switching = currentTab !== 'videos';
     setCurrentTab('videos');
-    requestAnimationFrame(() =>
-      document.getElementById(`activity-card-${actNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // Attendre la fin de la transition d'onglet avant de défiler.
+    setTimeout(
+      () => document.getElementById(`activity-card-${actNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+      switching ? 320 : 0
     );
   };
 
@@ -154,9 +190,11 @@ export default function App() {
       )}
 
       {/* 3. Main Body Content */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-6 space-y-6">
+      <MotionConfig reducedMotion="user">
+      <main className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-6">
+        <AnimatePresence mode="wait" initial={false}>
         {currentTab === 'videos' ? (
-          <>
+          <motion.div key="videos" className="space-y-6" {...pageTransition}>
             <HeroBanner
               completedActivities={progress.completedActivities}
               onTellStory={handleTellStory}
@@ -166,38 +204,42 @@ export default function App() {
 
             {/* 5 Sequential Interactive News Activities */}
             <section className="space-y-6 pt-2" key={currentStory.id}>
-              <div id="activity-card-1">
+              <ActivityReveal id="activity-card-1" index={0} done={done(1)}>
                 <CartoonPlayer
                   cartoon={currentStory.cartoon}
                   isCompleted={done(1)}
                   onComplete={() => handleCompleteActivity(1)}
                   onSelectWord={handleSelectWord}
                 />
-              </div>
-              <div id="activity-card-2">
+              </ActivityReveal>
+              <ActivityReveal id="activity-card-2" index={1} done={done(2)}>
                 <SoundQuizCard quiz={currentStory.soundQuiz} isCompleted={done(2)} onComplete={() => handleCompleteActivity(2)} />
-              </div>
-              <div id="activity-card-3">
+              </ActivityReveal>
+              <ActivityReveal id="activity-card-3" index={2} done={done(3)}>
                 <AnimalSoundCard discovery={currentStory.animalDiscovery} isCompleted={done(3)} onComplete={() => handleCompleteActivity(3)} />
-              </div>
-              <div id="activity-card-4">
+              </ActivityReveal>
+              <ActivityReveal id="activity-card-4" index={3} done={done(4)}>
                 <MysteryBubbleCard mystery={currentStory.mysteryBubble} isCompleted={done(4)} onComplete={() => handleCompleteActivity(4)} />
-              </div>
-              <div id="activity-card-5">
+              </ActivityReveal>
+              <ActivityReveal id="activity-card-5" index={4} done={done(5)}>
                 <BedtimeStoryCard tale={currentStory.bedtimeTale} isCompleted={done(5)} onComplete={() => handleCompleteActivity(5)} />
-              </div>
+              </ActivityReveal>
             </section>
-          </>
+          </motion.div>
         ) : (
-          <DiscoveriesView
-            currentStory={currentStory}
-            completedActivities={progress.completedActivities}
-            onSelectActivity={handleSelectActivity}
-            onGenerateNewAiEdition={handleGenerateAi}
-            isGeneratingAi={isGeneratingAi}
-          />
+          <motion.div key="discoveries" {...pageTransition}>
+            <DiscoveriesView
+              currentStory={currentStory}
+              completedActivities={progress.completedActivities}
+              onSelectActivity={handleSelectActivity}
+              onGenerateNewAiEdition={handleGenerateAi}
+              isGeneratingAi={isGeneratingAi}
+            />
+          </motion.div>
         )}
+        </AnimatePresence>
       </main>
+      </MotionConfig>
 
       {/* 4. Safe Footer for Kids */}
       <footer className="border-t border-amber-200/80 bg-white/60 py-4 px-4 text-center text-xs font-semibold text-amber-900/70 space-y-1">
