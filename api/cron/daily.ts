@@ -1,13 +1,11 @@
 import { timingSafeEqual } from 'node:crypto';
+import { getToday } from '../../server/daily.js';
 import { db, hasDatabase } from '../../server/db.js';
 import { HttpError, json, route } from '../../server/http.js';
-import { getSpacePhoto } from '../../server/space.js';
-import { getDailyStory } from '../../server/story.js';
 
 /**
- * Tâche planifiée Vercel (vercel.json → crons) : prépare chaque matin l'édition et la photo
- * du jour, pour que le premier enfant n'attende pas la génération.
- * Protégée par CRON_SECRET (Vercel l'envoie automatiquement en « Bearer »).
+ * Tâche planifiée Vercel (vercel.json → crons) : prépare chaque matin la vidéo du jour
+ * (photo NASA + thème IA mis en cache), pour que le premier enfant n'attende pas.
  */
 function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -21,15 +19,12 @@ function authorized(req: Request): boolean {
 
 export const GET = route(async (req) => {
   if (!authorized(req)) throw new HttpError(401, 'Non autorisé.');
-  const [story, photo] = await Promise.all([getDailyStory(), getSpacePhoto()]);
+  const today = await getToday();
   if (hasDatabase()) {
     // Ménage : compteurs expirés et contenus de plus de 30 jours.
     const sql = db();
     await sql`delete from rate_limits where window_start < now() - interval '1 day'`;
     await sql`delete from daily_cache where created_at < now() - interval '30 days'`;
   }
-  return json({
-    story: story.story ? { ok: true, provider: story.provider } : { ok: false },
-    photo: photo ? { ok: true, source: photo.source } : { ok: false }
-  });
+  return json({ ok: true, scenes: today.scenes.length, sources: today.sources });
 });

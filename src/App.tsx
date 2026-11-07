@@ -1,46 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import confetti from 'canvas-confetti';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
-import { Header } from './components/Header';
-import { HeroBanner } from './components/HeroBanner';
-import { CartoonPlayer } from './components/CartoonPlayer';
-import { SoundQuizCard } from './components/SoundQuizCard';
-import { AnimalSoundCard } from './components/AnimalSoundCard';
-import { MysteryBubbleCard } from './components/MysteryBubbleCard';
-import { BedtimeStoryCard } from './components/BedtimeStoryCard';
-import { DiscoveriesView } from './components/DiscoveriesView';
-import { BadgesModal } from './components/BadgesModal';
-import { InteractiveWordModal } from './components/InteractiveWordModal';
+import { Onboarding } from './components/Onboarding';
+import { Home } from './components/Home';
+import { Library } from './components/Library';
+import { TaleReader } from './components/TaleReader';
+import { ActivityPlayer } from './components/ActivityPlayer';
+import { DailyVideo } from './components/DailyVideo';
+import type { Section } from './components/ui';
+import { CONTES } from './data/contes';
+import { CONTES_DU_SOIR } from './data/contesDuSoir';
+import { ACTIVITES } from './data/activites';
+import { purgeLegacyStorage, useDone, useProfile } from './lib/profile';
+import { cachedToday, fetchToday } from './lib/today';
+import { stopSpeaking } from './utils/soundEffects';
+import type { Today } from '../shared/schemas';
 
-import type { DailyActivityPackage, UserProgress, VocabularyWord } from './types/news';
-import { SpacePhotoCard } from './components/SpacePhotoCard';
-import {
-  fetchSpacePhoto,
-  type SpacePhotoData,
-  fetchTodayStory,
-  loadCachedStory,
-  loadSavedProgress,
-  pickAnotherStory,
-  purgeLegacyStorage,
-  saveProgress,
-  SPEECH_RATE
-} from './services/newsService';
-import { computeStarsCount, determineEarnedBadges } from './utils/screenTime';
-import { soundEffects, speakFrenchText, stopSpeaking } from './utils/soundEffects';
+type View =
+  | { name: 'home' }
+  | { name: 'profile' }
+  | { name: 'video' }
+  | { name: 'library'; section: 'contes' | 'activites' | 'soir' }
+  | { name: 'tale'; section: 'contes' | 'soir'; id: string }
+  | { name: 'activity'; id: string };
 
-/** Recalcule étoiles et badges à partir de l'état brut (une seule source de vérité). */
-function withDerived(p: UserProgress): UserProgress {
-  const starsEarned = computeStarsCount(p.completedActivities);
-  const unlockedBadges = [...new Set([...p.unlockedBadges, ...determineEarnedBadges({ ...p, starsEarned })])];
-  return { ...p, starsEarned, unlockedBadges };
-}
-
-/** Statut réseau réel du navigateur (le mode hors ligne s'active tout seul). */
-function useOffline() {
-  const [offline, setOffline] = useState(() => typeof navigator !== 'undefined' && !navigator.onLine);
+function useOnline() {
+  const [online, setOnline] = useState(() => navigator.onLine);
   useEffect(() => {
-    const on = () => setOffline(false);
-    const off = () => setOffline(true);
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
     window.addEventListener('online', on);
     window.addEventListener('offline', off);
     return () => {
@@ -48,218 +35,124 @@ function useOffline() {
       window.removeEventListener('offline', off);
     };
   }, []);
-  return offline;
+  return online;
 }
-
-/**
- * Carte d'activité animée : apparition douce au défilement, puis un petit « boing »
- * de fête au moment où la mission est réussie.
- */
-function ActivityReveal({ id, index, done, children }: { id: string; index: number; done: boolean; children: React.ReactNode }) {
-  return (
-    <motion.div
-      id={id}
-      initial={{ opacity: 0, y: 28, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ type: 'spring', stiffness: 120, damping: 18, delay: Math.min(index, 2) * 0.06 }}
-    >
-      <motion.div
-        key={done ? 'done' : 'todo'}
-        initial={done ? { scale: 1 } : false}
-        animate={done ? { scale: [1, 1.025, 0.995, 1] } : undefined}
-        transition={{ duration: 0.55, ease: 'easeOut' }}
-      >
-        {children}
-      </motion.div>
-    </motion.div>
-  );
-}
-
-const pageTransition = {
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 },
-  transition: { duration: 0.22, ease: 'easeOut' as const }
-};
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<'videos' | 'discoveries' | 'badges'>('videos');
-  const [currentStory, setCurrentStory] = useState<DailyActivityPackage>(loadCachedStory);
-  const [progress, setProgress] = useState<UserProgress>(loadSavedProgress);
+  const { profile, setProfile } = useProfile();
+  const { done, markDone } = useDone();
+  const [view, setViewState] = useState<View>({ name: 'home' });
+  const [today, setToday] = useState<Today>(cachedToday);
+  const online = useOnline();
 
-  const [isBadgesOpen, setIsBadgesOpen] = useState(false);
-  const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
-  const [isSpeakingState, setIsSpeakingState] = useState(false);
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
-  const [spacePhoto, setSpacePhoto] = useState<SpacePhotoData | null>(null);
-  const isOffline = useOffline();
-
-  // Démarrage : nettoyage des anciennes données et chargement de l'édition du jour.
   useEffect(() => {
     purgeLegacyStorage();
-    fetchTodayStory().then((story) => story && setCurrentStory(story));
-    fetchSpacePhoto().then(setSpacePhoto);
+    fetchToday().then((t) => t && setToday(t));
   }, []);
 
-  const updateProgress = (fn: (p: UserProgress) => UserProgress) => {
-    setProgress((prev) => {
-      const next = withDerived(fn(prev));
-      saveProgress(next);
-      return next;
-    });
+  const setView = (v: View) => {
+    stopSpeaking();
+    window.scrollTo({ top: 0 });
+    setViewState(v);
   };
+  const home = () => setView({ name: 'home' });
 
-  const handleCompleteActivity = (actNum: number) => {
-    if (progress.completedActivities.includes(actNum)) return;
-    const finishesAll = computeStarsCount([...progress.completedActivities, actNum]) >= 5;
-    updateProgress((p) => ({ ...p, completedActivities: [...p.completedActivities, actNum] }));
+  const counts = useMemo(() => {
+    const c = (ids: { id: string }[]) => ({ total: ids.length, done: ids.filter((i) => done.has(i.id)).length });
+    return { contes: c(CONTES), activites: c(ACTIVITES), soir: c(CONTES_DU_SOIR) };
+  }, [done]);
 
-    if (finishesAll) {
-      soundEffects.playFanfare();
-      confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
-      speakFrenchText('Youpi ! Tu as réussi les 5 missions magiques du jour ! Tu es un vrai champion !', {
-        rate: 0.9,
-        pitch: 1.2
-      });
+  /** Prochain contenu de la liste (en priorité un pas encore fait). */
+  const nextId = (list: { id: string }[], current: string) => {
+    const start = list.findIndex((i) => i.id === current);
+    for (let k = 1; k <= list.length; k++) {
+      const cand = list[(start + k) % list.length];
+      if (!done.has(cand.id)) return cand.id;
     }
+    return list[(start + 1) % list.length].id;
   };
 
-  // Chaque mot touché enrichit le vocabulaire (débloque le badge « explorateur des mots »).
-  const handleSelectWord = (word: VocabularyWord) => {
-    setSelectedWord(word);
-    updateProgress((p) =>
-      p.wordsDiscovered.includes(word.word) ? p : { ...p, wordsDiscovered: [...p.wordsDiscovered, word.word] }
+  if (!profile || view.name === 'profile') {
+    return (
+      <Onboarding
+        initial={profile}
+        onDone={(p) => {
+          setProfile(p);
+          home();
+        }}
+      />
     );
-  };
+  }
 
-  const handleTellStory = () => {
-    if (isSpeakingState) {
-      stopSpeaking();
-      setIsSpeakingState(false);
-      return;
+  let screen: React.ReactNode;
+  switch (view.name) {
+    case 'video':
+      screen = <DailyVideo today={today} name={profile.name} onBack={home} />;
+      break;
+    case 'library': {
+      const items = view.section === 'contes' ? CONTES : view.section === 'soir' ? CONTES_DU_SOIR : ACTIVITES;
+      screen = (
+        <Library
+          section={view.section}
+          items={items}
+          done={done}
+          onBack={home}
+          onPick={(id) => setView(view.section === 'activites' ? { name: 'activity', id } : { name: 'tale', section: view.section as 'contes' | 'soir', id })}
+        />
+      );
+      break;
     }
-    setIsSpeakingState(true);
-    const speech = `Bonjour petit explorateur ! Aujourd’hui dans Pulse Kids : ${currentStory.summary} ${currentStory.cartoon.heroName} t’attend pour l’aventure ! Touche l’écran pour commencer !`;
-    speakFrenchText(speech, {
-      rate: SPEECH_RATE,
-      pitch: 1.15,
-      onEnd: () => setIsSpeakingState(false),
-      onError: () => setIsSpeakingState(false)
-    });
-  };
-
-  const handleGenerateAi = async () => {
-    setIsGeneratingAi(true);
-    try {
-      const today = await fetchTodayStory();
-      const next = today && today.id !== currentStory.id ? today : pickAnotherStory(currentStory.id);
-      setCurrentStory(next);
-      soundEffects.playFanfare();
-      confetti({ particleCount: 60 });
-      speakFrenchText('Tadaaa ! Une nouvelle édition magique vient d’arriver !', { rate: 0.9 });
-    } finally {
-      setIsGeneratingAi(false);
+    case 'tale': {
+      const list = view.section === 'contes' ? CONTES : CONTES_DU_SOIR;
+      const tale = list.find((t) => t.id === view.id) ?? list[0];
+      screen = (
+        <TaleReader
+          key={tale.id}
+          tale={tale}
+          name={profile.name}
+          onBack={() => setView({ name: 'library', section: view.section })}
+          onFinished={() => markDone(tale.id)}
+          onNext={() => setView({ name: 'tale', section: view.section, id: nextId(list, tale.id) })}
+        />
+      );
+      break;
     }
-  };
+    case 'activity': {
+      const activity = ACTIVITES.find((a) => a.id === view.id) ?? ACTIVITES[0];
+      screen = (
+        <ActivityPlayer
+          key={activity.id}
+          activity={activity}
+          name={profile.name}
+          onBack={() => setView({ name: 'library', section: 'activites' })}
+          onSolved={() => markDone(activity.id)}
+          onNext={() => setView({ name: 'activity', id: nextId(ACTIVITES, activity.id) })}
+        />
+      );
+      break;
+    }
+    default:
+      screen = (
+        <Home
+          profile={profile}
+          today={today}
+          counts={counts}
+          offline={!online}
+          onOpen={(s: Section) => setView(s === 'video' ? { name: 'video' } : { name: 'library', section: s })}
+          onEditProfile={() => setView({ name: 'profile' })}
+        />
+      );
+  }
 
-  const handleSelectActivity = (actNum: number) => {
-    const switching = currentTab !== 'videos';
-    setCurrentTab('videos');
-    // Attendre la fin de la transition d'onglet avant de défiler.
-    setTimeout(
-      () => document.getElementById(`activity-card-${actNum}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
-      switching ? 320 : 0
-    );
-  };
-
-  const done = (n: number) => progress.completedActivities.includes(n);
+  const viewKey = view.name === 'tale' || view.name === 'activity' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'library' ? `lib-${view.section}` : view.name;
 
   return (
-    <div className="min-h-screen bg-[#FAF7F0] text-slate-800 flex flex-col font-sans antialiased">
-      {/* 1. Header */}
-      <Header
-        currentTab={currentTab}
-        onSelectTab={(tab) => (tab === 'badges' ? setIsBadgesOpen(true) : setCurrentTab(tab))}
-        starsCount={progress.starsEarned}
-        onToggleReadAloud={handleTellStory}
-        isSpeaking={isSpeakingState}
-        isOffline={isOffline}
-      />
-
-      {/* 2. Offline Mode Badge Bar (automatique) */}
-      {isOffline && (
-        <div role="status" className="bg-orange-100 text-orange-900 px-4 py-1.5 text-center text-xs font-bold border-b border-orange-200">
-          ✈️ Mode Hors-Ligne Actif : Les activités fonctionnent 100% sans connexion internet !
-        </div>
-      )}
-
-      {/* 3. Main Body Content */}
-      <MotionConfig reducedMotion="user">
-      <main className="flex-1 max-w-4xl w-full mx-auto p-3 sm:p-6">
-        <AnimatePresence mode="wait" initial={false}>
-        {currentTab === 'videos' ? (
-          <motion.div key="videos" className="space-y-6" {...pageTransition}>
-            <HeroBanner
-              completedActivities={progress.completedActivities}
-              onTellStory={handleTellStory}
-              isSpeaking={isSpeakingState}
-              onSelectActivity={handleSelectActivity}
-            />
-
-            {/* 5 Sequential Interactive News Activities */}
-            <section className="space-y-6 pt-2" key={currentStory.id}>
-              <ActivityReveal id="activity-card-1" index={0} done={done(1)}>
-                <CartoonPlayer
-                  cartoon={currentStory.cartoon}
-                  isCompleted={done(1)}
-                  onComplete={() => handleCompleteActivity(1)}
-                  onSelectWord={handleSelectWord}
-                />
-              </ActivityReveal>
-              <ActivityReveal id="activity-card-2" index={1} done={done(2)}>
-                <SoundQuizCard quiz={currentStory.soundQuiz} isCompleted={done(2)} onComplete={() => handleCompleteActivity(2)} />
-              </ActivityReveal>
-              <ActivityReveal id="activity-card-3" index={2} done={done(3)}>
-                <AnimalSoundCard discovery={currentStory.animalDiscovery} isCompleted={done(3)} onComplete={() => handleCompleteActivity(3)} />
-              </ActivityReveal>
-              <ActivityReveal id="activity-card-4" index={3} done={done(4)}>
-                <MysteryBubbleCard mystery={currentStory.mysteryBubble} isCompleted={done(4)} onComplete={() => handleCompleteActivity(4)} />
-              </ActivityReveal>
-              <ActivityReveal id="activity-card-5" index={4} done={done(5)}>
-                <BedtimeStoryCard tale={currentStory.bedtimeTale} isCompleted={done(5)} onComplete={() => handleCompleteActivity(5)} />
-              </ActivityReveal>
-              {spacePhoto && (
-                <ActivityReveal id="space-photo" index={5} done={false}>
-                  <SpacePhotoCard photo={spacePhoto} />
-                </ActivityReveal>
-              )}
-            </section>
-          </motion.div>
-        ) : (
-          <motion.div key="discoveries" {...pageTransition}>
-            <DiscoveriesView
-              currentStory={currentStory}
-              completedActivities={progress.completedActivities}
-              onSelectActivity={handleSelectActivity}
-              onGenerateNewAiEdition={handleGenerateAi}
-              isGeneratingAi={isGeneratingAi}
-            />
-          </motion.div>
-        )}
-        </AnimatePresence>
-      </main>
-      </MotionConfig>
-
-      {/* 4. Safe Footer for Kids */}
-      <footer className="border-t border-amber-200/80 bg-white/60 py-4 px-4 text-center text-xs font-semibold text-amber-900/70 space-y-1">
-        <p>Pulse Kids • Le journal bienveillant des enfants de 5 ans • Sans publicité • 100% confidentiel</p>
-        <p className="text-[11px] text-slate-500">Développé avec amour pour les p’tits curieux</p>
-      </footer>
-
-      {/* 5. MODALS */}
-      <InteractiveWordModal word={selectedWord} onClose={() => setSelectedWord(null)} />
-      <BadgesModal isOpen={isBadgesOpen} onClose={() => setIsBadgesOpen(false)} unlockedBadgeIds={progress.unlockedBadges} />
-    </div>
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence mode="wait">
+        <motion.div key={viewKey} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+          {screen}
+        </motion.div>
+      </AnimatePresence>
+    </MotionConfig>
   );
 }

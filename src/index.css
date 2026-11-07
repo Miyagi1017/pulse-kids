@@ -1,62 +1,87 @@
 @import "tailwindcss";
-/* Utilitaires animate-in / fade-in / zoom-in déjà utilisés par les composants. */
 @import "tw-animate-css";
 
-/* Respect du réglage « réduire les animations » de l'appareil. */
+/* ---------- Design system Pulse Kids : épuré, joyeux, lisible ---------- */
+@theme {
+  --font-sans: 'Fredoka', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+
+  --color-creme: #fff8ee;
+  --color-encre: #2b2350;
+  --color-doux: #6b6593;
+
+  --color-soleil: #ffc83d;
+  --color-soleil-clair: #fff3cc;
+  --color-corail: #ff7a59;
+  --color-corail-clair: #ffe4dc;
+  --color-menthe: #2fc59a;
+  --color-menthe-clair: #d9f7ec;
+  --color-ciel: #4aa8ff;
+  --color-ciel-clair: #dcefff;
+  --color-lavande: #8b7cf6;
+  --color-lavande-clair: #ece9ff;
+  --color-rose: #ff6fa8;
+  --color-rose-clair: #ffe3ef;
+  --color-nuit: #26215c;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-creme);
+    color: var(--color-encre);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  input {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  :focus-visible {
+    outline: 4px solid var(--color-ciel);
+    outline-offset: 3px;
+  }
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Ombre « bonbon » : douce et colorée, donne du relief sans surcharger. */
+.shadow-bonbon {
+  box-shadow: 0 6px 0 rgb(0 0 0 / 0.08), 0 12px 28px -12px rgb(43 35 80 / 0.25);
+}
+.press {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.press:active {
+  transform: translateY(4px) scale(0.98);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.08);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+.float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-@layer base {
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-  }
-}
-
-/* Playful micro-interactions */
-@keyframes soft-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-.animate-soft-bounce {
-  animation: soft-bounce 3s infinite ease-in-out;
-}
-
-.animate-gentle-pulse {
-  transition: transform 0.2s ease;
-}
-.animate-gentle-pulse:hover {
-  transform: scale(1.04);
-}
-
-.animate-wiggle:hover {
-  transform: rotate(4deg);
-}
-
-/* Custom scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1ede4;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
 }

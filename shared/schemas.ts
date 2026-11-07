@@ -1,120 +1,46 @@
 /**
- * Schémas zod partagés front/back.
- * Toute donnée qui entre (requête client, réponse de l'IA) est validée ici.
+ * Schémas zod partagés front/back : tout contenu qui vient d'un service externe
+ * (IA, réponse d'API) est validé avant d'être montré à un enfant.
  */
 import { z } from 'zod';
 
-// Texte affiché à un enfant : longueur bornée, pas de balises HTML.
-const kidText = (max: number) =>
+// Texte affiché à un enfant : longueur bornée, pas de balises HTML ni de liens.
+export const kidText = (max: number) =>
   z
     .string()
     .trim()
     .min(1)
     .max(max)
-    .refine((s) => !/<[^>]+>/.test(s), 'balises interdites');
+    .refine((s) => !/<[^>]+>/.test(s), 'balises interdites')
+    .refine((s) => !/https?:\/\//i.test(s), 'liens interdits');
 
 const emoji = z.string().trim().min(1).max(16);
 
-export const vocabularyWordSchema = z.object({
-  word: kidText(40),
-  syllables: kidText(60),
-  definition: kidText(240),
-  emoji
+export const sceneBgs = ['soleil', 'ciel', 'menthe', 'lavande', 'nuit', 'rose'] as const;
+
+export const videoSceneSchema = z.object({
+  emoji,
+  text: kidText(260),
+  bg: z.enum(sceneBgs).catch('ciel'),
+  imageUrl: z.string().url().optional(),
+  credit: z.string().max(140).optional()
 });
+export type VideoScene = z.infer<typeof videoSceneSchema>;
 
-const sceneSchema = z.object({
-  id: z.string().max(40),
-  title: kidText(80),
-  narration: kidText(600),
-  durationSeconds: z.number().int().min(5).max(60).catch(15),
-  bgType: z.enum(['workshop', 'space', 'ocean', 'nature', 'windmills']).catch('nature'),
-  character: z.object({
-    name: kidText(40),
-    avatar: emoji,
-    mood: z.enum(['happy', 'thinking', 'proud', 'excited', 'sleepy']).catch('happy'),
-    speech: kidText(200)
-  }),
-  interactiveHotspots: z
-    .array(
-      z.object({
-        id: z.string().max(40),
-        label: kidText(60),
-        xPercent: z.number().min(5).max(95).catch(50),
-        yPercent: z.number().min(5).max(95).catch(50),
-        emoji,
-        soundType: z.string().max(30).catch('pop'),
-        reactionText: kidText(200)
-      })
-    )
-    .max(6),
-  keyWords: z.array(vocabularyWordSchema).max(4)
+/** Ce que l'IA doit renvoyer : un thème du jour en 3 petites scènes. */
+export const aiThemeSchema = z.object({
+  theme: kidText(60),
+  emoji,
+  scenes: z.array(z.object({ emoji, text: kidText(220) })).min(2).max(4)
 });
+export type AiTheme = z.infer<typeof aiThemeSchema>;
 
-const quizSound = z.enum(['water-tap', 'wrench', 'tractor', 'bell', 'chime']);
-
-export const storySchema = z.object({
-  id: z.string().max(60),
+/** Réponse de /api/today. Le prénom n'y figure jamais (placeholder « {p} », remplacé côté appareil). */
+export const todaySchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  tagline: kidText(120),
-  topic: kidText(100),
-  source: kidText(80),
-  summary: kidText(400),
-  cartoon: z.object({
-    title: kidText(100),
-    durationLabel: kidText(30),
-    badgeLabel: kidText(40),
-    heroName: kidText(60),
-    heroDescription: kidText(240),
-    scenes: z.array(sceneSchema).min(1).max(6)
-  }),
-  soundQuiz: z.object({
-    title: kidText(80),
-    question: kidText(200),
-    soundToPlay: z.enum(['water-tap', 'tractor', 'wrench']).catch('water-tap'),
-    options: z
-      .array(
-        z.object({
-          id: z.string().max(40),
-          label: kidText(60),
-          hint: kidText(120),
-          emoji,
-          isCorrect: z.boolean(),
-          soundType: quizSound.catch('chime')
-        })
-      )
-      .min(2)
-      .max(4)
-      .refine((opts) => opts.filter((o) => o.isCorrect).length === 1, 'une seule bonne réponse')
-  }),
-  animalDiscovery: z.object({
-    title: kidText(100),
-    subtitle: kidText(160),
-    animals: z
-      .array(
-        z.object({
-          id: z.string().max(40),
-          name: kidText(40),
-          soundText: kidText(60),
-          emoji,
-          soundType: z.enum(['cow', 'sheep', 'pig', 'chicken']).catch('cow')
-        })
-      )
-      .min(2)
-      .max(6)
-  }),
-  mysteryBubble: z.object({
-    title: kidText(80),
-    question: kidText(200),
-    shortExplanation: kidText(400),
-    detailedSecret: kidText(600),
-    bubbleCount: z.number().int().min(2).max(8).catch(4)
-  }),
-  bedtimeTale: z.object({
-    title: kidText(80),
-    summary: kidText(240),
-    nightTheme: kidText(80),
-    taleText: kidText(1500)
-  })
+  title: kidText(80),
+  emoji,
+  scenes: z.array(videoSceneSchema).min(2).max(12),
+  sources: z.array(z.string().max(60)).max(8)
 });
-
-export type StoryInput = z.infer<typeof storySchema>;
+export type Today = z.infer<typeof todaySchema>;
