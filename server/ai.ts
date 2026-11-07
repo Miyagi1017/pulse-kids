@@ -68,7 +68,7 @@ function chatCompletionsProvider(name: string, baseUrl: string, model: string, a
 }
 
 /** Modèles ouverts servis par Hugging Face (routeur compatible OpenAI). */
-export const DEFAULT_HF_TEXT_MODEL = 'mistralai/Mistral-Small-24B-Instruct-2501'; // Apache 2.0, très bon en français
+export const DEFAULT_HF_TEXT_MODEL = 'openai/gpt-oss-20b'; // modèle ouvert Apache 2.0, servi par le routeur HF
 
 function huggingFaceProvider(): AiProvider | null {
   const token = process.env.HF_TOKEN;

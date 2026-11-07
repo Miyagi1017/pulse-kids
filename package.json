@@ -35,6 +35,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@gradio/client": "^2.7.2",
+    "@huggingface/inference": "^4.13.32",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^22.14.0",
     "@types/react": "^19.3.0",

@@ -68,8 +68,8 @@ api/                 today · health · cron/daily
 | Validation | zod | MIT |
 | Police | Fredoka (via Fontsource) | SIL OFL 1.1 |
 | Base de données | Neon / Lakebase Postgres, driver `@neondatabase/serverless` | Apache 2.0 / MIT |
-| Illustrations des contes | **FLUX.1-schnell** via Hugging Face, compressées avec sharp | Apache 2.0 |
-| Thème du jour (IA) | **Mistral Small 24B** via Hugging Face (ou tout modèle ouvert : Qwen, Llama via Ollama…) | Apache 2.0 |
+| Illustrations des contes | **FLUX.1-schnell** via le Space officiel Hugging Face (client Gradio), compressées avec sharp | Apache 2.0 |
+| Thème du jour (IA) | **gpt-oss-20b** via Hugging Face (ou tout modèle ouvert : Qwen, Llama via Ollama…) | Apache 2.0 |
 | Météo | Open-Meteo | AGPL (données CC BY 4.0) |
 | Photos de l’espace | NASA APOD & Image Library | Domaine public |
 | Synthèse vocale | Web Speech API du navigateur | Standard W3C |
