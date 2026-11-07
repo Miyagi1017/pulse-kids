@@ -1,10 +1,11 @@
 import { GoogleGenAI } from '@google/genai';
 
 /**
- * Génération de JSON par IA avec plusieurs fournisseurs, essayés dans l'ordre :
- *   1. Google Gemini            (GEMINI_API_KEY, GEMINI_MODEL)
+ * Génération de JSON par IA avec plusieurs fournisseurs, essayés dans l'ordre (open source d'abord) :
+ *   1. Modèle open source via Hugging Face (HF_TOKEN, HF_TEXT_MODEL) — Apache 2.0 par défaut
  *   2. Toute API compatible OpenAI (AI_API_KEY, AI_BASE_URL, AI_MODEL)
- *      → Groq, OpenRouter, Mistral, Together, DeepSeek, Ollama, LM Studio…
+ *      → Ollama / LM Studio (local, open source), Groq, OpenRouter, Mistral…
+ *   3. Google Gemini (GEMINI_API_KEY) — propriétaire, en dernier recours
  * Le premier qui répond un JSON valide gagne. Aucun fournisseur → null.
  */
 
@@ -33,15 +34,11 @@ function geminiProvider(): AiProvider | null {
   };
 }
 
-/** Exemples : https://api.groq.com/openai/v1 · https://openrouter.ai/api/v1 · https://api.mistral.ai/v1 */
-function openAiCompatibleProvider(): AiProvider | null {
-  const apiKey = process.env.AI_API_KEY;
-  const baseUrl = process.env.AI_BASE_URL;
-  const model = process.env.AI_MODEL;
-  if (!baseUrl || !model) return null;
+/** Client générique pour toute API « chat/completions » compatible OpenAI. */
+function chatCompletionsProvider(name: string, baseUrl: string, model: string, apiKey?: string): AiProvider {
   const endpoint = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
   return {
-    name: `openai-compatible:${new URL(endpoint).host}:${model}`,
+    name: `${name}:${new URL(endpoint).host}:${model}`,
     async generate(prompt) {
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -70,8 +67,25 @@ function openAiCompatibleProvider(): AiProvider | null {
   };
 }
 
+/** Modèles ouverts servis par Hugging Face (routeur compatible OpenAI). */
+export const DEFAULT_HF_TEXT_MODEL = 'mistralai/Mistral-Small-24B-Instruct-2501'; // Apache 2.0, très bon en français
+
+function huggingFaceProvider(): AiProvider | null {
+  const token = process.env.HF_TOKEN;
+  if (!token) return null;
+  return chatCompletionsProvider('huggingface', 'https://router.huggingface.co/v1', process.env.HF_TEXT_MODEL || DEFAULT_HF_TEXT_MODEL, token);
+}
+
+/** Exemples : http://localhost:11434/v1 (Ollama) · https://api.groq.com/openai/v1 · https://openrouter.ai/api/v1 */
+function openAiCompatibleProvider(): AiProvider | null {
+  const baseUrl = process.env.AI_BASE_URL;
+  const model = process.env.AI_MODEL;
+  if (!baseUrl || !model) return null;
+  return chatCompletionsProvider('openai-compatible', baseUrl, model, process.env.AI_API_KEY);
+}
+
 export function availableProviders(): AiProvider[] {
-  return [geminiProvider(), openAiCompatibleProvider()].filter((p): p is AiProvider => p !== null);
+  return [huggingFaceProvider(), openAiCompatibleProvider(), geminiProvider()].filter((p): p is AiProvider => p !== null);
 }
 
 export function hasAi(): boolean {

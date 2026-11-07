@@ -10,6 +10,7 @@ import type { Section } from './components/ui';
 import { CONTES } from './data/contes';
 import { CONTES_DU_SOIR } from './data/contesDuSoir';
 import { ACTIVITES, CATEGORY_INFO } from './data/activites';
+import { illustrationFor } from './data/illustrations';
 import { purgeLegacyStorage, useDone, useProfile } from './lib/profile';
 import { cachedToday, fetchToday } from './lib/today';
 import { stopSpeaking } from './utils/soundEffects';
@@ -90,7 +91,8 @@ export default function App() {
       screen = <DailyVideo today={today} name={profile.name} onBack={home} />;
       break;
     case 'library': {
-      const items = view.section === 'contes' ? CONTES : view.section === 'soir' ? CONTES_DU_SOIR : ACTIVITES;
+      const items =
+        view.section === 'activites' ? ACTIVITES : (view.section === 'contes' ? CONTES : CONTES_DU_SOIR).map((t) => ({ ...t, image: illustrationFor(t.id) }));
       screen = (
         <Library
           section={view.section}

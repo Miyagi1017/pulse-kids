@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test \"src/**/*.test.ts\" \"shared/**/*.test.ts\" \"server/**/*.test.ts\"",
     "check": "npm run typecheck && npm test && npm run build",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "illustrations": "tsx scripts/generate-illustrations.ts"
   },
   "dependencies": {
     "@fontsource/fredoka": "^5.3.0",
@@ -39,6 +40,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "esbuild": "^0.28.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"

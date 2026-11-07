@@ -9,6 +9,7 @@ export interface LibraryItem {
   emoji: string;
   title: string;
   category?: string;
+  image?: string;
 }
 
 export type CategoryLabels = Record<string, { label: string; emoji: string }>;
@@ -83,9 +84,13 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
                       ✓
                     </span>
                   )}
-                  <span className={`w-16 h-16 rounded-2xl ${dark ? 'bg-white/10' : st.soft} flex items-center justify-center text-4xl`} aria-hidden>
-                    {item.emoji}
-                  </span>
+                  {item.image ? (
+                    <img src={item.image} alt="" loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover rounded-2xl" />
+                  ) : (
+                    <span className={`w-16 h-16 rounded-2xl ${dark ? 'bg-white/10' : st.soft} flex items-center justify-center text-4xl`} aria-hidden>
+                      {item.emoji}
+                    </span>
+                  )}
                   <span className="font-semibold leading-snug">{item.title}</span>
                 </button>
               </motion.li>

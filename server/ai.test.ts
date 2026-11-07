@@ -9,21 +9,21 @@ test('extractJson lit du JSON nu, dans un bloc ```json ou entouré de texte', ()
   assert.throws(() => extractJson('pas de json'));
 });
 
-test('les fournisseurs sont activés par les variables d’environnement, Gemini en premier', () => {
+test('ordre des fournisseurs : open source d’abord (Hugging Face, OpenAI-compatible), Gemini en dernier', () => {
   const saved = { ...process.env };
   try {
-    delete process.env.GEMINI_API_KEY;
-    delete process.env.AI_BASE_URL;
-    delete process.env.AI_MODEL;
+    for (const k of ['HF_TOKEN', 'HF_TEXT_MODEL', 'GEMINI_API_KEY', 'AI_BASE_URL', 'AI_MODEL']) delete process.env[k];
     assert.equal(availableProviders().length, 0);
 
-    process.env.AI_BASE_URL = 'https://api.groq.com/openai/v1/';
-    process.env.AI_MODEL = 'llama-3.3-70b-versatile';
-    assert.deepEqual(availableProviders().map((p) => p.name), ['openai-compatible:api.groq.com:llama-3.3-70b-versatile']);
-
     process.env.GEMINI_API_KEY = 'test';
-    assert.equal(availableProviders()[0].name.startsWith('gemini:'), true);
-    assert.equal(availableProviders().length, 2);
+    process.env.AI_BASE_URL = 'http://localhost:11434/v1/';
+    process.env.AI_MODEL = 'qwen2.5:7b';
+    process.env.HF_TOKEN = 'hf_test';
+    const names = availableProviders().map((p) => p.name);
+    assert.equal(names.length, 3);
+    assert.ok(names[0].startsWith('huggingface:router.huggingface.co:'), names[0]);
+    assert.equal(names[1], 'openai-compatible:localhost:11434:qwen2.5:7b');
+    assert.ok(names[2].startsWith('gemini:'));
   } finally {
     process.env = saved;
   }

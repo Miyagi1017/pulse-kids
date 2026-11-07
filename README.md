@@ -25,7 +25,7 @@ Simple, joyeux, personnalisé avec le prénom de l’enfant — sans publicité,
 | | | |
 |---|---|---|
 | 🎬 | **La vidéo du jour** | Un petit dessin animé narré et sous-titré, construit chaque jour à partir des vraies infos : date, saison, **météo en direct**, **photo NASA**, anecdote « Le savais-tu ? » et thème écrit par l’IA |
-| 📖 | **50 contes** | Histoires de journée, page par page, lues à voix haute |
+| 📖 | **50 contes** | Histoires de journée, page par page, lues à voix haute, **illustrées et animées** (zoom lent, particules selon le sujet) |
 | 🧩 | **110 activités** | 50 jeux classiques (devinettes, compter, trouve l’intrus) **+ 60 jeux d’apprentissage** mélangés : 🗣️ langue · 💛 savoir-être · 🙏 savoir-vivre · 🤖 découvrir l’IA · ⏰ discipline — avec « Oui ou non ? » et « Remets dans l’ordre », jouables sans savoir lire |
 | 🌙 | **50 contes du soir** | Fond étoilé, voix lente, fin apaisante et petite berceuse |
 
@@ -60,6 +60,22 @@ server/              IA multi-fournisseurs, NASA, météo, cache, rate-limit
 api/                 today · health · cron/daily
 ```
 
+## 💚 100 % open source
+
+| Brique | Projet | Licence |
+|---|---|---|
+| Interface | React, Vite, Tailwind CSS, motion, lucide, canvas-confetti, tw-animate-css | MIT / ISC |
+| Validation | zod | MIT |
+| Police | Fredoka (via Fontsource) | SIL OFL 1.1 |
+| Base de données | Neon / Lakebase Postgres, driver `@neondatabase/serverless` | Apache 2.0 / MIT |
+| Illustrations des contes | **FLUX.1-schnell** via Hugging Face, compressées avec sharp | Apache 2.0 |
+| Thème du jour (IA) | **Mistral Small 24B** via Hugging Face (ou tout modèle ouvert : Qwen, Llama via Ollama…) | Apache 2.0 |
+| Météo | Open-Meteo | AGPL (données CC BY 4.0) |
+| Photos de l’espace | NASA APOD & Image Library | Domaine public |
+| Synthèse vocale | Web Speech API du navigateur | Standard W3C |
+
+Les illustrations sont générées **une seule fois** (`npm run illustrations`) puis embarquées : l’enfant n’appelle jamais Hugging Face. Gemini reste possible mais uniquement en dernier recours, si aucun fournisseur ouvert n’est configuré.
+
 ## 🔐 Sécurité & vie privée
 
 - **Aucune donnée personnelle côté serveur** : pas de compte ; le prénom est inséré localement (`{p}` dans les textes).
@@ -82,7 +98,9 @@ Tout fonctionne sans configuration. Options (voir `.env.example`) :
 | Variable | Active |
 |---|---|
 | `DATABASE_URL` | Cache partagé du jour + limitation de débit (Neon : `neon init && neon deploy`, puis `npm run db:migrate`) |
-| `GEMINI_API_KEY` **ou** `AI_BASE_URL` + `AI_MODEL` (+ `AI_API_KEY`) | Thème du jour écrit par l’IA (Gemini, Groq, OpenRouter, Mistral, Ollama…) |
+| `HF_TOKEN` | Illustrations (`npm run illustrations`) + thème du jour avec un modèle ouvert Hugging Face |
+| `AI_BASE_URL` + `AI_MODEL` (+ `AI_API_KEY`) | Autre fournisseur compatible OpenAI (Ollama local, Groq, OpenRouter…) |
+| `GEMINI_API_KEY` | Gemini (propriétaire), en dernier recours |
 | `NASA_API_KEY` | Clé NASA perso (sinon `DEMO_KEY` puis la bibliothèque d’images sans clé) |
 | `CRON_SECRET` | Protège la tâche planifiée |
 
@@ -91,6 +109,7 @@ Tout fonctionne sans configuration. Options (voir `.env.example`) :
 | `npm run dev` | Front + API en local |
 | `npm run check` | Typecheck + tests + build |
 | `npm run db:migrate` | Crée les tables Neon |
+| `npm run illustrations` | Génère les illustrations manquantes (FLUX.1-schnell) |
 
 ## 🚢 Déploiement
 

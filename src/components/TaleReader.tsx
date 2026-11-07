@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { personalize, type Tale } from '../data/format';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
 import { SpeakButton, TopBar } from './ui';
+import { TaleScene } from './TaleScene';
 
 /**
  * Lecteur de conte page par page : gros emoji animé, texte large, lecture à voix haute
@@ -100,16 +101,9 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: night ? 0.5 : 0.3 }}
-              className="flex-1 flex flex-col items-center justify-center text-center gap-8 py-6"
+              className="flex-1 flex flex-col items-center justify-center text-center gap-6 py-4"
             >
-              <motion.div
-                className="text-8xl sm:text-9xl"
-                animate={{ y: [0, -10, 0], rotate: night ? 0 : [0, 4, -4, 0] }}
-                transition={{ duration: night ? 5 : 3, repeat: Infinity, ease: 'easeInOut' }}
-                aria-hidden
-              >
-                {tale.emoji}
-              </motion.div>
+              <TaleScene tale={tale} page={page} />
               <p className={`text-2xl sm:text-3xl leading-relaxed font-medium ${night ? 'text-white/95' : ''}`}>{pages[page]}</p>
             </motion.section>
           ) : (

@@ -4,6 +4,7 @@ import { CONTES } from './contes';
 import { CONTES_DU_SOIR } from './contesDuSoir';
 import { ACTIVITES } from './activites';
 import { JEUX } from './jeux';
+import { ambienceFor } from './ambience';
 import { personalize } from './format';
 import { cleanName } from '../lib/profile';
 
@@ -24,6 +25,12 @@ for (const [label, list] of [['contes', CONTES], ['contes du soir', CONTES_DU_SO
     }
   });
 }
+
+test('chaque conte a une ambiance animée adaptée à son sujet', () => {
+  assert.deepEqual(ambienceFor(CONTES.find((t) => t.title.includes('Baleine'))!).motion, 'rise');
+  assert.deepEqual(ambienceFor(CONTES.find((t) => t.title.includes('bonhomme de neige'))!).motion, 'fall');
+  for (const t of [...CONTES, ...CONTES_DU_SOIR]) assert.ok(ambienceFor(t).particles.length > 0, t.id);
+});
 
 test('le prénom personnalise les textes, avec un repli', () => {
   assert.equal(personalize('Bonne nuit, {p} !', 'Léa'), 'Bonne nuit, Léa !');
