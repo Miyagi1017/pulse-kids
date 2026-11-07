@@ -1,31 +1,22 @@
 import React from 'react';
-import { Volume2, Lock, Sparkles, Star, Award, Wifi, WifiOff, Clock } from 'lucide-react';
-import { formatTimeDisplay } from '../utils/screenTime';
+import { Volume2, Sparkles, Star, Award, Wifi, WifiOff } from 'lucide-react';
 
 interface HeaderProps {
   currentTab: 'videos' | 'discoveries' | 'badges';
   onSelectTab: (tab: 'videos' | 'discoveries' | 'badges') => void;
   starsCount: number;
-  timeRemainingSeconds: number;
-  isWarning: boolean;
-  onOpenParents: () => void;
   onToggleReadAloud: () => void;
   isSpeaking: boolean;
   isOffline: boolean;
-  onToggleOffline: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentTab,
   onSelectTab,
   starsCount,
-  timeRemainingSeconds,
-  isWarning,
-  onOpenParents,
   onToggleReadAloud,
   isSpeaking,
-  isOffline,
-  onToggleOffline
+  isOffline
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-[#FAF7F0]/95 backdrop-blur-md border-b border-amber-200/70 px-3 py-2.5 sm:px-6 sm:py-3 shadow-xs">
@@ -54,24 +45,28 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Quick status bar on mobile */}
           <div className="flex items-center gap-2 md:hidden">
-            {/* Screen time indicator */}
-            <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors ${
-              isWarning
-                ? 'bg-red-100 text-red-700 border-red-300 animate-pulse'
-                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            }`}>
-              <Clock className="w-3.5 h-3.5" />
-              <span>{formatTimeDisplay(timeRemainingSeconds)}</span>
+            {/* Network status (mobile) */}
+            <div
+              role="status"
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors ${
+                isOffline
+                  ? 'bg-orange-100 text-orange-800 border-orange-300'
+                  : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              }`}
+            >
+              {isOffline ? <WifiOff className="w-3.5 h-3.5" /> : <Wifi className="w-3.5 h-3.5" />}
+              <span>{isOffline ? 'Hors ligne' : 'En ligne'}</span>
             </div>
 
-            {/* Parents button mobile */}
+            {/* Read aloud (mobile) */}
             <button
-              onClick={onOpenParents}
-              className="flex items-center gap-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full text-xs font-bold border border-indigo-200 shadow-xs"
-              aria-label="Accès Espace Parents"
+              onClick={onToggleReadAloud}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs ${
+                isSpeaking ? 'bg-teal-500 text-white border-teal-600 animate-pulse' : 'bg-teal-400 text-teal-950 border-teal-500'
+              }`}
+              aria-label="Écouter la voix magique"
             >
-              <Lock className="w-3.5 h-3.5" />
-              <span>Parents</span>
+              <Volume2 className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
@@ -117,19 +112,19 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action buttons (Right) */}
         <div className="hidden md:flex items-center gap-2.5">
-          {/* Offline mode indicator/toggle */}
-          <button
-            onClick={onToggleOffline}
+          {/* Real network status (offline mode works automatically) */}
+          <div
+            role="status"
             title={isOffline ? "Mode hors-ligne actif (sans internet)" : "Connecté à internet"}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
               isOffline
                 ? 'bg-orange-100 text-orange-800 border-orange-300'
-                : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
             }`}
           >
             {isOffline ? <WifiOff className="w-3.5 h-3.5 text-orange-600" /> : <Wifi className="w-3.5 h-3.5 text-emerald-600" />}
             <span>{isOffline ? 'Mode Hors Ligne' : 'En Ligne'}</span>
-          </button>
+          </div>
 
           {/* Read aloud global button */}
           <button
@@ -143,29 +138,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Volume2 className={`w-4 h-4 ${isSpeaking ? 'animate-bounce' : ''}`} />
             <span>{isSpeaking ? 'En train de parler...' : 'Écoute-moi !'}</span>
-          </button>
-
-          {/* Screen time pill */}
-          <div
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold border ${
-              isWarning
-                ? 'bg-red-100 text-red-800 border-red-300 animate-pulse'
-                : 'bg-amber-100/90 text-amber-900 border-amber-300'
-            }`}
-            title="Temps d'écran restant"
-          >
-            <Clock className="w-4 h-4 text-amber-800" />
-            <span>{formatTimeDisplay(timeRemainingSeconds)}</span>
-          </div>
-
-          {/* Parental button */}
-          <button
-            onClick={onOpenParents}
-            className="flex items-center gap-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold border border-indigo-300 shadow-xs transition-transform active:scale-95"
-            aria-label="Accès Contrôle Parental"
-          >
-            <Lock className="w-3.5 h-3.5 text-indigo-700" />
-            <span>Parents</span>
           </button>
         </div>
 

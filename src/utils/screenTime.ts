@@ -1,4 +1,4 @@
-import { ParentalSettings, UserProgress } from '../types/news';
+import type { UserProgress } from '../types/news';
 
 export function calculateRemainingSeconds(
   allowedMinutes: number,
@@ -31,14 +31,6 @@ export function formatTimeDisplay(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-export function verifyParentPin(entered: string, correctPin: string): boolean {
-  return entered.trim() === correctPin.trim();
-}
-
-export function verifyAdultChallenge(num1: number, num2: number, answer: number): boolean {
-  return num1 * num2 === answer || num1 + num2 === answer;
 }
 
 export function computeStarsCount(completedActivities: number[]): number {

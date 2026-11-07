@@ -3,14 +3,14 @@ import { Volume2, Sparkles, CheckCircle2 } from 'lucide-react';
 import { speakFrenchText, stopSpeaking, soundEffects } from '../utils/soundEffects';
 
 interface HeroBannerProps {
-  completedCount: number;
+  completedActivities: number[];
   onTellStory: () => void;
   isSpeaking: boolean;
   onSelectActivity: (activityNum: number) => void;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
-  completedCount,
+  completedActivities,
   onTellStory,
   isSpeaking,
   onSelectActivity
@@ -85,7 +85,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         {/* 1 -> 2 -> 3 -> 4 -> 5 step indicators */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           {[1, 2, 3, 4, 5].map((num, idx) => {
-            const isDone = completedCount >= num;
+            const isDone = completedActivities.includes(num);
             return (
               <React.Fragment key={num}>
                 <button

@@ -87,22 +87,6 @@ export interface DailyActivityPackage {
   };
 }
 
-export interface ParentalSettings {
-  pin: string;
-  screenTimeMinutes: number;
-  audioWarningMinutesBefore: number;
-  speechRate: number; // 0.8 for slow kid pace
-  soundEffectsEnabled: boolean;
-  autoPlayNextActivity: boolean;
-  dailyGoalStars: number;
-  topicsAllowed: {
-    nature: boolean;
-    science: boolean;
-    animals: boolean;
-    inventions: boolean;
-    space: boolean;
-  };
-}
 
 export interface UserProgress {
   completedActivities: number[]; // e.g. [1, 2, 3]

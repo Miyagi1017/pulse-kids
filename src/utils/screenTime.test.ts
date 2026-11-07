@@ -5,7 +5,6 @@ import {
   isSessionExpired,
   isWarningTimeReached,
   formatTimeDisplay,
-  verifyParentPin,
   computeStarsCount,
   determineEarnedBadges
 } from './screenTime';
@@ -42,12 +41,6 @@ test('formatTimeDisplay formats minutes and seconds with leading zero', () => {
   assert.equal(formatTimeDisplay(65), '1:05');
   assert.equal(formatTimeDisplay(9), '0:09');
   assert.equal(formatTimeDisplay(0), '0:00');
-});
-
-test('verifyParentPin validates pin with trim', () => {
-  assert.equal(verifyParentPin('1234', '1234'), true);
-  assert.equal(verifyParentPin(' 1234 ', '1234'), true);
-  assert.equal(verifyParentPin('0000', '1234'), false);
 });
 
 test('computeStarsCount caps at 5 and counts unique completed activities', () => {

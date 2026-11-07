@@ -1,137 +1,106 @@
-import { DailyActivityPackage, ParentalSettings, UserProgress } from '../types/news';
+import type { DailyActivityPackage, UserProgress } from '../types/news';
 import { INITIAL_DAILY_STORIES } from '../data/dailyStories';
-import { computeStarsCount, determineEarnedBadges } from '../utils/screenTime';
+import { storySchema } from '../../shared/schemas';
 
 const STORAGE_KEYS = {
-  CURRENT_STORY: 'pulse_kids_current_story_v1',
-  PROGRESS: 'pulse_kids_progress_v1',
-  SETTINGS: 'pulse_kids_parental_settings_v1',
-  OFFLINE_MODE: 'pulse_kids_offline_mode_v1',
+  STORY: 'pulse_kids_story_v2',
+  PROGRESS: 'pulse_kids_progress_v2',
+  // Anciennes clés (dont l'ancien code PIN stocké en clair) : supprimées au démarrage.
+  LEGACY: ['pulse_kids_current_story_v1', 'pulse_kids_progress_v1', 'pulse_kids_parental_settings_v1', 'pulse_kids_offline_mode_v1']
 };
 
-export const DEFAULT_PARENTAL_SETTINGS: ParentalSettings = {
-  pin: '1234',
-  screenTimeMinutes: 15, // 15 min screen time per user requirement
-  audioWarningMinutesBefore: 2,
-  speechRate: 0.85,
-  soundEffectsEnabled: true,
-  autoPlayNextActivity: false,
-  dailyGoalStars: 5,
-  topicsAllowed: {
-    nature: true,
-    science: true,
-    animals: true,
-    inventions: true,
-    space: true,
-  }
-};
+/** Rythme de lecture adapté aux enfants de 5 ans. */
+export const SPEECH_RATE = 0.85;
 
-export const DEFAULT_USER_PROGRESS: UserProgress = {
-  completedActivities: [],
-  starsEarned: 0,
-  unlockedBadges: ['curieux-debutant'],
-  wordsDiscovered: ['bâtisseur', 'chaudière', 'radiateur'],
-  timeSpentSecondsToday: 0,
-  lastVisitDate: new Date().toISOString().slice(0, 10)
-};
+export function todayKey(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
+}
 
-export function loadSavedSettings(): ParentalSettings {
-  if (typeof window === 'undefined') return DEFAULT_PARENTAL_SETTINGS;
+export function emptyProgress(): UserProgress {
+  return {
+    completedActivities: [],
+    starsEarned: 0,
+    unlockedBadges: ['curieux-debutant'],
+    wordsDiscovered: [],
+    timeSpentSecondsToday: 0,
+    lastVisitDate: todayKey()
+  };
+}
+
+function read<T>(key: string): T | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-    if (!raw) return DEFAULT_PARENTAL_SETTINGS;
-    return { ...DEFAULT_PARENTAL_SETTINGS, ...JSON.parse(raw) };
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
   } catch {
-    return DEFAULT_PARENTAL_SETTINGS;
+    return null;
   }
 }
 
-export function saveSettings(settings: ParentalSettings) {
-  if (typeof window === 'undefined') return;
+function write(key: string, value: unknown) {
   try {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-  } catch (err) {
-    console.error('Failed to save settings:', err);
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* quota / navigation privée : l'app continue en mémoire */
   }
 }
+
+export function purgeLegacyStorage() {
+  try {
+    STORAGE_KEYS.LEGACY.forEach((k) => localStorage.removeItem(k));
+  } catch {
+    /* ignore */
+  }
+}
+
+// ---- Progression ----
 
 export function loadSavedProgress(): UserProgress {
-  if (typeof window === 'undefined') return DEFAULT_USER_PROGRESS;
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const raw = localStorage.getItem(STORAGE_KEYS.PROGRESS);
-    if (!raw) return { ...DEFAULT_USER_PROGRESS, lastVisitDate: today };
-    const parsed: UserProgress = JSON.parse(raw);
-
-    // Reset daily counters if new day
-    if (parsed.lastVisitDate !== today) {
-      return {
-        ...parsed,
-        completedActivities: [],
-        starsEarned: 0,
-        timeSpentSecondsToday: 0,
-        lastVisitDate: today
-      };
-    }
-    return parsed;
-  } catch {
-    return DEFAULT_USER_PROGRESS;
+  const parsed = read<UserProgress>(STORAGE_KEYS.PROGRESS);
+  if (!parsed) return emptyProgress();
+  if (parsed.lastVisitDate !== todayKey()) {
+    // Nouveau jour : on garde badges et vocabulaire, les missions repartent à zéro.
+    return { ...parsed, completedActivities: [], starsEarned: 0, timeSpentSecondsToday: 0, lastVisitDate: todayKey() };
   }
+  return parsed;
 }
 
 export function saveProgress(progress: UserProgress) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
-  } catch (err) {
-    console.error('Failed to save progress:', err);
-  }
+  write(STORAGE_KEYS.PROGRESS, progress);
 }
 
-export function loadCurrentStory(): DailyActivityPackage {
-  if (typeof window === 'undefined') return INITIAL_DAILY_STORIES[0];
+// ---- Édition du jour ----
+
+/** Histoire embarquée choisie selon la date : elle change chaque jour, même hors ligne. */
+export function localStoryForToday(): DailyActivityPackage {
+  const day = Math.floor(Date.parse(todayKey()) / 86400000);
+  return INITIAL_DAILY_STORIES[day % INITIAL_DAILY_STORIES.length];
+}
+
+export function loadCachedStory(): DailyActivityPackage {
+  const cached = read<{ day: string; story: DailyActivityPackage }>(STORAGE_KEYS.STORY);
+  if (cached?.day === todayKey()) return cached.story;
+  return localStoryForToday();
+}
+
+/** Récupère l'édition IA du jour (revalidée côté client). Renvoie null si indisponible. */
+export async function fetchTodayStory(): Promise<DailyActivityPackage | null> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.CURRENT_STORY);
-    if (raw) return JSON.parse(raw);
+    const res = await fetch('/api/news/today');
+    if (!res.ok) return null;
+    const data = await res.json();
+    const parsed = storySchema.safeParse(data.story);
+    if (!parsed.success) return null;
+    const story = parsed.data as DailyActivityPackage;
+    write(STORAGE_KEYS.STORY, { day: todayKey(), story });
+    return story;
   } catch {
-    // fallback
-  }
-  return INITIAL_DAILY_STORIES[0];
-}
-
-export function saveCurrentStory(story: DailyActivityPackage) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_STORY, JSON.stringify(story));
-  } catch (err) {
-    console.error('Failed to save story:', err);
+    return null;
   }
 }
 
-export async function fetchDailyNewsAi(isOffline: boolean): Promise<DailyActivityPackage> {
-  // If offline, pick from local pre-packaged stories
-  if (isOffline) {
-    const storyIdx = Math.floor(Math.random() * INITIAL_DAILY_STORIES.length);
-    return INITIAL_DAILY_STORIES[storyIdx];
-  }
-
-  try {
-    const res = await fetch('/api/news/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.story) {
-        saveCurrentStory(data.story);
-        return data.story;
-      }
-    }
-  } catch (err) {
-    console.warn('API generation failed, falling back to local story archive:', err);
-  }
-
-  // Fallback to rotating local story
-  const randomStory = INITIAL_DAILY_STORIES[Math.floor(Math.random() * INITIAL_DAILY_STORIES.length)];
-  return randomStory;
+/** Autre histoire de la bibliothèque (bouton « nouvelle édition »). */
+export function pickAnotherStory(currentId: string): DailyActivityPackage {
+  const others = INITIAL_DAILY_STORIES.filter((s) => s.id !== currentId);
+  return others[Math.floor(Math.random() * others.length)] ?? INITIAL_DAILY_STORIES[0];
 }
