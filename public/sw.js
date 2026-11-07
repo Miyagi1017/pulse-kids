@@ -3,7 +3,7 @@
  * - Assets (JS/CSS/polices/icônes) : cache d'abord (fichiers versionnés par Vite).
  * - /api : jamais mis en cache (données personnelles), sauf l'édition du jour.
  */
-const VERSION = 'pk-v2';
+const VERSION = 'pk-v3';
 const SHELL = ['/', '/index.html', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -24,12 +24,12 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  const sameOrigin = url.origin === self.location.origin;
-  const isFont = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
-  if (!sameOrigin && !isFont) return;
+  // Ressources externes (photos NASA) : laissées au navigateur.
+  if (url.origin !== self.location.origin) return;
 
-  if (sameOrigin && url.pathname.startsWith('/api/')) {
-    if (url.pathname !== '/api/news/today') return; // données privées : jamais en cache
+  if (url.pathname.startsWith('/api/')) {
+    // Seul le contenu public du jour est mis en cache (pour l'ouvrir hors ligne).
+    if (url.pathname !== '/api/news/today' && url.pathname !== '/api/space/today') return;
     event.respondWith(networkFirst(req));
     return;
   }

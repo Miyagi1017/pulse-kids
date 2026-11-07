@@ -1,13 +1,16 @@
-import { GoogleGenAI } from '@google/genai';
 import { storySchema, type StoryInput } from '../shared/schemas.js';
-import { db, hasDatabase } from './db.js';
+import { generateJson } from './ai.js';
+import { cacheGet, cacheSet, once } from './cache.js';
 
 export function todayParis(): string {
   // Date « du jour » côté enfants français, indépendante du fuseau du serveur.
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(new Date());
 }
 
-const memoryCache = new Map<string, StoryInput>();
+const validStory = (raw: unknown) => {
+  const r = storySchema.safeParse(raw);
+  return r.success ? r.data : null;
+};
 
 function buildPrompt(day: string): string {
   return `Tu es le rédacteur en chef bienveillant de « PULSE KIDS », un journal animé quotidien pour enfants de 5 ans.
@@ -80,60 +83,24 @@ Réponds UNIQUEMENT avec un objet JSON valide qui respecte exactement cette stru
 Produis 3 scènes, 3 options de quiz, 4 animaux.`;
 }
 
-async function generateWithGemini(day: string): Promise<StoryInput | null> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const ai = new GoogleGenAI({ apiKey });
-  const response = await ai.models.generateContent({
-    model: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
-    contents: buildPrompt(day),
-    config: { responseMimeType: 'application/json', temperature: 0.7 }
-  });
-
-  const raw = JSON.parse(response.text?.trim() || '{}');
-  // On impose l'id/la date : l'IA ne contrôle pas les clés de cache.
-  const parsed = storySchema.safeParse({ ...raw, id: `story-ai-${day}`, date: day });
-  if (!parsed.success) {
-    console.warn('[story] réponse IA rejetée par la validation', parsed.error.issues.slice(0, 3));
-    return null;
-  }
-  return parsed.data;
-}
-
 /**
- * Édition du jour : cache base → génération IA (une seule fois par jour) → null (le client
- * utilise alors ses histoires embarquées).
+ * Édition du jour : cache (mémoire → Postgres) → génération IA (une fois par jour,
+ * Gemini puis API compatible OpenAI) → null (le client utilise ses histoires embarquées).
  */
-export async function getDailyStory(): Promise<{ story: StoryInput | null; cached: boolean }> {
+export async function getDailyStory(): Promise<{ story: StoryInput | null; provider?: string }> {
   const day = todayParis();
+  const key = `story:${day}`;
 
-  const mem = memoryCache.get(day);
-  if (mem) return { story: mem, cached: true };
+  const cached = await cacheGet(key, validStory);
+  if (cached) return { story: cached, provider: 'cache' };
 
-  if (hasDatabase()) {
-    const rows = (await db()`select story from daily_stories where day = ${day}`) as { story: unknown }[];
-    if (rows[0]) {
-      const parsed = storySchema.safeParse(rows[0].story);
-      if (parsed.success) {
-        memoryCache.set(day, parsed.data);
-        return { story: parsed.data, cached: true };
-      }
-    }
-  }
-
-  const story = await generateWithGemini(day).catch((err) => {
-    console.error('[story] génération Gemini échouée', err);
-    return null;
+  return once(key, async () => {
+    const result = await generateJson(buildPrompt(day), (raw) =>
+      // L'id et la date sont imposés : l'IA ne contrôle pas les clés de cache.
+      validStory({ ...(raw as object), id: `story-ai-${day}`, date: day })
+    );
+    if (!result) return { story: null };
+    await cacheSet(key, result.value);
+    return { story: result.value, provider: result.provider };
   });
-  if (!story) return { story: null, cached: false };
-
-  memoryCache.set(day, story);
-  if (hasDatabase()) {
-    await db()`
-      insert into daily_stories (day, story) values (${day}, ${JSON.stringify(story)}::jsonb)
-      on conflict (day) do nothing
-    `;
-  }
-  return { story, cached: false };
 }

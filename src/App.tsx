@@ -13,7 +13,10 @@ import { BadgesModal } from './components/BadgesModal';
 import { InteractiveWordModal } from './components/InteractiveWordModal';
 
 import type { DailyActivityPackage, UserProgress, VocabularyWord } from './types/news';
+import { SpacePhotoCard } from './components/SpacePhotoCard';
 import {
+  fetchSpacePhoto,
+  type SpacePhotoData,
   fetchTodayStory,
   loadCachedStory,
   loadSavedProgress,
@@ -89,12 +92,14 @@ export default function App() {
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
   const [isSpeakingState, setIsSpeakingState] = useState(false);
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [spacePhoto, setSpacePhoto] = useState<SpacePhotoData | null>(null);
   const isOffline = useOffline();
 
   // Démarrage : nettoyage des anciennes données et chargement de l'édition du jour.
   useEffect(() => {
     purgeLegacyStorage();
     fetchTodayStory().then((story) => story && setCurrentStory(story));
+    fetchSpacePhoto().then(setSpacePhoto);
   }, []);
 
   const updateProgress = (fn: (p: UserProgress) => UserProgress) => {
@@ -224,6 +229,11 @@ export default function App() {
               <ActivityReveal id="activity-card-5" index={4} done={done(5)}>
                 <BedtimeStoryCard tale={currentStory.bedtimeTale} isCompleted={done(5)} onComplete={() => handleCompleteActivity(5)} />
               </ActivityReveal>
+              {spacePhoto && (
+                <ActivityReveal id="space-photo" index={5} done={false}>
+                  <SpacePhotoCard photo={spacePhoto} />
+                </ActivityReveal>
+              )}
             </section>
           </motion.div>
         ) : (

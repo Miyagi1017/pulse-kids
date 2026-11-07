@@ -99,6 +99,37 @@ export async function fetchTodayStory(): Promise<DailyActivityPackage | null> {
   }
 }
 
+// ---- Photo de l'espace du jour (NASA) ----
+
+export interface SpacePhotoData {
+  date: string;
+  title: string;
+  caption: string;
+  emoji: string;
+  imageUrl: string;
+  originalTitle: string;
+  credit: string;
+  link: string;
+}
+
+const NASA_HOSTS = ['apod.nasa.gov', 'images-assets.nasa.gov'];
+
+export async function fetchSpacePhoto(): Promise<SpacePhotoData | null> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return null;
+  try {
+    const res = await fetch('/api/space/today');
+    if (!res.ok) return null;
+    const { photo } = (await res.json()) as { photo: SpacePhotoData | null };
+    if (!photo || typeof photo.imageUrl !== 'string') return null;
+    // Défense en profondeur : seules les images NASA https sont affichées.
+    const url = new URL(photo.imageUrl);
+    if (url.protocol !== 'https:' || !NASA_HOSTS.includes(url.hostname)) return null;
+    return photo;
+  } catch {
+    return null;
+  }
+}
+
 /** Autre histoire de la bibliothèque (bouton « nouvelle édition »). */
 export function pickAnotherStory(currentId: string): DailyActivityPackage {
   const others = INITIAL_DAILY_STORIES.filter((s) => s.id !== currentId);
