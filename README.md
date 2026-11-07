@@ -105,6 +105,17 @@ npm run db:migrate                    # créer les tables
 | `npm test` | Tests unitaires (étoiles & badges, validation du contenu) |
 | `npm run db:migrate` | Applique `db/schema.sql` |
 
+## 🚢 Déploiement
+
+Le dépôt est connecté à Vercel : le déploiement est **automatique**.
+
+| Action | Résultat |
+|---|---|
+| Push sur `main` | Mise en production sur [pulse-kids-main.vercel.app](https://pulse-kids-main.vercel.app/) |
+| Push sur une autre branche / pull request | URL de preview pour tester avant de fusionner |
+
+Pensez à lancer `npm run check` avant de pousser.
+
 ## 🧭 API
 
 | Méthode | Route | Description |
