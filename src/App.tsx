@@ -35,6 +35,7 @@ import { CLASSIQUES } from './data/classiques';
 const CONTES = [...CLASSIQUES, ...CONTES_PULSE];
 const CONTES_CATEGORIES = { classiques: { label: 'Les grands classiques', emoji: '📜' }, pulse: { label: 'Les contes Pulse Kids', emoji: '✨' } };
 import { CONTES_DU_SOIR } from './data/contesDuSoir';
+import { personalize } from './data/format';
 import { ACTIVITES, CATEGORY_INFO } from './data/activites';
 import { illustrationFor } from './data/illustrations';
 import { purgeLegacyStorage, useDone, useProfile } from './lib/profile';
@@ -185,7 +186,7 @@ export default function App() {
       const items =
         view.section === 'activites'
           ? ACTIVITES
-          : (view.section === 'contes' ? CONTES : CONTES_DU_SOIR).map((t) => ({ ...t, image: illustrationFor(t.id), category: t.id.startsWith('classique-') ? 'classiques' : 'pulse' }));
+          : (view.section === 'contes' ? CONTES : CONTES_DU_SOIR).map((t) => ({ ...t, title: personalize(t.title, profile.name), image: illustrationFor(t.id), category: t.id.startsWith('classique-') ? 'classiques' : 'pulse' }));
       screen = (
         <Library
           section={view.section}
@@ -286,7 +287,7 @@ export default function App() {
       break;
     }
     case 'lire':
-      screen = <LireLibrary done={done} onBack={home} onPick={(id) => setView({ name: 'lecture', id })} />;
+      screen = <LireLibrary name={profile.name} done={done} onBack={home} onPick={(id) => setView({ name: 'lecture', id })} />;
       break;
     case 'lecture': {
       const lecture = LECTURES.find((l) => l.id === view.id) ?? LECTURES[0];

@@ -1,8 +1,9 @@
 /**
- * 50 contes du soir : rythme lent, images douces, fin apaisante.
+ * 200 contes du soir (ces 50 + les 150 de contesDuSoirPlus.ts) : rythme lent, images douces, fin apaisante.
  * Format : [emoji, titre, pages séparées par « | »]. « {p} » = prénom.
  */
 import { parseTales } from './format';
+import { CONTES_SOIR_PLUS } from './contesDuSoirPlus';
 
 export const CONTES_DU_SOIR = parseTales('soir', [
   ['🌙', 'Bonne nuit, petite lune', 'La petite lune se lève doucement au-dessus des toits.|Elle dit bonne nuit aux arbres, aux chats et aux maisons.|Elle passe devant la fenêtre de {p} et sourit.|« Dors bien, {p}. Je veille sur toi toute la nuit. »'],
@@ -54,5 +55,6 @@ export const CONTES_DU_SOIR = parseTales('soir', [
   ['📖', 'Le livre qui se refermait', 'Le livre de {p} a raconté une belle histoire.|Ses pages se tournent une dernière fois.|Les personnages disent au revoir et rentrent chez eux.|Le livre se referme tout doucement… clap.'],
   ['🌑', 'La nuit est une amie', 'La nuit n’est pas méchante : elle est douce et calme.|Elle donne du repos aux animaux, aux arbres et aux enfants.|Elle allume les étoiles pour qu’on ne soit jamais seul.|Bonne nuit, {p}. La nuit veille sur toi.'],
   ['🐥', 'Le poussin sous l’aile', 'Le petit poussin a un peu froid.|Il se glisse sous l’aile de sa maman poule.|C’est chaud, c’est doux, ça sent bon.|Piou… il s’endort tout de suite.'],
-  ['💤', 'Le dernier bisou', 'La journée est finie, {p}.|Un bisou sur le front, un câlin bien serré.|La couette remonte jusqu’au menton.|Fais de beaux rêves. À demain matin !']
+  ['💤', 'Le dernier bisou', 'La journée est finie, {p}.|Un bisou sur le front, un câlin bien serré.|La couette remonte jusqu’au menton.|Fais de beaux rêves. À demain matin !'],
+  ...CONTES_SOIR_PLUS
 ]);

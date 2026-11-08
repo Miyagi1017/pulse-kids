@@ -14,7 +14,7 @@ export interface LibraryItem {
 
 export type CategoryLabels = Record<string, { label: string; emoji: string }>;
 
-/** Grille des 50 contenus d'un espace : gros emojis, titre court, coche quand c'est fait. */
+/** Grille des contenus d'un espace : gros emojis, titre court, coche quand c'est fait. */
 export function Library({ section, items: allItems, done, onBack, onPick, categories, intro, action, footer }: { section: Section; items: LibraryItem[]; done: Set<string>; onBack: () => void; onPick: (id: string) => void; categories?: CategoryLabels; intro?: ReactNode; action?: { label: string; onClick: () => void }; footer?: (filter: string | null) => ReactNode }) {
   const st = SECTION_STYLE[section];
   const [filter, setFilter] = useState<string | null>(null);

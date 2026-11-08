@@ -20,6 +20,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
   const [page, setPage] = useState(0);
   const [listening, setListening] = useState(false);
   const pages = tale.pages.map((p) => personalize(p, name));
+  const title = personalize(tale.title, name);
   const isEnd = page >= pages.length;
   // Décor : d'après la page en cours, sinon d'après toute l'histoire.
   const taleTheme = sceneFor(`${tale.title} ${pages.join(' ')}`, night ? 'nuit' : 'nature');
@@ -35,7 +36,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
       setListening(false);
       return;
     }
-    const text = page === 0 ? `${tale.title}. ${pages[0]}` : pages[page];
+    const text = page === 0 ? `${title}. ${pages[0]}` : pages[page];
     speakFrenchText(text, {
       rate: night ? 0.75 : 0.88,
       pitch: night ? 1.0 : 1.12,
@@ -81,7 +82,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
       </div>
 
       <TopBar
-        title={tale.title}
+        title={title}
         emoji={tale.emoji}
         onBack={onBack}
         dark={night}

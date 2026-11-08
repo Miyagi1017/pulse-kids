@@ -10,7 +10,7 @@ import { TopBar } from './ui';
 import { burst, pointOf } from './fx';
 
 /** Liste des 200 textes, par niveau. */
-export function LireLibrary({ done, onBack, onPick }: { done: Set<string>; onBack: () => void; onPick: (id: string) => void }) {
+export function LireLibrary({ name, done, onBack, onPick }: { name: string; done: Set<string>; onBack: () => void; onPick: (id: string) => void }) {
   const [niveau, setNiveau] = useState<Niveau>(1);
   const list = LECTURES.filter((l) => l.niveau === niveau);
   return (
@@ -48,7 +48,7 @@ export function LireLibrary({ done, onBack, onPick }: { done: Set<string>; onBac
                 <span className="w-14 h-14 rounded-2xl bg-ciel-clair flex items-center justify-center text-3xl" aria-hidden>
                   {l.emoji}
                 </span>
-                <span className="font-semibold leading-snug">{l.title}</span>
+                <span className="font-semibold leading-snug">{personalize(l.title, name)}</span>
               </motion.button>
             </motion.li>
           ))}
@@ -165,7 +165,7 @@ export function LireReader({ lecture, name, onBack, onDone, onNext }: { lecture:
 
   return (
     <div className="min-h-dvh flex flex-col">
-      <TopBar title={lecture.title} emoji={lecture.emoji} onBack={onBack} />
+      <TopBar title={personalize(lecture.title, name)} emoji={lecture.emoji} onBack={onBack} />
       <main className="flex-1 max-w-3xl w-full mx-auto px-5 py-6 flex flex-col items-center gap-6">
         <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
           {NIVEAUX[lecture.niveau].emoji} {NIVEAUX[lecture.niveau].label}

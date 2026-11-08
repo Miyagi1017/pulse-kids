@@ -10,7 +10,7 @@ import { cleanName } from '../lib/profile';
 
 const FORBIDDEN = /<[^>]+>|https?:\/\/|mort|tuer|sang|guerre|arme|monstre méchant/i;
 
-for (const [label, list, expected] of [['contes', CONTES, 200], ['contes du soir', CONTES_DU_SOIR, 50]] as const) {
+for (const [label, list, expected] of [['contes', CONTES, 200], ['contes du soir', CONTES_DU_SOIR, 200]] as const) {
   test(`${label} : exactement ${expected}, ids uniques, 3 à 6 pages courtes`, () => {
     assert.equal(list.length, expected);
     assert.equal(new Set(list.map((t) => t.id)).size, expected);
