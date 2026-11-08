@@ -8,7 +8,7 @@ import type { Playable } from '../lib/playlist';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot as AnimalMascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
-import type { Theme } from '../lib/theme';
+import { nextTheme, THEME_INFO, type Theme } from '../lib/theme';
 import { KawaiiFace } from './Backdrop';
 import { Habitudes } from './Habitudes';
 import { personalize } from '../data/format';
@@ -68,7 +68,7 @@ function journalSummary(today: Pick<Today, 'scenes'>, name: string): { emoji: st
 }
 
 export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme }: HomeProps) {
-  const kawaii = theme === 'kawaii';
+  const kawaii = theme !== 'aquarelle';
   const open = (s: Section, e: MouseEvent<HTMLButtonElement>, emojis: string[]) => {
     soundEffects.playPop();
     const p = pointOf(e);
@@ -116,15 +116,15 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
             soundEffects.playSparkle();
             const p = pointOf(e);
             burst(p.x, p.y, kawaii ? ['🍃', '☁️', '🌿'] : ['🌸', '💮', '✨'], 8);
-            onTheme(kawaii ? 'aquarelle' : 'kawaii');
+            onTheme(nextTheme(theme));
           }}
           className="h-11 px-3 rounded-2xl bg-white shadow-bonbon flex items-center gap-1.5 font-semibold text-doux"
-          aria-label={kawaii ? 'Passer au thème aquarelle' : 'Passer au thème kawaii'}
+          aria-label={`Thème ${THEME_INFO[theme].label}. Passer au thème ${THEME_INFO[nextTheme(theme)].label}`}
         >
           <span className="text-xl" aria-hidden>
-            {kawaii ? '🌸' : '🍃'}
+            {THEME_INFO[theme].emoji}
           </span>
-          <span className="hidden sm:inline">{kawaii ? 'Kawaii' : 'Aquarelle'}</span>
+          <span className="hidden sm:inline">{THEME_INFO[theme].label}</span>
         </motion.button>
         <button onClick={onEditProfile} className="press w-11 h-11 rounded-2xl bg-white shadow-bonbon flex items-center justify-center text-doux" aria-label="Changer de prénom">
           <Pencil className="w-5 h-5" />

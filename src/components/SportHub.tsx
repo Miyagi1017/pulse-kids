@@ -4,6 +4,7 @@ import type { SportTip } from '../data/sport';
 import { ESSENTIELS } from '../data/programmes';
 import { MINI_DEFIS } from '../data/miniDefis';
 import { WUSHU } from '../data/wushu';
+import { PHYSIQUES } from '../data/physiques';
 import { Mascot } from './Mascot';
 import { soundEffects } from '../utils/soundEffects';
 import { LIFT, POP_IN, PRESS, SPRING_SOFT, float } from '../lib/motion';
@@ -17,7 +18,7 @@ const heroFloat = float(8, 2);
  *  1. le défi du jour ;
  *  2. les 5 essentiels pour grandir (sauter, équilibre, muscles, souplesse, calme) ;
  */
-export function SportHub({ daily, done, onBack, onPlay, onMinis }: { daily: SportTip; done: Set<string>; onBack: () => void; onPlay: (id: string) => void; onMinis: () => void }) {
+export function SportHub({ daily, done, onBack, onPlay, onMinis, onPhysiques }: { daily: SportTip; done: Set<string>; onBack: () => void; onPlay: (id: string) => void; onMinis: () => void; onPhysiques: () => void }) {
   const go = (fn: () => void) => () => {
     soundEffects.playPop();
     fn();
@@ -57,6 +58,20 @@ export function SportHub({ daily, done, onBack, onPlay, onMinis }: { daily: Spor
           </span>
           <span className="bg-white text-corail rounded-full px-3 py-1.5 font-bold shrink-0">
             {MINI_DEFIS.filter((d) => done.has(d.id)).length} ✓
+          </span>
+        </motion.button>
+
+        {/* Les 60 activités physiques à la maison */}
+        <motion.button {...appear(2)} whileHover={LIFT} whileTap={PRESS} onClick={go(onPhysiques)} className="sticker w-full rounded-[2rem] bg-menthe text-white p-5 flex items-center gap-4 text-left mb-6">
+          <span className="text-6xl leading-none" aria-hidden>
+            🤸
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-2xl font-bold leading-tight">{PHYSIQUES.length} activités physiques</span>
+            <span className="block opacity-90">Une minute à la maison : se défouler, devenir fort, adresse, mini-séances</span>
+          </span>
+          <span className="bg-white text-menthe rounded-full px-3 py-1.5 font-bold shrink-0">
+            {PHYSIQUES.filter((a) => done.has(a.id)).length} ✓
           </span>
         </motion.button>
 

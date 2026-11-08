@@ -12,7 +12,7 @@ import type { VideoTheme } from './videos';
 export interface JamyVideo {
   id: string; // identifiant YouTube
   title: string;
-  channel: "C'est pas sorcier" | "C'est toujours pas sorcier" | 'Le Monde de Jamy' | "Je T'explique Comment";
+  channel: "C'est pas sorcier" | "C'est toujours pas sorcier" | 'Le Monde de Jamy' | "Je T'explique Comment" | 'Human Tetris Workout' | 'Tibo InShape Entrainement';
   duration: string;
 }
 

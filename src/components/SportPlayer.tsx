@@ -11,6 +11,7 @@ import { POSES, poseFor } from '../lib/poses';
 import { float, jump, POP_IN, SPRING_SOFT } from '../lib/motion';
 import { mascotForMove } from '../lib/mascots';
 import { Mascot } from './Mascot';
+import { ThemeScene, type SceneTheme } from './ThemeScene';
 
 const introFloat = float(12, 1.6);
 const introHop = jump(30, 0.9);
@@ -41,7 +42,8 @@ export function SportPlayer({
   title = 'Le sport du jour',
   headerEmoji = '🏃',
   rule = 'Fais de la place autour de toi.',
-  anotherLabel = 'Un autre défi ➜'
+  anotherLabel = 'Un autre défi ➜',
+  scene
 }: {
   tip: SportTip;
   name: string;
@@ -52,6 +54,8 @@ export function SportPlayer({
   headerEmoji?: string;
   rule?: string;
   anotherLabel?: string;
+  /** Décor animé en fond (par défaut, aucun). */
+  scene?: SceneTheme;
 }) {
   const [phase, setPhase] = useState<Phase>({ name: 'intro' });
   const [left, setLeft] = useState(0);
@@ -132,13 +136,18 @@ export function SportPlayer({
 
   return (
     <div className="min-h-dvh flex flex-col bg-gradient-to-b from-soleil-clair/70 to-transparent">
+      {scene && (
+        <div className="fixed inset-0 pointer-events-none z-0" aria-hidden>
+          <ThemeScene theme={scene} />
+        </div>
+      )}
       <TopBar
         title={title}
         emoji={headerEmoji}
         onBack={onBack}
         right={phase.name === 'intro' ? <SpeakButton speaking={speaking} label="Écouter" onClick={() => (speaking ? (stopSpeaking(), setSpeaking(false)) : say(introText))} /> : undefined}
       />
-      <main className="flex-1 max-w-2xl w-full mx-auto px-5 py-6 flex flex-col items-center justify-center gap-6 text-center">
+      <main className="relative z-10 flex-1 max-w-2xl w-full mx-auto px-5 py-6 flex flex-col items-center justify-center gap-6 text-center">
         <AnimatePresence mode="wait">
           {phase.name === 'intro' && (
             <motion.section key="intro" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={SPRING_SOFT} className="flex flex-col items-center gap-5">
@@ -219,7 +228,7 @@ export function SportPlayer({
                     key={`${pose}-${i}`}
                     animate={{ opacity: i === cue ? 1 : 0.45, scale: i === cue ? 1 : 0.98 }}
                     transition={SPRING_SOFT}
-                    className={`flex gap-2 items-start rounded-2xl px-3 py-2 ${i === cue ? 'bg-white shadow-bonbon' : ''}`}
+                    className={`flex gap-2 items-start rounded-2xl px-3 py-2 ${i === cue ? 'bg-white shadow-bonbon' : 'bg-white/70'}`}
                   >
                     <span className="shrink-0 w-6 h-6 rounded-full bg-corail text-white text-sm font-bold flex items-center justify-center">{i + 1}</span>
                     <span className="leading-snug">{c}</span>

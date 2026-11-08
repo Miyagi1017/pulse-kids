@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { motion } from 'motion/react';
 import type { Theme } from '../lib/theme';
 
 /**
@@ -7,6 +8,45 @@ import type { Theme } from '../lib/theme';
  *  - Aquarelle : grands cumulus qui dérivent lentement, feuilles d'automne qui tombent, collines peintes, grain de papier.
  * Animations CSS en transformations seules ; figées si l'appareil demande moins d'animations.
  */
+
+const INK = '#47386b';
+const armLoop = { duration: 0.9, repeat: Infinity, repeatType: 'mirror' as const, ease: 'easeInOut' as const };
+
+/** Petite fille ou petit garçon kawaii, dessinés pour Pulse Kids : ils font coucou en se balançant. */
+export function KawaiiKid({ kind, size = 110 }: { kind: 'fille' | 'garcon'; size?: number }) {
+  const girl = kind === 'fille';
+  const hair = girl ? '#8a5433' : '#4d3a2c';
+  const cloth = girl ? '#ff9ec7' : '#6db8ff';
+  return (
+    <svg width={size} height={size * 1.25} viewBox="0 0 120 150" aria-hidden>
+      <g stroke={INK} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round">
+        {girl && (
+          <>
+            <circle cx="20" cy="46" r="15" fill={hair} />
+            <circle cx="100" cy="46" r="15" fill={hair} />
+          </>
+        )}
+        <rect x="42" y="118" width="13" height="24" rx="6" fill="#ffd9b8" />
+        <rect x="65" y="118" width="13" height="24" rx="6" fill="#ffd9b8" />
+        <ellipse cx="47" cy="143" rx="11" ry="5" fill={girl ? '#a08aff' : '#3cc49c'} />
+        <ellipse cx="73" cy="143" rx="11" ry="5" fill={girl ? '#a08aff' : '#3cc49c'} />
+        <motion.path d="M38 96 L16 76" fill="none" stroke="#ffd9b8" strokeWidth="11" style={{ originX: 1, originY: 1 }} animate={{ rotate: [-14, 12] }} transition={armLoop} />
+        <motion.path d="M82 96 L104 72" fill="none" stroke="#ffd9b8" strokeWidth="11" style={{ originX: 0, originY: 1 }} animate={{ rotate: [-18, 18] }} transition={armLoop} />
+        {girl ? <path d="M46 84 H74 L90 124 Q60 134 30 124 Z" fill={cloth} /> : <><rect x="40" y="84" width="40" height="30" rx="10" fill={cloth} /><path d="M40 108 H80 V124 H63 L60 116 L57 124 H40 Z" fill="#ffd36b" /></>}
+        <circle cx="60" cy="48" r="36" fill="#ffe3c9" />
+        {girl ? <path d="M24 50 C22 12 98 12 96 50 C86 34 74 30 60 32 C46 30 34 34 24 50 Z" fill={hair} /> : <path d="M25 44 C24 8 96 8 95 44 C84 34 70 30 60 34 C48 30 36 34 25 44 Z" fill={hair} />}
+        {girl ? <path d="M84 20 l13 -9 v18 z M84 20 l-13 -9 v18 z" fill="#ff7fa3" transform="translate(4 2)" /> : <path d="M34 26 C40 2 82 2 88 26 C74 18 48 18 34 26 Z M86 24 Q104 26 108 34 Q94 34 82 30 Z" fill="#3cc49c" />}
+      </g>
+      <ellipse cx="46" cy="52" rx="4.5" ry="5.5" fill={INK} />
+      <ellipse cx="74" cy="52" rx="4.5" ry="5.5" fill={INK} />
+      <circle cx="47.5" cy="50" r="1.7" fill="#fff" />
+      <circle cx="75.5" cy="50" r="1.7" fill="#fff" />
+      <ellipse cx="37" cy="62" rx="6" ry="3.5" fill="#ff8fb1" opacity="0.6" />
+      <ellipse cx="83" cy="62" rx="6" ry="3.5" fill="#ff8fb1" opacity="0.6" />
+      <path d="M54 63 Q60 70 66 63" stroke={INK} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 /** Petit nuage kawaii avec un visage. */
 function FaceCloud({ size = 90 }: { size?: number }) {
@@ -145,6 +185,11 @@ export const Backdrop = memo(function Backdrop({ theme }: { theme: Theme }) {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
       {theme === 'aquarelle' ? <Aquarelle /> : <Kawaii />}
+      {(theme === 'fille' || theme === 'garcon') && (
+        <div className="absolute bottom-1 left-2 bob">
+          <KawaiiKid kind={theme} />
+        </div>
+      )}
     </div>
   );
 });

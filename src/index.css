@@ -133,6 +133,24 @@
   --backdrop: linear-gradient(180deg, #a9d2ee 0%, #cfe6f2 38%, #f6ecd6 72%, #f7f1e3 100%);
 }
 
+:root[data-theme='fille'] {
+  --color-creme: #fff4fa;
+  --color-corail: #f76fa8;
+  --color-corail-clair: #ffdcec;
+  --backdrop: linear-gradient(180deg, #fde4f2 0%, #efe4ff 50%, #fff4fa 100%);
+}
+
+:root[data-theme='garcon'] {
+  --color-creme: #f3f9ff;
+  --color-encre: #2c3a66;
+  --color-doux: #6c7ba3;
+  --color-corail: #4f97f5;
+  --color-corail-clair: #dcebff;
+  --color-rose: #63c7d9;
+  --color-rose-clair: #dcf4f8;
+  --backdrop: linear-gradient(180deg, #dcedff 0%, #dff5ee 50%, #f3f9ff 100%);
+}
+
 body {
   background: var(--backdrop), var(--color-creme);
   background-attachment: fixed;

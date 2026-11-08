@@ -9,7 +9,7 @@ import { VideoPlayer } from './components/DailyVideo';
 import { JamyLinks } from './components/JamyLinks';
 import { BurstLayer } from './components/fx';
 import { Backdrop } from './components/Backdrop';
-import { useTheme } from './lib/theme';
+import { kawaiiScene, useTheme } from './lib/theme';
 import { SportPlayer } from './components/SportPlayer';
 import { SPORT_TIPS, sportOfTheDay } from './data/sport';
 import { SportHub } from './components/SportHub';
@@ -17,6 +17,8 @@ import { ESSENTIELS, isEssential } from './data/programmes';
 import { MINI_DEFIS, isMiniDefi } from './data/miniDefis';
 import { MiniDefis } from './components/MiniDefis';
 import { WUSHU, isWushu } from './data/wushu';
+import { PHYSIQUES, isPhysique } from './data/physiques';
+import { ActivitesPhysiques } from './components/ActivitesPhysiques';
 import { LireLibrary, LireReader } from './components/Lire';
 import { LECTURES } from './data/lectures';
 import { AventureScene, AventuresList } from './components/Aventures';
@@ -50,6 +52,7 @@ type View =
   | { name: 'activity'; id: string }
   | { name: 'sportHub' }
   | { name: 'minis' }
+  | { name: 'physiques' }
   | { name: 'lire' }
   | { name: 'aventures' }
   | { name: 'aventure'; id: string }
@@ -106,7 +109,7 @@ export default function App() {
   const sportToday = useMemo(() => sportOfTheDay(today.date), [today.date]);
   // Défi de l'accueil : tiré au sort à chaque chargement (défis + mini-défis), stable pendant la visite.
   const [sportPick] = useState(() => {
-    const all = [...SPORT_TIPS, ...MINI_DEFIS];
+    const all = [...SPORT_TIPS, ...MINI_DEFIS, ...PHYSIQUES];
     return all[Math.floor(Math.random() * all.length)];
   });
 
@@ -261,6 +264,7 @@ export default function App() {
           onBack={home}
           onPlay={(id) => setView({ name: 'sport', id })}
           onMinis={() => setView({ name: 'minis' })}
+          onPhysiques={() => setView({ name: 'physiques' })}
         />
       );
       break;
@@ -299,6 +303,9 @@ export default function App() {
       );
       break;
     }
+    case 'physiques':
+      screen = <ActivitesPhysiques scene={kawaiiScene(theme)} done={done} onBack={() => setView({ name: 'sportHub' })} onPlay={(id) => setView({ name: 'sport', id })} />;
+      break;
     case 'minis':
       screen = <MiniDefis done={done} onBack={() => setView({ name: 'sportHub' })} onPlay={(id) => setView({ name: 'sport', id })} />;
       break;
@@ -306,18 +313,20 @@ export default function App() {
       const essential = isEssential(view.id);
       const mini = isMiniDefi(view.id);
       const wushu = isWushu(view.id);
-      const sportList = essential ? ESSENTIELS : mini ? MINI_DEFIS : wushu ? WUSHU : SPORT_TIPS;
+      const physique = isPhysique(view.id);
+      const sportList = essential ? ESSENTIELS : mini ? MINI_DEFIS : wushu ? WUSHU : physique ? PHYSIQUES : SPORT_TIPS;
       const tip = sportList.find((t) => t.id === view.id) ?? sportToday;
       screen = (
         <SportPlayer
           key={tip.id}
           tip={tip}
           name={profile.name}
-          onBack={() => (view.from === 'home' ? home() : setView({ name: mini ? 'minis' : 'sportHub' }))}
+          onBack={() => (view.from === 'home' ? home() : setView({ name: mini ? 'minis' : physique ? 'physiques' : 'sportHub' }))}
           onDone={() => markDone(tip.id)}
           onAnother={() => setView({ name: 'sport', id: nextId(sportList, tip.id) })}
           {...(essential && { title: 'Les essentiels', headerEmoji: '🌱', anotherLabel: 'Essentiel suivant ➜' })}
           {...(mini && { title: 'Mini-défi', headerEmoji: '🎯', anotherLabel: 'Mini-défi suivant ➜' })}
+          {...(physique && { title: 'Activité physique', headerEmoji: '🤸', anotherLabel: 'Activité suivante ➜', scene: kawaiiScene(theme) })}
           {...(wushu && { title: 'Le yoga des animaux', headerEmoji: '🐾', anotherLabel: 'Animal suivant ➜', rule: 'Fais de la place et bouge lentement.' })}
         />
       );

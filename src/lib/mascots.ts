@@ -22,7 +22,10 @@ export const SCENE_MASCOT: Record<SceneTheme, Animal> = {
   neige: 'pingouin',
   pluie: 'grue',
   fete: 'singe',
-  nuit: 'hibou'
+  nuit: 'hibou',
+  kawaii: 'singe',
+  kawaiiFille: 'cerf',
+  kawaiiGarcon: 'tigre'
 };
 
 export const MOVE_MASCOT: Record<MoveAnim, Animal> = {

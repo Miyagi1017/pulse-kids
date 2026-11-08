@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'motion/react';
+import { KawaiiFace } from './Backdrop';
 
 /**
  * Décor animé des vidéos éducatives, différent pour chaque thème.
@@ -7,7 +8,7 @@ import { motion } from 'motion/react';
  * Les animations s'arrêtent d'elles-mêmes si l'appareil demande moins d'animations (MotionConfig).
  */
 
-export type SceneTheme = 'animaux' | 'nature' | 'espace' | 'metiers' | 'corps' | 'monde' | 'journal' | 'mer' | 'neige' | 'pluie' | 'fete' | 'nuit';
+export type SceneTheme = 'animaux' | 'nature' | 'espace' | 'metiers' | 'corps' | 'monde' | 'journal' | 'mer' | 'neige' | 'pluie' | 'fete' | 'nuit' | 'kawaii' | 'kawaiiFille' | 'kawaiiGarcon';
 
 const loop = (duration: number, delay = 0) => ({ duration, delay, repeat: Infinity, ease: 'easeInOut' as const });
 
@@ -251,7 +252,65 @@ function Nuit() {
   );
 }
 
-const SCENES: Record<SceneTheme, () => React.JSX.Element> = { animaux: Animaux, nature: Nature, espace: Espace, metiers: Metiers, corps: Corps, monde: Monde, journal: Journal, mer: Mer, neige: Neige, pluie: Pluie, fete: Fete, nuit: Nuit };
+const MOCHIS = [
+  { left: '6%', color: '#ffc4dc', size: 76, delay: 0 },
+  { left: '42%', color: '#c9f0dc', size: 60, delay: 0.5 },
+  { left: '76%', color: '#fff0a8', size: 70, delay: 1 }
+];
+
+/** Le fond kawaii : soleil qui sourit, cœurs qui montent, étoiles qui scintillent, petits mochis qui rebondissent. */
+function KawaiiScene({ kid }: { kid?: 'fille' | 'garcon' }) {
+  const rising = kid === 'fille' ? ['🌸', '🦋', '💖', '🎀'] : kid === 'garcon' ? ['⭐', '🚀', '⚽', '🦕'] : ['💖', '🌸', '💕', '⭐'];
+  return (
+    <>
+      <motion.div className="absolute top-20 right-4 w-24 h-24" animate={{ y: [0, -8, 0], rotate: [-4, 4, -4] }} transition={loop(4)}>
+        <motion.div className="absolute inset-0" animate={{ rotate: 360 }} transition={{ duration: 24, repeat: Infinity, ease: 'linear' }}>
+          {Array.from({ length: 8 }, (_, i) => (
+            <span key={i} className="absolute left-1/2 top-1/2 w-2.5 h-5 -ml-[5px] -mt-[58px] rounded-full bg-[#ffd76a]" style={{ transform: `rotate(${i * 45}deg)`, transformOrigin: '5px 58px' }} />
+          ))}
+        </motion.div>
+        <div className="absolute inset-3 rounded-full bg-[#ffe48f] flex items-center justify-center">
+          <KawaiiFace className="w-14" />
+        </div>
+      </motion.div>
+      {Array.from({ length: 9 }, (_, i) => (
+        <motion.span
+          key={i}
+          className="absolute text-3xl"
+          style={{ left: `${6 + i * 11}%`, bottom: '-8%' }}
+          animate={{ y: ['0vh', '-105vh'], x: [0, i % 2 ? 26 : -26, 0], scale: [0.7, 1.1, 0.8], opacity: [0, 0.9, 0.9, 0] }}
+          transition={{ duration: 10 + (i % 4) * 2, delay: i * 1.1, repeat: Infinity, ease: 'linear' }}
+        >
+          {rising[i % 4]}
+        </motion.span>
+      ))}
+      {Array.from({ length: 10 }, (_, i) => (
+        <motion.span
+          key={`s${i}`}
+          className="absolute text-xl text-[#ff9ec7]"
+          style={{ left: `${(i * 37 + 9) % 94}%`, top: `${(i * 29 + 12) % 80}%` }}
+          animate={{ opacity: [0.15, 1, 0.15], scale: [0.7, 1.2, 0.7] }}
+          transition={loop(2.2 + (i % 3) * 0.7, i * 0.3)}
+        >
+          ✦
+        </motion.span>
+      ))}
+      {MOCHIS.map((m) => (
+        <motion.div
+          key={m.left}
+          className="absolute bottom-1 rounded-[50%_50%_45%_45%] flex items-center justify-center"
+          style={{ left: m.left, width: m.size, height: m.size * 0.78, background: m.color, originY: 1 }}
+          animate={{ y: [0, -26, 0, 0], scaleY: [0.86, 1.08, 0.82, 0.86], scaleX: [1.1, 0.95, 1.14, 1.1] }}
+          transition={{ duration: 1.5, delay: m.delay, repeat: Infinity, times: [0, 0.45, 0.85, 1], ease: 'easeInOut' }}
+        >
+          <KawaiiFace className="w-3/5" />
+        </motion.div>
+      ))}
+    </>
+  );
+}
+
+const SCENES: Record<SceneTheme, () => React.JSX.Element> = { animaux: Animaux, nature: Nature, espace: Espace, metiers: Metiers, corps: Corps, monde: Monde, journal: Journal, mer: Mer, neige: Neige, pluie: Pluie, fete: Fete, nuit: Nuit, kawaii: () => <KawaiiScene />, kawaiiFille: () => <KawaiiScene kid="fille" />, kawaiiGarcon: () => <KawaiiScene kid="garcon" /> };
 
 /** Choisit le décor d'après les mots d'un texte (titre, page, question…). */
 const RULES: [RegExp, SceneTheme][] = [

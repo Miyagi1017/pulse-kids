@@ -13,27 +13,29 @@ import { PRESS, SPRING_SOFT } from '../lib/motion';
  * Avant de quitter l'app, un petit écran demande d'appeler un adulte (YouTube montre des publicités
  * et d'autres vidéos). Aucune miniature n'est chargée depuis YouTube : seulement des emojis.
  */
-export function JamyLinks({ theme }: { theme: string | null }) {
+export function JamyLinks({ theme, videos, intro }: { theme: string | null; videos?: JamyVideo[]; intro?: string }) {
   const [pending, setPending] = useState<JamyVideo | null>(null);
   // Un thème choisi : ses vidéos. « Tout mélangé » : tous les thèmes, y compris sciences et vie quotidienne.
   const themes = (theme && theme in JAMY ? [theme] : Object.keys(JAMY)) as JamyTheme[];
+  // Une liste fournie (ex. les séances de sport) remplace les thèmes.
+  const groups = videos ? [{ key: 'liste', label: null, list: videos }] : themes.map((t) => ({ key: t, label: themes.length > 1 ? LABELS[t] : null, list: JAMY[t] }));
 
   return (
     <section className="mt-8" aria-labelledby="jamy-title">
       <h2 id="jamy-title" className="text-2xl font-bold mb-1">
         ▶ Vidéos à regarder sur YouTube
       </h2>
-      <p className="text-doux mb-4">Sciences, corps, bons gestes, planète, objets fabriqués… des vidéos de « C’est pas sorcier », du « Monde de Jamy » et de « Je t’explique comment », à regarder avec un adulte.</p>
+      <p className="text-doux mb-4">{intro ?? 'Sciences, corps, bons gestes, planète, objets fabriqués… des vidéos de « C’est pas sorcier », du « Monde de Jamy » et de « Je t’explique comment », à regarder avec un adulte.'}</p>
       <div className="grid gap-5">
-        {themes.map((t) => (
-          <div key={t}>
-            {themes.length > 1 && (
+        {groups.map((g) => (
+          <div key={g.key}>
+            {g.label && (
               <h3 className="font-bold text-lg mb-2">
-                {LABELS[t].emoji} {LABELS[t].label}
+                {g.label.emoji} {g.label.label}
               </h3>
             )}
             <ul className="grid sm:grid-cols-2 gap-2">
-              {JAMY[t].map((v) => (
+              {g.list.map((v) => (
                 <li key={v.id}>
                   <motion.button
                     whileTap={PRESS}
