@@ -5,24 +5,37 @@
  * Une activité dure environ 1 minute de vidéo : le rendu complet peut prendre plusieurs heures.
  */
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, renameSync, rmSync } from 'node:fs';
+
+// Machine chargée : Node 26 abandonne trop vite les connexions locales vers le navigateur de rendu.
+const env = { ...process.env, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --network-family-autoselection-attempt-timeout=5000`.trim() };
+const ATTEMPTS = 3;
 
 const filter = process.argv[2] ?? '';
-const output = execSync('npx remotion compositions src/index.ts --quiet', { encoding: 'utf8' });
+const output = execSync('npx remotion compositions src/index.ts --quiet', { encoding: 'utf8', env });
 const ids = output.split(/\s+/).filter((id) => /^sport-[\w-]+$/.test(id) && id.includes(filter));
 
 mkdirSync('out', { recursive: true });
 console.log(`${ids.length} vidéo(s) à traiter`);
-let failed = 0;
+
+const failed = [];
 for (const [i, id] of ids.entries()) {
   const file = `out/${id}.mp4`;
   if (existsSync(file)) continue;
-  console.log(`[${i + 1}/${ids.length}] ${id}`);
-  try {
-    execSync(`npx remotion render src/index.ts ${id} ${file}`, { stdio: 'inherit' });
-  } catch {
-    failed++;
+  // On écrit dans un fichier temporaire : une vidéo interrompue n'est jamais prise pour une vidéo finie.
+  const partial = `out/${id}.partial.mp4`;
+  let done = false;
+  for (let attempt = 1; attempt <= ATTEMPTS && !done; attempt++) {
+    console.log(`[${i + 1}/${ids.length}] ${id} (essai ${attempt})`);
+    try {
+      execSync(`npx remotion render src/index.ts ${id} ${partial}`, { stdio: 'inherit', env });
+      renameSync(partial, file);
+      done = true;
+    } catch {
+      rmSync(partial, { force: true });
+    }
   }
+  if (!done) failed.push(id);
 }
-console.log(failed ? `${failed} rendu(s) en échec` : 'Terminé');
-process.exit(failed ? 1 : 0);
+console.log(failed.length ? `Échec : ${failed.join(', ')}` : 'Terminé');
+process.exit(failed.length ? 1 : 0);
