@@ -16,6 +16,7 @@ import { SportHub } from './components/SportHub';
 import { ESSENTIELS, isEssential } from './data/programmes';
 import { MINI_DEFIS, isMiniDefi } from './data/miniDefis';
 import { MiniDefis } from './components/MiniDefis';
+import { WUSHU, isWushu } from './data/wushu';
 import { LireLibrary, LireReader } from './components/Lire';
 import { LECTURES } from './data/lectures';
 import { AventureScene, AventuresList } from './components/Aventures';
@@ -304,7 +305,9 @@ export default function App() {
     case 'sport': {
       const essential = isEssential(view.id);
       const mini = isMiniDefi(view.id);
-      const tip = (essential ? ESSENTIELS : mini ? MINI_DEFIS : SPORT_TIPS).find((t) => t.id === view.id) ?? sportToday;
+      const wushu = isWushu(view.id);
+      const sportList = essential ? ESSENTIELS : mini ? MINI_DEFIS : wushu ? WUSHU : SPORT_TIPS;
+      const tip = sportList.find((t) => t.id === view.id) ?? sportToday;
       screen = (
         <SportPlayer
           key={tip.id}
@@ -312,9 +315,10 @@ export default function App() {
           name={profile.name}
           onBack={() => (view.from === 'home' ? home() : setView({ name: mini ? 'minis' : 'sportHub' }))}
           onDone={() => markDone(tip.id)}
-          onAnother={() => setView({ name: 'sport', id: nextId(essential ? ESSENTIELS : mini ? MINI_DEFIS : SPORT_TIPS, tip.id) })}
+          onAnother={() => setView({ name: 'sport', id: nextId(sportList, tip.id) })}
           {...(essential && { title: 'Les essentiels', headerEmoji: '🌱', anotherLabel: 'Essentiel suivant ➜' })}
           {...(mini && { title: 'Mini-défi', headerEmoji: '🎯', anotherLabel: 'Mini-défi suivant ➜' })}
+          {...(wushu && { title: 'Le yoga des animaux', headerEmoji: '🐾', anotherLabel: 'Animal suivant ➜', rule: 'Fais de la place et bouge lentement.' })}
         />
       );
       break;

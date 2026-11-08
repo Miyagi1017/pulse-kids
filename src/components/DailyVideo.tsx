@@ -9,6 +9,8 @@ import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffec
 import { TopBar } from './ui';
 import { burst } from './fx';
 import { ThemeScene, type SceneTheme } from './ThemeScene';
+import { Mascot } from './Mascot';
+import { mascotForScene } from '../lib/mascots';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
 
 const cloud = float(12, 2.8);
@@ -137,6 +139,10 @@ export function VideoPlayer({ playlist, startIndex, name, onBack, onWatched }: {
               >
                 {/* Décor animé propre au thème de la vidéo */}
                 <ThemeScene theme={(video.category as SceneTheme | undefined) ?? 'journal'} />
+                {/* La mascotte présente la vidéo */}
+                <div className="absolute top-3 right-3 z-10">
+                  <Mascot animal={mascotForScene((video.category as SceneTheme | undefined) ?? 'journal')} mood={playing ? 'talk' : 'idle'} size={92} />
+                </div>
                 <motion.span className="absolute top-6 left-6 text-4xl opacity-40" animate={cloud.animate} transition={cloud.transition} aria-hidden>
                   ☁️
                 </motion.span>
@@ -181,7 +187,7 @@ export function VideoPlayer({ playlist, startIndex, name, onBack, onWatched }: {
             ) : (
               <motion.section key={`fin-${videoIndex}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-corail text-white flex flex-col items-center justify-center gap-5 p-6 text-center">
                 <div className="text-7xl" aria-hidden>
-                  {nextVideo ? '⭐' : '🎉'}
+                  <Mascot animal={mascotForScene((video.category as SceneTheme | undefined) ?? 'journal')} mood="cheer" size={130} />
                 </div>
                 {nextVideo && countdown !== null ? (
                   <>

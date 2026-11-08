@@ -7,6 +7,8 @@ import { boing, jump, LIFT, PRESS, spin, SPRING_BOUNCY, SPRING_SOFT, wiggle } fr
 import { SpeakButton, TopBar } from './ui';
 import { burst, pointOf } from './fx';
 import { sceneFor, ThemeScene } from './ThemeScene';
+import { Mascot } from './Mascot';
+import { mascotForScene } from '../lib/mascots';
 
 /** Liste des aventures à explorer. */
 export function AventuresList({ done, onBack, onPick }: { done: Set<string>; onBack: () => void; onPick: (id: string) => void }) {
@@ -202,7 +204,10 @@ export function AventureScene({ aventure, name, onBack, onDone, onNext }: { aven
           </AnimatePresence>
         </div>
 
-        <p className={`text-center font-medium ${dark ? 'text-doux' : 'text-doux'}`}>{hint ? '👀 Regarde ce qui bouge !' : 'Touche les objets pour chercher.'}</p>
+        <div className="flex items-center justify-center gap-3">
+          <Mascot animal={mascotForScene(sceneFor(`${aventure.title} ${aventure.story}`, 'nature'))} mood={done ? 'cheer' : hint ? 'hint' : speaking ? 'talk' : 'idle'} size={84} />
+          <p className={`text-center font-medium ${dark ? 'text-doux' : 'text-doux'}`}>{hint ? '👀 Regarde ce qui bouge !' : 'Touche les objets pour chercher.'}</p>
+        </div>
 
         {done && (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_SOFT} className="flex flex-col items-center gap-3">

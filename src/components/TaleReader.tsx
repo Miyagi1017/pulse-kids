@@ -7,6 +7,8 @@ import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffec
 import { SpeakButton, TopBar } from './ui';
 import { TaleScene } from './TaleScene';
 import { sceneFor, ThemeScene } from './ThemeScene';
+import { Mascot } from './Mascot';
+import { mascotForScene } from '../lib/mascots';
 
 /**
  * Lecteur de conte page par page : gros emoji animé, texte large, lecture à voix haute
@@ -22,6 +24,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
   // Décor : d'après la page en cours, sinon d'après toute l'histoire.
   const taleTheme = sceneFor(`${tale.title} ${pages.join(' ')}`, night ? 'nuit' : 'nature');
   const pageTheme = isEnd ? taleTheme : sceneFor(pages[page], taleTheme);
+  const animal = night ? 'hibou' : mascotForScene(pageTheme);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -132,6 +135,15 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
             </motion.section>
           )}
         </AnimatePresence>
+
+        {/* La mascotte du thème accompagne l'histoire ; le soir, le hibou finit par s'endormir */}
+        <div className="flex justify-center pb-2">
+          <AnimatePresence mode="wait">
+            <motion.div key={animal} initial={{ scale: 0, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0, y: 20 }} transition={{ type: 'spring', stiffness: 300, damping: 18 }}>
+              <Mascot animal={animal} mood={isEnd ? (night ? 'sleep' : 'cheer') : listening ? 'talk' : 'idle'} size={92} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {!isEnd && (
           <nav className="flex items-center justify-between gap-4 pb-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>

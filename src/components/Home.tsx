@@ -6,6 +6,8 @@ import type { Today } from '../../shared/schemas';
 import type { SportTip } from '../data/sport';
 import type { Playable } from '../lib/playlist';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
+import { Mascot as AnimalMascot } from './Mascot';
+import { mascotForScene } from '../lib/mascots';
 import type { Theme } from '../lib/theme';
 import { KawaiiFace } from './Backdrop';
 import { Habitudes } from './Habitudes';
@@ -191,8 +193,8 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
       >
         {/* Décor animé du thème de la vidéo */}
         <ThemeScene theme={(featured.category as SceneTheme | undefined) ?? sceneFor(featured.title, 'journal')} />
-        <motion.span variants={wiggle} className="absolute -right-4 -bottom-6 text-[9rem] opacity-25 rotate-12" aria-hidden>
-          {featured.emoji}
+        <motion.span variants={wiggle} className="absolute right-2 bottom-2" aria-hidden>
+          <AnimalMascot animal={mascotForScene((featured.category as SceneTheme | undefined) ?? sceneFor(featured.title, 'journal'))} size={88} />
         </motion.span>
         <span className="relative inline-block bg-white/25 rounded-full px-3 py-1 text-sm font-semibold mb-3">🎬 {featured.title === today.title ? 'Le journal du jour' : 'Ta vidéo surprise'}</span>
         <span className="relative block text-2xl sm:text-3xl font-bold leading-tight max-w-[85%]">{featured.title}</span>

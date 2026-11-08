@@ -2,24 +2,16 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Pause, Play, SkipForward } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import type { MoveAnim, SportTip } from '../data/sport';
+import type { SportTip } from '../data/sport';
 import { personalize } from '../data/format';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
 import { SpeakButton, TopBar } from './ui';
 import { burst, pointOf } from './fx';
 import { POSES, poseFor } from '../lib/poses';
-import { calmLoop, float, type Loop, hopLoop, punchLoop, jump, POP_IN, runLoop, SPRING_SOFT, stretchLoop, sway, turnLoop } from '../lib/motion';
+import { float, jump, POP_IN, SPRING_SOFT } from '../lib/motion';
+import { mascotForMove } from '../lib/mascots';
+import { Mascot } from './Mascot';
 
-/** Comment l'emoji bouge pendant chaque type de mouvement (l'enfant imite) : boucles douces, posées au sol. */
-const ANIMS: Record<MoveAnim, Loop> = {
-  saut: hopLoop(48, 0.85),
-  balance: sway(13, 1.5),
-  course: runLoop(0.34),
-  etire: stretchLoop(2.4),
-  tourne: turnLoop(3.4),
-  calme: calmLoop(3.6),
-  frappe: punchLoop(0.9)
-};
 const introFloat = float(12, 1.6);
 const introHop = jump(30, 0.9);
 
@@ -164,7 +156,7 @@ export function SportPlayer({
                 }}
                 aria-label={tip.title}
               >
-                {tip.emoji}
+                <Mascot animal={mascotForMove(tip.moves[0])} mood={speaking ? 'talk' : 'idle'} size={190} />
               </motion.button>
               <h2 className="text-3xl sm:text-4xl font-bold">{tip.title}</h2>
               <div className="bg-white rounded-3xl shadow-bonbon px-5 py-4 max-w-md">
@@ -191,16 +183,13 @@ export function SportPlayer({
               <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
                 Mouvement {phase.index + 1} / {tip.moves.length}
               </span>
-              {/* Le grand emoji du mouvement, animé comme le geste à faire */}
-              <motion.div
-                className="text-[9rem] sm:text-[11rem] leading-none"
-                style={{ originY: 1 }}
-                animate={playing ? ANIMS[tip.moves[phase.index].anim].animate : { y: 0, x: 0, rotate: 0, scale: 1, scaleX: 1, scaleY: 1 }}
-                transition={playing ? ANIMS[tip.moves[phase.index].anim].transition : SPRING_SOFT}
-                aria-hidden
-              >
-                {tip.moves[phase.index].emoji}
-              </motion.div>
+              {/* L'animal montre le geste ; la bulle garde l'image du mouvement (grenouille, kangourou…) */}
+              <div className="relative">
+                <Mascot animal={mascotForMove(tip.moves[phase.index])} gesture={playing ? tip.moves[phase.index].anim : undefined} size={210} />
+                <span className="absolute -right-8 bottom-0 w-16 h-16 rounded-full bg-white shadow-bonbon flex items-center justify-center text-4xl" aria-hidden>
+                  {tip.moves[phase.index].emoji}
+                </span>
+              </div>
               <p className="text-2xl sm:text-3xl font-semibold leading-snug max-w-lg">{personalize(tip.moves[phase.index].text, name)}</p>
               {/* Consignes détaillées, une après l'autre (placement · respiration · sensation) */}
               <div className="flex items-center justify-center gap-5">
@@ -225,7 +214,7 @@ export function SportPlayer({
                 </nav>
               </div>
               <ol className="w-full max-w-md grid gap-1.5 text-left" aria-label="Comment bien faire le mouvement">
-                {POSES[pose].cues.map((c, i) => (
+                {(tip.moves[phase.index].cues ?? POSES[pose].cues).map((c, i) => (
                   <motion.li
                     key={`${pose}-${i}`}
                     animate={{ opacity: i === cue ? 1 : 0.45, scale: i === cue ? 1 : 0.98 }}
@@ -244,7 +233,7 @@ export function SportPlayer({
             <motion.section key="bravo" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center gap-5">
               <motion.div className="text-[8rem] leading-none" style={{ originY: 1 }} initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 260, damping: 9 }} aria-hidden>
                 <motion.span className="inline-block" animate={introFloat.animate} transition={introFloat.transition}>
-                  🏆
+                  <Mascot animal={mascotForMove(tip.moves[tip.moves.length - 1])} mood="cheer" size={180} />
                 </motion.span>
               </motion.div>
               <h2 className="text-4xl font-bold">Bravo {name} !</h2>

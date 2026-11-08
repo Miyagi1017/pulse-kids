@@ -6,6 +6,8 @@
  * Animations : saut · balance · course · etire · tourne · calme · frappe (kung-fu, dans le vide).
  */
 
+import type { Animal } from '../lib/mascots';
+
 export type MoveAnim = 'saut' | 'balance' | 'course' | 'etire' | 'tourne' | 'calme' | 'frappe';
 
 export interface SportMove {
@@ -13,6 +15,10 @@ export interface SportMove {
   text: string;
   seconds: number;
   anim: MoveAnim;
+  /** Animal qui montre le mouvement (sinon choisi d'après `anim`). */
+  mascotte?: Animal;
+  /** Consignes détaillées propres à ce mouvement (sinon celles de la posture la plus proche). */
+  cues?: [string, string, string];
 }
 
 export interface SportTip {

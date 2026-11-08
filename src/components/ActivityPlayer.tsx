@@ -8,6 +8,8 @@ import { SpeakButton, TopBar } from './ui';
 import { burst, pointOf } from './fx';
 import { FindAllGame, MemoryGame } from './games';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
+import { Mascot } from './Mascot';
+import { mascotForScene } from '../lib/mascots';
 
 /** Décor par défaut selon la famille de jeu, quand le texte ne donne pas d'indice. */
 const CATEGORY_SCENE: Record<string, SceneTheme> = {
@@ -103,6 +105,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
   const [misses, setMisses] = useState(0); // après 2 erreurs, la bonne réponse se met à bouger
   const [nextIn, setNextIn] = useState<number | null>(null); // « clique et c'est parti » : jeu suivant automatique
   const hint = misses >= 2 && !solved;
+  const [oops, setOops] = useState(false); // la mascotte fait « oh » un instant après une erreur
   const cat = CATEGORY_INFO[activity.category];
 
   const say = (text: string) => {
@@ -150,6 +153,8 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
   /** Erreur : un « oups » doux, une phrase courte ; à la 2e, on montre la bonne réponse qui bouge. */
   const miss = (key: string, word: string) => {
     setWrong(key);
+    setOops(true);
+    setTimeout(() => setOops(false), 1400);
     soundEffects.playOops();
     const n = misses + 1;
     setMisses(n);
@@ -208,6 +213,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
         right={<SpeakButton speaking={speaking} label="Répète" onClick={() => (speaking ? (stopSpeaking(), setSpeaking(false)) : say(round.question))} />}
       />
       <main className="relative z-10 flex-1 max-w-2xl w-full mx-auto px-5 py-6 flex flex-col items-center justify-center gap-7 text-center">
+        <Mascot animal={mascotForScene(scene)} mood={solved ? 'cheer' : hint ? 'hint' : oops ? 'oops' : speaking ? 'talk' : 'idle'} size={88} />
         <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
           {cat.emoji} {cat.label}
         </span>

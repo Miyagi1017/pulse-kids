@@ -3,6 +3,8 @@ import { Check } from 'lucide-react';
 import type { SportTip } from '../data/sport';
 import { ESSENTIELS } from '../data/programmes';
 import { MINI_DEFIS } from '../data/miniDefis';
+import { WUSHU } from '../data/wushu';
+import { Mascot } from './Mascot';
 import { soundEffects } from '../utils/soundEffects';
 import { LIFT, POP_IN, PRESS, SPRING_SOFT, float } from '../lib/motion';
 import { TopBar } from './ui';
@@ -57,6 +59,26 @@ export function SportHub({ daily, done, onBack, onPlay, onMinis }: { daily: Spor
             {MINI_DEFIS.filter((d) => done.has(d.id)).length} ✓
           </span>
         </motion.button>
+
+        {/* Le yoga des animaux, façon wushu */}
+        <div className="flex items-baseline justify-between mb-1">
+          <h2 className="text-2xl font-bold">Le yoga des animaux</h2>
+          <span className="text-doux font-semibold">
+            {WUSHU.filter((s) => done.has(s.id)).length} / {WUSHU.length}
+          </span>
+        </div>
+        <p className="text-doux mb-3">Façon wushu : des gestes lents, expliqués par les maîtres animaux.</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+          {WUSHU.map((s, i) => (
+            <motion.button key={s.id} {...appear(i + 1)} whileHover={LIFT} whileTap={PRESS} onClick={go(() => onPlay(s.id))} className={`sticker rounded-3xl ${s.color} text-white p-3 flex flex-col items-center text-center`}>
+              <Mascot animal={s.mascotte} size={92} />
+              <span className="block text-lg font-bold leading-tight mt-1">{s.title}</span>
+              <span className="block text-sm opacity-90">
+                {s.qualite} {done.has(s.id) ? '✓' : ''}
+              </span>
+            </motion.button>
+          ))}
+        </div>
 
         {/* 2. Les 5 essentiels */}
         <div className="flex items-baseline justify-between mb-3">
