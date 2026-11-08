@@ -3,7 +3,7 @@
  * - Assets (JS/CSS/polices/icônes) : cache d'abord (fichiers versionnés par Vite).
  * - /api : jamais mis en cache (données personnelles), sauf l'édition du jour.
  */
-const VERSION = 'pk-v4';
+const VERSION = 'pk-v5';
 const SHELL = ['/', '/index.html', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -26,6 +26,9 @@ self.addEventListener('fetch', (event) => {
 
   // Ressources externes (photos NASA) : laissées au navigateur.
   if (url.origin !== self.location.origin) return;
+
+  // Vidéos : trop lourdes pour le cache, et le navigateur les lit par morceaux.
+  if (url.pathname.startsWith('/videos/')) return;
 
   if (url.pathname.startsWith('/api/')) {
     // Seul le contenu public du jour est mis en cache (pour l'ouvrir hors ligne).

@@ -10,6 +10,7 @@ import { burst, pointOf } from './fx';
 import { POSES, poseFor } from '../lib/poses';
 import { float, jump, POP_IN, SPRING_SOFT } from '../lib/motion';
 import { mascotForMove } from '../lib/mascots';
+import { sportVideoUrl } from '../lib/sportVideos';
 import { Mascot } from './Mascot';
 import { ThemeScene, type SceneTheme } from './ThemeScene';
 
@@ -61,6 +62,8 @@ export function SportPlayer({
   const [left, setLeft] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [speaking, setSpeaking] = useState(false);
+  const [watching, setWatching] = useState(false);
+  const videoUrl = sportVideoUrl(tip.id);
   const [cue, setCue] = useState(0);
   const pose = phase.name === 'move' ? poseFor(tip.moves[phase.index]) : 'respire';
 
@@ -184,6 +187,19 @@ export function SportPlayer({
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={start} className="shadow-bonbon px-10 py-5 rounded-3xl bg-corail text-white text-2xl font-bold flex items-center gap-3">
                 <Play className="w-8 h-8" /> C’est parti !
               </motion.button>
+              {videoUrl && (
+                <button
+                  onClick={() => {
+                    soundEffects.playPop();
+                    stopSpeaking();
+                    setSpeaking(false);
+                    setWatching(true);
+                  }}
+                  className="press shadow-bonbon px-7 py-3 rounded-2xl bg-white text-xl font-bold"
+                >
+                  🎬 Regarder la vidéo
+                </button>
+              )}
             </motion.section>
           )}
 
@@ -259,6 +275,16 @@ export function SportPlayer({
           )}
         </AnimatePresence>
       </main>
+
+      {/* La vidéo animée de l'activité, en plein écran */}
+      {watching && videoUrl && (
+        <div className="fixed inset-0 z-50 bg-encre/95 flex items-center justify-center p-3" role="dialog" aria-modal="true" aria-label={`Vidéo : ${tip.title}`}>
+          <video src={videoUrl} controls autoPlay playsInline preload="auto" onEnded={() => setWatching(false)} className="max-w-full max-h-full rounded-2xl" />
+          <button onClick={() => setWatching(false)} className="press absolute top-4 right-4 w-14 h-14 rounded-full bg-white shadow-bonbon text-2xl font-bold" aria-label="Fermer la vidéo">
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,3 +19,12 @@ illustrations-review.jpg
 src/assets/illustrations-pending/
 video-images-review.jpg
 src/assets/video-images-pending/
+
+# Vidéos rendues (lourdes) et cache HyperFrames
+video/out/
+.hyperframes/
+video/intro/.hyperframes/
+
+# Outils locaux
+.claude/
+skills-lock.json

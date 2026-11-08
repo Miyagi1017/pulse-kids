@@ -1,0 +1,23 @@
+{
+  "name": "pulse-kids-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Assemble les vidéos animées des activités sportives de Pulse Kids (Remotion + intro HTML HyperFrames).",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts",
+    "render:all": "node scripts/render-all.mjs",
+    "intro": "node scripts/render-intro.mjs",
+    "publish:videos": "node scripts/publish-videos.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.541",
+    "@remotion/transitions": "4.0.541",
+    "@fontsource/fredoka": "^5.3.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "remotion": "4.0.541"
+  }
+}
