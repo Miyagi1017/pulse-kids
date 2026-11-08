@@ -1,0 +1,151 @@
+/**
+ * Petit dictionnaire des mots des textes : une explication simple, comme on la donnerait à un enfant
+ * de 5 ans (ce que c'est + à quoi ça sert ou où on le trouve). Clé = mot en minuscules, au singulier.
+ */
+
+export const DICTIONNAIRE: Record<string, [string, string]> = {
+  // Animaux
+  abeille: ['🐝', 'L’abeille est un petit insecte qui vole. Elle va de fleur en fleur et fabrique le miel dans la ruche.'],
+  baleine: ['🐳', 'La baleine est le plus grand animal du monde. Elle vit dans la mer, mais ce n’est pas un poisson : elle respire de l’air.'],
+  chenille: ['🐛', 'La chenille est un petit animal tout mou qui mange des feuilles. Un jour, elle devient un papillon.'],
+  chouette: ['🦉', 'La chouette est un oiseau qui se réveille la nuit. Elle a de grands yeux pour voir dans le noir.'],
+  coccinelle: ['🐞', 'La coccinelle est un petit insecte rouge avec des points noirs. Elle mange les pucerons qui abîment les plantes.'],
+  dauphin: ['🐬', 'Le dauphin vit dans la mer. Il saute hors de l’eau et parle avec des petits sifflements.'],
+  écureuil: ['🐿️', 'L’écureuil est un petit animal roux avec une grande queue touffue. Il vit dans les arbres et cache des noisettes.'],
+  éléphant: ['🐘', 'L’éléphant est le plus gros animal qui marche sur la terre. Il a une longue trompe et de grandes oreilles.'],
+  escargot: ['🐌', 'L’escargot est un petit animal tout lent qui porte sa coquille sur son dos, comme une maison.'],
+  girafe: ['🦒', 'La girafe est l’animal le plus grand. Avec son long cou, elle mange les feuilles en haut des arbres.'],
+  grenouille: ['🐸', 'La grenouille est un petit animal vert qui saute très loin. Elle vit près de l’eau et fait croâ.'],
+  hérisson: ['🦔', 'Le hérisson est un petit animal couvert de piquants. Quand il a peur, il se roule en boule.'],
+  luciole: ['✨', 'La luciole est un petit insecte dont le ventre s’allume la nuit, comme une petite lampe.'],
+  manchot: ['🐧', 'Le manchot est un oiseau qui ne vole pas, mais qui nage très bien. Il vit là où il fait très froid.'],
+  pingouin: ['🐧', 'Le pingouin est un oiseau noir et blanc des pays froids. Il glisse sur la glace et plonge pour pêcher.'],
+  poussin: ['🐥', 'Le poussin est le bébé de la poule. Il sort d’un œuf et fait piou piou.'],
+  renard: ['🦊', 'Le renard est un animal roux avec une grande queue. Il vit dans la forêt et sort souvent la nuit.'],
+  tortue: ['🐢', 'La tortue est un animal très lent qui porte une carapace sur son dos pour se protéger.'],
+  têtard: ['🐸', 'Le têtard est le bébé de la grenouille. Il nage dans l’eau avec sa queue, puis ses pattes poussent.'],
+  mouette: ['🐦', 'La mouette est un oiseau blanc qui vit près de la mer. Elle crie très fort.'],
+  cygne: ['🦢', 'Le cygne est un grand oiseau blanc avec un long cou. Il nage sur les lacs.'],
+  pieuvre: ['🐙', 'La pieuvre vit dans la mer. Elle a huit grands bras qu’on appelle des tentacules.'],
+  lionceau: ['🦁', 'Le lionceau est le bébé du lion.'],
+  caneton: ['🐥', 'Le caneton est le bébé du canard.'],
+  // Parties d'animaux
+  crinière: ['🦁', 'La crinière, ce sont les longs poils autour de la tête du lion, ou sur le cou du cheval.'],
+  trompe: ['🐘', 'La trompe est le très long nez de l’éléphant. Il s’en sert comme d’une main pour attraper et pour boire.'],
+  carapace: ['🐢', 'La carapace est la maison dure que la tortue porte sur son dos. Elle la protège.'],
+  coquille: ['🐌', 'La coquille est l’enveloppe dure qui protège l’escargot, un coquillage ou un œuf.'],
+  piquant: ['🦔', 'Un piquant est comme une petite aiguille. Le hérisson en a plein sur le dos pour se protéger.'],
+  plume: ['🪶', 'La plume pousse sur le corps des oiseaux. Les plumes les gardent au chaud et les aident à voler.'],
+  aile: ['🦋', 'L’aile sert à voler. Les oiseaux, les papillons et les avions ont des ailes.'],
+  // Nature
+  cocon: ['🦋', 'Le cocon est une petite maison que la chenille fabrique pour dormir. Elle en sort transformée en papillon.'],
+  nénuphar: ['🪷', 'Le nénuphar est une plante qui flotte sur l’eau, avec de grandes feuilles rondes où les grenouilles se posent.'],
+  nectar: ['🌸', 'Le nectar est le jus sucré caché au fond des fleurs. Les abeilles s’en servent pour faire le miel.'],
+  ruche: ['🐝', 'La ruche est la maison des abeilles. C’est là qu’elles fabriquent et rangent le miel.'],
+  étang: ['🦆', 'Un étang est une petite étendue d’eau calme, plus petite qu’un lac. Les canards et les grenouilles y vivent.'],
+  mare: ['🐸', 'Une mare est une toute petite étendue d’eau, où vivent des grenouilles et des têtards.'],
+  ruisseau: ['💧', 'Un ruisseau est une toute petite rivière qui coule doucement.'],
+  rivière: ['🏞️', 'Une rivière est de l’eau qui coule, comme une route d’eau, jusqu’à la mer.'],
+  océan: ['🌊', 'L’océan est une immense mer, si grande qu’on ne voit pas l’autre côté.'],
+  vague: ['🌊', 'La vague, c’est l’eau de la mer qui monte, avance et retombe sur la plage.'],
+  corail: ['🪸', 'Le corail ressemble à une plante de toutes les couleurs, mais c’est un animal. Il forme des maisons pour les poissons.'],
+  banquise: ['🧊', 'La banquise est une grande plaque de glace qui flotte sur la mer, dans les pays très froids.'],
+  savane: ['🦒', 'La savane est un grand pays plein d’herbe et de quelques arbres, en Afrique. Les lions et les girafes y vivent.'],
+  forêt: ['🌲', 'La forêt est un endroit avec beaucoup, beaucoup d’arbres. Plein d’animaux y vivent.'],
+  verger: ['🍎', 'Un verger est un jardin avec des arbres qui donnent des fruits, comme les pommes et les poires.'],
+  potager: ['🥕', 'Le potager est le coin du jardin où l’on fait pousser les légumes.'],
+  graine: ['🌱', 'La graine est une toute petite chose qu’on met dans la terre. Avec de l’eau et du soleil, une plante en sort.'],
+  racine: ['🌳', 'La racine est la partie de la plante cachée sous la terre. Elle boit l’eau pour la plante.'],
+  tige: ['🌱', 'La tige est la partie de la plante qui pousse vers le haut et porte les feuilles et les fleurs.'],
+  gland: ['🌰', 'Le gland est le fruit du chêne. Si on le plante, un nouveau chêne peut pousser.'],
+  chêne: ['🌳', 'Le chêne est un grand arbre très solide, qui peut vivre des centaines d’années. Il donne des glands.'],
+  sapin: ['🌲', 'Le sapin est un arbre qui reste vert tout l’hiver. Ses feuilles sont fines comme des aiguilles.'],
+  tournesol: ['🌻', 'Le tournesol est une grande fleur jaune qui tourne sa tête pour suivre le soleil.'],
+  marguerite: ['🌼', 'La marguerite est une fleur blanche avec un cœur jaune.'],
+  tulipe: ['🌷', 'La tulipe est une fleur en forme de petite coupe qui pousse au printemps.'],
+  champignon: ['🍄', 'Le champignon pousse dans les bois quand il pleut. Attention : certains sont dangereux, on ne les touche pas sans un adulte.'],
+  citrouille: ['🎃', 'La citrouille est un très gros légume orange et rond qui pousse à l’automne.'],
+  noisette: ['🌰', 'La noisette est un petit fruit dur et rond. L’écureuil adore la manger.'],
+  // Ciel et saisons
+  'arc-en-ciel': ['🌈', 'L’arc-en-ciel apparaît quand il y a du soleil et de la pluie en même temps. Il a sept couleurs.'],
+  étoile: ['⭐', 'Une étoile est un soleil très, très loin. La nuit, on la voit briller comme un petit point.'],
+  'étoile filante': ['🌠', 'Une étoile filante est un petit caillou de l’espace qui brûle en traversant le ciel, comme un trait de lumière.'],
+  lune: ['🌙', 'La lune tourne autour de la Terre. On la voit briller la nuit, et sa forme change chaque soir.'],
+  soleil: ['☀️', 'Le soleil est une énorme étoile très chaude. Il nous donne la lumière et la chaleur. On ne le regarde jamais en face.'],
+  planète: ['🪐', 'Une planète est une très grosse boule qui tourne autour du soleil. Nous vivons sur la planète Terre.'],
+  nuage: ['☁️', 'Le nuage est fait de toutes petites gouttes d’eau qui flottent dans le ciel. Quand elles grossissent, il pleut.'],
+  orage: ['⛈️', 'L’orage, c’est quand il y a des éclairs qui brillent et le tonnerre qui fait boum.'],
+  tonnerre: ['⚡', 'Le tonnerre est le gros bruit, boum, qu’on entend après l’éclair pendant un orage.'],
+  flocon: ['❄️', 'Le flocon est une petite étoile de glace qui tombe du ciel quand il neige.'],
+  printemps: ['🌷', 'Le printemps est la saison où les fleurs poussent et où les oiseaux font leurs nids.'],
+  été: ['☀️', 'L’été est la saison la plus chaude. Les journées sont longues.'],
+  automne: ['🍂', 'L’automne est la saison où les feuilles des arbres deviennent jaunes et rouges, puis tombent.'],
+  hiver: ['❄️', 'L’hiver est la saison la plus froide. Parfois, il neige.'],
+  aurore: ['🌅', 'L’aurore, c’est le tout début du matin, quand le ciel s’éclaire.'],
+  // Espace et métiers
+  astronaute: ['👩‍🚀', 'Un astronaute est une personne qui voyage dans l’espace, dans une fusée.'],
+  fusée: ['🚀', 'La fusée est un engin très puissant qui décolle vers l’espace.'],
+  espace: ['🌌', 'L’espace est tout ce qu’il y a au-dessus du ciel : les étoiles, les planètes, la lune.'],
+  pompier: ['🚒', 'Le pompier éteint les incendies et vient aider les gens en danger.'],
+  boulanger: ['🥖', 'Le boulanger fabrique le pain et les croissants, très tôt le matin.'],
+  fermier: ['🧑‍🌾', 'Le fermier s’occupe des animaux et des champs à la ferme.'],
+  jardinier: ['🧑‍🌾', 'Le jardinier fait pousser les fleurs, les fruits et les légumes.'],
+  facteur: ['📮', 'Le facteur apporte les lettres et les colis dans les boîtes aux lettres.'],
+  maîtresse: ['🧑‍🏫', 'La maîtresse, ou le maître, apprend des choses aux enfants à l’école.'],
+  berger: ['🧑‍🌾', 'Le berger s’occupe des moutons et les emmène manger de l’herbe.'],
+  // Objets et lieux
+  bibliothèque: ['📚', 'La bibliothèque est un endroit plein de livres, qu’on peut emprunter et lire gratuitement.'],
+  cartable: ['🎒', 'Le cartable est le sac où l’on range ses affaires pour l’école.'],
+  bocal: ['🫙', 'Un bocal est un pot en verre. On y garde de la confiture… ou un poisson rouge.'],
+  parapluie: ['☂️', 'Le parapluie s’ouvre au-dessus de la tête pour ne pas être mouillé quand il pleut.'],
+  cerf: ['🦌', 'Le cerf est un grand animal de la forêt. Le papa a des bois sur la tête.'],
+  'cerf-volant': ['🪁', 'Le cerf-volant est un jouet en tissu qui vole dans le ciel grâce au vent, tenu par une ficelle.'],
+  montgolfière: ['🎈', 'La montgolfière est un énorme ballon qui vole dans le ciel avec un panier pour les passagers.'],
+  manège: ['🎠', 'Le manège est un jeu qui tourne en rond, avec des chevaux de bois ou des petites voitures.'],
+  toboggan: ['🛝', 'Le toboggan est une pente glissante du parc : on grimpe en haut et on glisse jusqu’en bas.'],
+  luge: ['🛷', 'La luge est un petit traîneau pour glisser sur la neige.'],
+  échelle: ['🪜', 'L’échelle sert à monter tout en haut, marche après marche.'],
+  cabane: ['🛖', 'Une cabane est une petite maison qu’on construit avec des branches ou des planches.'],
+  château: ['🏰', 'Un château est une très grande maison en pierre, avec des tours, où vivaient les rois et les reines.'],
+  musée: ['🏛️', 'Le musée est un endroit où l’on regarde des choses anciennes ou belles : des tableaux, des dinosaures…'],
+  passage: ['🚸', 'Le passage piéton, ce sont les bandes blanches sur la route, là où l’on traverse avec un adulte.'],
+  casque: ['🪖', 'Le casque protège la tête. On le met toujours à vélo ou en trottinette.'],
+  savon: ['🧼', 'Le savon fait de la mousse et enlève les microbes de nos mains.'],
+  microbe: ['🦠', 'Un microbe est une toute petite bête qu’on ne voit pas. Certains rendent malade : on se lave les mains pour les chasser.'],
+  // Nourriture
+  miel: ['🍯', 'Le miel est un jus doré et sucré fabriqué par les abeilles avec le nectar des fleurs.'],
+  farine: ['🌾', 'La farine est une poudre blanche faite avec du blé écrasé. On s’en sert pour le pain et les gâteaux.'],
+  blé: ['🌾', 'Le blé est une plante des champs. Avec ses graines, on fait la farine et le pain.'],
+  goûter: ['🍪', 'Le goûter est le petit repas de l’après-midi, après l’école.'],
+  'petit-déjeuner': ['🥣', 'Le petit-déjeuner est le premier repas de la journée, le matin.'],
+  // Corps et sentiments
+  cœur: ['❤️', 'Le cœur est dans ta poitrine. Il bat tout le temps, boum boum, pour donner de la force à tout ton corps.'],
+  souffle: ['🌬️', 'Le souffle, c’est l’air qui sort de ta bouche quand tu expires.'],
+  sieste: ['😴', 'La sieste est un petit dodo qu’on fait l’après-midi.'],
+  courage: ['🦁', 'Avoir du courage, c’est essayer quelque chose même quand on a un peu peur.'],
+  colère: ['😠', 'La colère est une émotion qui monte quand quelque chose ne nous plaît pas. Respirer doucement aide à la calmer.'],
+  timide: ['🙈', 'Être timide, c’est se sentir un peu gêné pour parler aux autres. Ça passe petit à petit.'],
+  fier: ['🏅', 'Être fier, c’est être content de soi parce qu’on a réussi quelque chose.'],
+  partager: ['🤝', 'Partager, c’est donner une partie de ce qu’on a pour que les autres en profitent aussi.'],
+  // Mots de poèmes
+  berceuse: ['🎶', 'La berceuse est une chanson très douce qu’on chante pour aider à s’endormir.'],
+  vermeil: ['🌹', 'Vermeil veut dire rouge vif, comme une fraise bien mûre.'],
+  festin: ['🍽️', 'Un festin est un très bon repas, avec plein de bonnes choses.'],
+  épatant: ['🤩', 'Épatant veut dire génial, super !'],
+  entrain: ['😃', 'Avoir de l’entrain, c’est être plein d’énergie et de bonne humeur.'],
+  harpe: ['🎵', 'La harpe est un grand instrument de musique avec beaucoup de cordes qu’on pince avec les doigts.'],
+  trésor: ['💎', 'Un trésor est quelque chose de très précieux, qu’on garde bien caché.'],
+  veiller: ['🌙', 'Veiller sur quelqu’un, c’est rester près de lui pour le protéger.']
+};
+
+/** Trouve l'explication d'un mot tel qu'il apparaît dans le texte (enlève l', d', le pluriel…). */
+export function definitionOf(raw: string): { word: string; emoji: string; text: string } | null {
+  let w = raw.toLowerCase().replace(/[«»"“”.,!?;:…()]/g, '').trim();
+  w = w.replace(/^(l|d|j|s|qu|n|m|t)[’']/, '');
+  const candidates = [w, w.replace(/s$/, ''), w.replace(/x$/, ''), w.replace(/aux$/, 'al'), w.replace(/aux$/, 'ail'), w.replace(/e?s$/, '')];
+  for (const c of candidates) {
+    const d = DICTIONNAIRE[c];
+    if (d) return { word: c, emoji: d[0], text: d[1] };
+  }
+  return null;
+}

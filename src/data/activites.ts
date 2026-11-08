@@ -8,8 +8,9 @@
  */
 
 import { JEUX, splitChoice, type Theme } from './jeux';
+import { JEUX_INTERACTIFS } from './jeuxInteractifs';
 
-export type Category = Theme | 'decouverte' | 'maths' | 'logique';
+export type Category = Theme | 'decouverte' | 'maths' | 'logique' | 'memoire' | 'suites' | 'observation';
 
 interface Base {
   id: string;
@@ -26,6 +27,9 @@ export type Activity = Base &
     | { kind: 'intrus'; items: string[] }
     | { kind: 'vf'; statement: string; answer: boolean }
     | { kind: 'ordre'; question: string; steps: string[] }
+    | { kind: 'memoire'; pairs: string[] }
+    | { kind: 'suite'; sequence: string[]; answer: string; choices: string[] }
+    | { kind: 'trouve'; question: string; targets: string[]; others: string[] }
   );
 
 type Row =
@@ -130,8 +134,8 @@ const byCategory = (list: Activity[]) => {
   return [...map.values()];
 };
 
-/** 110 activités : 50 classiques + 60 jeux d'apprentissage, toutes catégories mêlées. */
-export const ACTIVITES: Activity[] = interleave(byCategory([...APPRENTISSAGES, ...CLASSIQUES]));
+/** 270 activités : 50 classiques + 60 jeux d'apprentissage + 160 jeux interactifs, toutes catégories mêlées. */
+export const ACTIVITES: Activity[] = interleave(byCategory([...APPRENTISSAGES, ...CLASSIQUES, ...JEUX_INTERACTIFS]));
 
 export const CATEGORY_INFO: Record<Category, { label: string; emoji: string }> = {
   langue: { label: 'Langue', emoji: '🗣️' },
@@ -141,5 +145,8 @@ export const CATEGORY_INFO: Record<Category, { label: string; emoji: string }> =
   discipline: { label: 'Discipline', emoji: '⏰' },
   decouverte: { label: 'Découverte', emoji: '🔎' },
   maths: { label: 'Compter', emoji: '🔢' },
-  logique: { label: 'Logique', emoji: '🧠' }
+  logique: { label: 'Logique', emoji: '🧠' },
+  memoire: { label: 'Mémoire', emoji: '🃏' },
+  suites: { label: 'Suites', emoji: '🔁' },
+  observation: { label: 'Observation', emoji: '👆' }
 };

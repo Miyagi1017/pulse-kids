@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Volume2 } from 'lucide-react';
 import { AVATARS, cleanName, type Profile } from '../lib/profile';
 import { soundEffects, speakFrenchText } from '../utils/soundEffects';
+import { markGreeted } from './fx';
 
 /** Premier lancement (ou changement de prénom) : grand champ, avatars, un seul bouton. */
 export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDone: (p: Profile) => void }) {
@@ -21,6 +22,7 @@ export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDo
           soundEffects.playFanfare();
           const clean = cleanName(name);
           speakFrenchText(`Bonjour ${clean} ! Bienvenue dans Pulse Kids !`, { rate: 0.9, pitch: 1.15 });
+          markGreeted();
           onDone({ name: clean, avatar });
         }}
         className="w-full max-w-md bg-white rounded-[2rem] shadow-bonbon p-6 sm:p-8 text-center space-y-6"
@@ -43,6 +45,7 @@ export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDo
           </div>
         </div>
 
+        <div className="relative">
         <input
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 20))}
@@ -51,9 +54,23 @@ export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDo
           autoCapitalize="words"
           enterKeyHint="go"
           maxLength={20}
-          className="w-full text-center text-3xl font-semibold rounded-2xl border-4 border-soleil-clair focus:border-soleil outline-none py-4 px-3 bg-creme"
+          className="w-full text-center text-3xl font-semibold rounded-2xl border-4 border-soleil-clair focus:border-soleil outline-none py-4 px-14 bg-creme"
           aria-label="Ton prénom"
         />
+        {valid && (
+          <motion.button
+            type="button"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileTap={{ scale: 0.85 }}
+            onClick={() => speakFrenchText(cleanName(name), { rate: 0.85, pitch: 1.15 })}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-soleil text-encre flex items-center justify-center"
+            aria-label="Écouter mon prénom"
+          >
+            <Volume2 className="w-5 h-5" />
+          </motion.button>
+        )}
+        </div>
 
         <div>
           <p className="text-doux mb-3">Choisis ton ami :</p>

@@ -41,3 +41,19 @@ test('chaque photo publiée existe et a un crédit avec licence libre', () => {
 test('une vidéo du jour différente chaque jour', () => {
   assert.notEqual(videoOfTheDay('2026-11-07').id, videoOfTheDay('2026-11-08').id);
 });
+
+import { EXTRA_THEMES, JAMY } from './jamy';
+
+test('liens Jamy : chaque thème a au moins 3 vidéos officielles, identifiants YouTube valides et uniques', () => {
+  const ids = Object.values(JAMY).flat().map((v) => v.id);
+  assert.equal(new Set(ids).size, ids.length, 'pas de doublon');
+  for (const theme of [...Object.keys(VIDEO_THEMES), ...Object.keys(EXTRA_THEMES)]) {
+    const list = JAMY[theme as keyof typeof JAMY];
+    assert.ok(list && list.length >= 3, `${theme} : au moins 3 vidéos`);
+    for (const v of list) {
+      assert.match(v.id, /^[\w-]{11}$/, `${theme} : identifiant YouTube`);
+      assert.ok(["C'est pas sorcier", "C'est toujours pas sorcier", 'Le Monde de Jamy', "Je T'explique Comment"].includes(v.channel), `${theme} : chaîne choisie`);
+      assert.match(v.duration, /^\d{1,2}:\d{2}$/);
+    }
+  }
+});

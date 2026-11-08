@@ -10,11 +10,11 @@ import { cleanName } from '../lib/profile';
 
 const FORBIDDEN = /<[^>]+>|https?:\/\/|mort|tuer|sang|guerre|arme|monstre méchant/i;
 
-for (const [label, list] of [['contes', CONTES], ['contes du soir', CONTES_DU_SOIR]] as const) {
-  test(`${label} : exactement 50, ids uniques, 3 à 6 pages courtes`, () => {
-    assert.equal(list.length, 50);
-    assert.equal(new Set(list.map((t) => t.id)).size, 50);
-    assert.equal(new Set(list.map((t) => t.title)).size, 50, 'titres uniques');
+for (const [label, list, expected] of [['contes', CONTES, 200], ['contes du soir', CONTES_DU_SOIR, 50]] as const) {
+  test(`${label} : exactement ${expected}, ids uniques, 3 à 6 pages courtes`, () => {
+    assert.equal(list.length, expected);
+    assert.equal(new Set(list.map((t) => t.id)).size, expected);
+    assert.equal(new Set(list.map((t) => t.title)).size, expected, 'titres uniques');
     for (const t of list) {
       assert.ok(t.pages.length >= 3 && t.pages.length <= 6, `${t.id} : ${t.pages.length} pages`);
       for (const p of t.pages) {
@@ -46,9 +46,10 @@ test('nettoyage du prénom : lettres seulement, majuscule, 20 caractères max', 
   assert.ok(cleanName('a'.repeat(50)).length <= 20);
 });
 
-test('activités : 50 classiques + 60 jeux d’apprentissage = 110, ids uniques, jouables', () => {
-  assert.equal(ACTIVITES.length, 110);
-  assert.equal(new Set(ACTIVITES.map((a) => a.id)).size, 110);
+test('activités : 50 classiques + 60 jeux d’apprentissage + 160 jeux interactifs = 270, ids uniques, jouables', () => {
+  assert.equal(ACTIVITES.length, 270);
+  assert.equal(new Set(ACTIVITES.map((a) => a.id)).size, 270);
+  assert.equal(ACTIVITES.filter((a) => a.id.startsWith('ji-')).length, 160);
   assert.equal(ACTIVITES.filter((a) => a.id.startsWith('jeu-')).length, 60);
   for (const a of ACTIVITES) {
     if (a.kind === 'devinette') {
@@ -62,6 +63,16 @@ test('activités : 50 classiques + 60 jeux d’apprentissage = 110, ids uniques,
     } else if (a.kind === 'ordre') {
       assert.ok(a.steps.length >= 3 && a.steps.length <= 4, a.id);
       assert.equal(new Set(a.steps).size, a.steps.length, `${a.id} : étapes en double`);
+    } else if (a.kind === 'memoire') {
+      assert.ok(a.pairs.length >= 3 && a.pairs.length <= 4, `${a.id} : 3 ou 4 paires`);
+      assert.equal(new Set(a.pairs).size, a.pairs.length, `${a.id} : paires en double`);
+    } else if (a.kind === 'suite') {
+      assert.ok(a.sequence.length >= 4, a.id);
+      assert.ok(a.choices.includes(a.answer), `${a.id} : la réponse est dans les choix`);
+      assert.equal(new Set(a.choices).size, a.choices.length, `${a.id} : choix en double`);
+    } else if (a.kind === 'trouve') {
+      assert.ok(a.targets.length >= 2 && a.others.length >= 4, a.id);
+      assert.ok(!a.targets.some((x) => a.others.includes(x)), `${a.id} : une cible est aussi un piège`);
     } else {
       assert.ok(a.statement.length > 0, a.id);
     }
@@ -81,4 +92,86 @@ test('les 60 jeux couvrent les 5 thèmes (12 chacun) et sont bien mélangés', (
   // Les vrai/faux ont des réponses des deux sortes (pas toujours « oui »).
   const vf = JEUX.filter((j) => j.kind === 'vf');
   assert.ok(vf.some((j) => j.kind === 'vf' && j.answer) && vf.some((j) => j.kind === 'vf' && !j.answer));
+});
+
+import { LECTURES } from './lectures';
+
+test('apprendre à lire : 200 textes (70 + 70 + 60), ids et titres uniques, lignes courtes et sûres', () => {
+  assert.equal(LECTURES.length, 200);
+  assert.deepEqual([1, 2, 3].map((n) => LECTURES.filter((l) => l.niveau === n).length), [70, 70, 60]);
+  assert.equal(new Set(LECTURES.map((l) => l.id)).size, 200);
+  for (const n of [1, 2, 3]) {
+    const titles = LECTURES.filter((l) => l.niveau === n).map((l) => l.title);
+    assert.equal(new Set(titles).size, titles.length, `niveau ${n} : titres uniques`);
+  }
+  for (const l of LECTURES) {
+    assert.ok(l.lines.length >= 3 && l.lines.length <= 6, `${l.id} : ${l.lines.length} lignes`);
+    for (const line of l.lines) {
+      assert.ok(line.length <= (l.niveau === 1 ? 45 : 70), `${l.id} : ligne trop longue (${line})`);
+      assert.ok(!FORBIDDEN.test(line), `${l.id} : contenu interdit`);
+    }
+  }
+});
+
+import { AVENTURES } from './aventures';
+
+test('aventures à explorer : 12 scènes, 3 cachettes chacune, objets dans la scène', () => {
+  assert.equal(AVENTURES.length, 12);
+  assert.equal(new Set(AVENTURES.map((a) => a.id)).size, 12);
+  for (const a of AVENTURES) {
+    assert.equal(a.spots.filter((s) => s.hides).length, 3, `${a.id} : 3 cachettes`);
+    assert.ok(a.spots.length >= 7, `${a.id} : assez d'objets à toucher`);
+    for (const s of a.spots) {
+      assert.ok(s.x >= 8 && s.x <= 92 && s.y >= 8 && s.y <= 92, `${a.id} : ${s.emoji} sort de la scène`);
+      assert.ok(s.say.length > 0 && !FORBIDDEN.test(s.say), `${a.id} : phrase`);
+    }
+  }
+});
+
+import { definitionOf, DICTIONNAIRE } from './dictionnaire';
+
+test('dictionnaire : des explications simples, retrouvées même avec l’, le pluriel ou la ponctuation', () => {
+  assert.ok(Object.keys(DICTIONNAIRE).length >= 120);
+  for (const [word, [emoji, text]] of Object.entries(DICTIONNAIRE)) {
+    assert.ok(emoji && text.length >= 20 && text.length <= 160, `${word} : explication`);
+    assert.ok(!FORBIDDEN.test(text), `${word} : contenu interdit`);
+  }
+  assert.equal(definitionOf('crinière.')?.word, 'crinière');
+  assert.equal(definitionOf('L’abeille')?.word, 'abeille');
+  assert.equal(definitionOf('nénuphars')?.word, 'nénuphar');
+  assert.equal(definitionOf('coraux')?.word, 'corail');
+  assert.equal(definitionOf('maison'), null);
+  // Une bonne partie des textes à lire contient au moins un mot expliqué.
+  const withDef = LECTURES.filter((l) => l.lines.join(' ').split(/\s+/).some((w) => definitionOf(w)));
+  assert.ok(withDef.length >= 100, `${withDef.length} textes ont un mot expliqué`);
+});
+
+import { CLASSIQUES } from './classiques';
+
+test('grands classiques : 26 contes adaptés, l’auteur cité, pages courtes et douces', () => {
+  assert.equal(CLASSIQUES.length, 26);
+  assert.equal(new Set(CLASSIQUES.map((t) => t.id)).size, 26);
+  for (const t of CLASSIQUES) {
+    assert.ok(t.pages.length >= 5 && t.pages.length <= 7, `${t.id} : ${t.pages.length} pages`);
+    assert.match(t.pages[0], /(fable|conte)/i, `${t.id} : la 1re page dit d’où vient l’histoire`);
+    for (const p of t.pages) {
+      assert.ok(p.length <= 240, `${t.id} : page trop longue (${p.length})`);
+      assert.ok(!FORBIDDEN.test(p), `${t.id} : contenu interdit`);
+    }
+  }
+  assert.equal(CLASSIQUES.filter((t) => /La Fontaine/.test(t.pages[0])).length, 12, '12 fables de La Fontaine');
+});
+
+import { sceneFor } from '../components/ThemeScene';
+
+test('décor animé : choisi d’après les mots du texte, avec un repli', () => {
+  assert.equal(sceneFor('La baleine chante dans l’océan'), 'mer');
+  assert.equal(sceneFor('Un petit flocon tombe sur le bonhomme de neige'), 'neige');
+  assert.equal(sceneFor('La fusée décolle vers la planète'), 'espace');
+  assert.equal(sceneFor('Le renard se promène dans la forêt'), 'nature');
+  assert.equal(sceneFor('Il pleut, j’ai mon parapluie'), 'pluie');
+  assert.equal(sceneFor('Bonne nuit, petit cœur', 'nuit'), 'corps');
+  assert.equal(sceneFor('Un mot sans indice', 'nuit'), 'nuit');
+  // Chaque conte du soir a un décor (au moins la nuit).
+  for (const t of CONTES_DU_SOIR) assert.ok(sceneFor(`${t.title} ${t.pages.join(' ')}`, 'nuit'));
 });

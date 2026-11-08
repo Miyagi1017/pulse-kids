@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+import { useMemo, useState, type PointerEvent } from 'react';
+import { motion, useAnimationControls } from 'motion/react';
 import type { Tale } from '../data/format';
 import { ambienceFor } from '../data/ambience';
 import { illustrationFor } from '../data/illustrations';
+import { soundEffects } from '../utils/soundEffects';
+import { burst } from './fx';
+import { float, jump } from '../lib/motion';
+
+const heroFloat = float(10, 2.4);
+const nightFloat = float(6, 3.6);
 
 /**
  * Illustration animée d'un conte :
@@ -67,25 +73,35 @@ export function TaleScene({ tale, page }: { tale: Tale; page: number }) {
   const [failed, setFailed] = useState(false);
   const night = tale.kind === 'soir';
   const pan = PANS[page % PANS.length];
+  const amb = useMemo(() => ambienceFor(tale), [tale]);
+  const hop = useAnimationControls();
+
+  // Toucher l'image : les particules du conte jaillissent du doigt, et le héros sautille.
+  const touch = (e: PointerEvent<HTMLElement>) => {
+    soundEffects.playSparkle();
+    burst(e.clientX, e.clientY, [...amb.particles.filter((c) => c !== '·'), tale.emoji], 8);
+    void hop.start(jump(22, 0.75));
+  };
 
   if (!src || failed) {
     return (
-      <div className="relative w-full max-w-md aspect-[4/3] flex items-center justify-center">
+      <div className="relative w-full max-w-md aspect-[4/3] flex items-center justify-center cursor-pointer" onPointerDown={touch}>
         <Particles tale={tale} />
-        <motion.div
-          className="text-8xl sm:text-9xl"
-          animate={{ y: [0, -10, 0], rotate: night ? 0 : [0, 4, -4, 0] }}
-          transition={{ duration: night ? 5 : 3, repeat: Infinity, ease: 'easeInOut' }}
-          aria-hidden
-        >
-          {tale.emoji}
+        <motion.div animate={hop} style={{ originY: 1 }} aria-hidden>
+          <motion.div
+            className="text-8xl sm:text-9xl"
+            animate={(night ? nightFloat : heroFloat).animate}
+            transition={(night ? nightFloat : heroFloat).transition}
+          >
+            {tale.emoji}
+          </motion.div>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <figure className={`relative w-full max-w-lg aspect-[4/3] rounded-[2rem] overflow-hidden shadow-bonbon ring-4 ${night ? 'ring-white/15' : 'ring-white'}`}>
+    <figure onPointerDown={touch} className={`relative w-full max-w-lg aspect-[4/3] rounded-[2rem] overflow-hidden shadow-bonbon ring-4 cursor-pointer ${night ? 'ring-white/15' : 'ring-white'}`}>
       <motion.img
         key={page}
         src={src}
@@ -99,9 +115,9 @@ export function TaleScene({ tale, page }: { tale: Tale; page: number }) {
       />
       {night && <div className="absolute inset-0 bg-nuit/25" aria-hidden />}
       <Particles tale={tale} />
-      <span className="absolute bottom-3 right-3 text-3xl bg-white/85 rounded-2xl w-12 h-12 flex items-center justify-center shadow" aria-hidden>
+      <motion.span animate={hop} style={{ originY: 1 }} className="absolute bottom-3 right-3 text-3xl bg-white/85 rounded-2xl w-12 h-12 flex items-center justify-center shadow" aria-hidden>
         {tale.emoji}
-      </span>
+      </motion.span>
     </figure>
   );
 }

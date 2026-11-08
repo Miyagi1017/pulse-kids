@@ -3,6 +3,8 @@
  * 100% offline-compatible, no external audio assets required.
  */
 
+import { pickVoice, softTone } from './voice';
+
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
@@ -46,6 +48,110 @@ class SoundEngine {
 
     osc.start(now);
     osc.stop(now + 0.09);
+  }
+
+  /** Petit « oups » doux (deux notes qui descendent) : une erreur, sans jamais faire peur. */
+  public playOops() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    [523.25, 392].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime + i * 0.13;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    });
+  }
+
+  /** « Fffuit » de page qui tourne (bruit filtré qui glisse). */
+  public playWhoosh() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.3), ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(600, now);
+    filter.frequency.exponentialRampToValueAtTime(2400, now + 0.25);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(now);
+  }
+
+  /** « Tic » court : les dernières secondes d'un chrono. */
+  public playTick() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(1200, now);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.06);
+  }
+
+  /** « Boing » élastique : quand on touche la mascotte. */
+  public playBoing() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.exponentialRampToValueAtTime(520, now + 0.12);
+    osc.frequency.exponentialRampToValueAtTime(260, now + 0.3);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.36);
+  }
+
+  /** Petite pluie de notes aiguës : quand on touche une image. */
+  public playSparkle() {
+    if (this.isMuted) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    [1318.5, 1568, 2093].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const now = ctx.currentTime + idx * 0.05;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq * (0.97 + Math.random() * 0.06), now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.21);
+    });
   }
 
   public playStarChime() {
@@ -352,6 +458,18 @@ export interface SpeakOptions {
 
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 
+/** La voix la plus douce disponible ; recalculée quand le navigateur charge ses voix (souvent après coup). */
+let cachedVoice: SpeechSynthesisVoice | undefined;
+function frenchVoice(): SpeechSynthesisVoice | undefined {
+  if (!cachedVoice) cachedVoice = pickVoice(window.speechSynthesis.getVoices());
+  return cachedVoice;
+}
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  window.speechSynthesis.addEventListener?.('voiceschanged', () => {
+    cachedVoice = pickVoice(window.speechSynthesis.getVoices());
+  });
+}
+
 export function stopSpeaking() {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -375,14 +493,15 @@ export function speakFrenchText(text: string, options: SpeakOptions = {}) {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'fr-FR';
-  utterance.rate = options.rate ?? 0.85;
-  utterance.pitch = options.pitch ?? 1.1;
+  // Voix de conteuse : douce, posée, jamais criarde (voir utils/voice.ts).
+  const tone = softTone(options.rate, options.pitch);
+  utterance.rate = tone.rate;
+  utterance.pitch = tone.pitch;
+  utterance.volume = tone.volume;
 
-  // Try to pick a good French voice
-  const voices = window.speechSynthesis.getVoices();
-  const frVoice = voices.find(v => v.lang.startsWith('fr') && (v.name.includes('Amélie') || v.name.includes('Thomas') || v.name.includes('Google') || v.name.includes('Natural')));
-  if (frVoice) {
-    utterance.voice = frVoice;
+  const voice = frenchVoice();
+  if (voice) {
+    utterance.voice = voice;
   }
 
   utterance.onboundary = (event) => {

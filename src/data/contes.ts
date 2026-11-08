@@ -1,8 +1,9 @@
 /**
- * 50 contes de journée pour les 5 ans.
+ * 200 contes de journée pour les 5 ans (50 ici + 150 dans contesPlus.ts).
  * Format compact : [emoji, titre, pages séparées par « | »]. « {p} » = prénom de l'enfant.
  */
 import { parseTales } from './format';
+import { CONTES_PLUS } from './contesPlus';
 
 export const CONTES = parseTales('conte', [
   ['🦊', 'Nino le renard qui avait peur du noir', 'Nino le petit renard avait un secret : il avait peur du noir.|Un soir, une luciole se posa sur son nez. « Je vais t’éclairer ! » dit-elle.|Ensemble, ils découvrirent la forêt de nuit : les chouettes, les étoiles, le doux bruit du vent.|Depuis, Nino n’a plus peur. Et toi {p}, tu sais que la nuit aussi est pleine de jolies choses ?'],
@@ -54,5 +55,6 @@ export const CONTES = parseTales('conte', [
   ['🎪', 'Le cirque des animaux', 'Le cirque arrivait en ville avec des animaux rigolos.|Un phoque jonglait, un chien faisait du vélo, un ours dansait.|{p} applaudit si fort que tous les animaux saluèrent.|C’était le plus beau spectacle de l’année !'],
   ['🌸', 'Le cerisier en fleurs', 'Au printemps, le cerisier se couvrit de fleurs roses.|Le vent fit voler les pétales comme une pluie de couleurs.|Les enfants dansaient dessous en riant.|L’été venu, l’arbre leur offrit de délicieuses cerises.'],
   ['🦀', 'Le crabe qui marchait de côté', 'Paco le crabe marchait de côté, et les autres trouvaient ça drôle.|Un jour, un rocher bloqua le chemin de tout le monde.|Seul Paco put passer, en marchant de côté !|Il alla chercher de l’aide et sauva ses amis.'],
-  ['🏆', 'La grande course de {p}', 'C’était le jour de la grande course de l’école.|{p} courut de toutes ses forces, le cœur battant.|Un ami tomba : {p} s’arrêta pour l’aider à se relever.|Ils finirent la course main dans la main, sous les applaudissements.']
+  ['🏆', 'La grande course de {p}', 'C’était le jour de la grande course de l’école.|{p} courut de toutes ses forces, le cœur battant.|Un ami tomba : {p} s’arrêta pour l’aider à se relever.|Ils finirent la course main dans la main, sous les applaudissements.'],
+  ...CONTES_PLUS
 ]);

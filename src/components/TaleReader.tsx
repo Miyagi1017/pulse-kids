@@ -6,6 +6,7 @@ import { personalize, type Tale } from '../data/format';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
 import { SpeakButton, TopBar } from './ui';
 import { TaleScene } from './TaleScene';
+import { sceneFor, ThemeScene } from './ThemeScene';
 
 /**
  * Lecteur de conte page par page : gros emoji animé, texte large, lecture à voix haute
@@ -18,6 +19,9 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
   const [listening, setListening] = useState(false);
   const pages = tale.pages.map((p) => personalize(p, name));
   const isEnd = page >= pages.length;
+  // Décor : d'après la page en cours, sinon d'après toute l'histoire.
+  const taleTheme = sceneFor(`${tale.title} ${pages.join(' ')}`, night ? 'nuit' : 'nature');
+  const pageTheme = isEnd ? taleTheme : sceneFor(pages[page], taleTheme);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -51,6 +55,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
   }, [isEnd]);
 
   const go = (delta: number) => {
+    soundEffects.playWhoosh();
     stopSpeaking();
     setListening(false);
     soundEffects.playPop();
@@ -59,15 +64,18 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
 
   return (
     <div className={`min-h-dvh flex flex-col ${night ? 'bg-nuit text-white' : ''}`}>
-      {night && (
-        <div className="fixed inset-0 pointer-events-none overflow-hidden" aria-hidden>
-          {Array.from({ length: 18 }, (_, i) => (
-            <span key={i} className="absolute twinkle text-xs" style={{ left: `${(i * 53) % 100}%`, top: `${(i * 37) % 90}%`, animationDelay: `${(i % 6) * 0.5}s` }}>
-              ✦
-            </span>
-          ))}
-        </div>
-      )}
+      {/* Décor animé de la scène : la nuit pour les contes du soir, plus le thème de la page */}
+      <div className="fixed inset-0 pointer-events-none z-0" aria-hidden>
+        {night && <ThemeScene theme="nuit" />}
+        {/* La nuit, pas de décor avec un soleil (nature, journal) : seulement la nuit */}
+        {pageTheme !== 'nuit' && !(night && (pageTheme === 'nature' || pageTheme === 'journal')) && (
+          <AnimatePresence mode="wait">
+            <motion.div key={pageTheme} className={`absolute inset-0 ${night ? 'opacity-50' : ''}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.8 }}>
+              <ThemeScene theme={pageTheme} />
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </div>
 
       <TopBar
         title={tale.title}
@@ -92,7 +100,7 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
         }
       />
 
-      <main className="relative flex-1 max-w-2xl w-full mx-auto px-5 flex flex-col">
+      <main className="relative z-10 flex-1 max-w-2xl w-full mx-auto px-5 flex flex-col">
         <AnimatePresence mode="wait">
           {!isEnd ? (
             <motion.section

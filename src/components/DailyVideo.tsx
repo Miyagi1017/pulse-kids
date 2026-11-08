@@ -7,6 +7,13 @@ import { personalize } from '../data/format';
 import type { Playable } from '../lib/playlist';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
 import { TopBar } from './ui';
+import { burst } from './fx';
+import { ThemeScene, type SceneTheme } from './ThemeScene';
+import { float, SPRING_SOFT, sway } from '../lib/motion';
+
+const cloud = float(12, 2.8);
+const sparkle = sway(18, 2.2);
+const heroFloat = float(8, 2.2);
 
 const BG: Record<VideoScene['bg'], string> = {
   soleil: 'bg-soleil text-encre',
@@ -121,13 +128,19 @@ export function VideoPlayer({ playlist, startIndex, name, onBack, onWatched }: {
                 initial={{ opacity: 0, scale: 1.04 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.97 }}
-                transition={{ duration: 0.45 }}
-                className={`absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 text-center ${BG[scene.bg]}`}
+                transition={SPRING_SOFT}
+                onPointerDown={(e) => {
+                  soundEffects.playSparkle();
+                  burst(e.clientX, e.clientY, [scene.emoji, '✨', '⭐'], 7);
+                }}
+                className={`absolute inset-0 flex flex-col items-center justify-center gap-6 p-6 text-center cursor-pointer ${BG[scene.bg]}`}
               >
-                <motion.span className="absolute top-6 left-6 text-4xl opacity-40" animate={{ y: [0, -12, 0] }} transition={{ duration: 4, repeat: Infinity }} aria-hidden>
+                {/* Décor animé propre au thème de la vidéo */}
+                <ThemeScene theme={(video.category as SceneTheme | undefined) ?? 'journal'} />
+                <motion.span className="absolute top-6 left-6 text-4xl opacity-40" animate={cloud.animate} transition={cloud.transition} aria-hidden>
                   ☁️
                 </motion.span>
-                <motion.span className="absolute bottom-24 right-8 text-3xl opacity-40" animate={{ rotate: [0, 20, 0] }} transition={{ duration: 5, repeat: Infinity }} aria-hidden>
+                <motion.span className="absolute bottom-24 right-8 text-3xl opacity-40" animate={sparkle.animate} transition={sparkle.transition} aria-hidden>
                   ✨
                 </motion.span>
 
@@ -151,11 +164,13 @@ export function VideoPlayer({ playlist, startIndex, name, onBack, onWatched }: {
                   <motion.div
                     className="text-[7rem] sm:text-[9rem] leading-none drop-shadow-lg"
                     initial={{ scale: 0, rotate: -30 }}
-                    animate={{ scale: [0, 1.2, 1], rotate: 0, y: [0, 0, -10, 0] }}
-                    transition={{ duration: 1.6, times: [0, 0.4, 0.7, 1] }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 11, delay: 0.15 }}
                     aria-hidden
                   >
-                    {scene.emoji}
+                    <motion.span className="inline-block" animate={heroFloat.animate} transition={heroFloat.transition}>
+                      {scene.emoji}
+                    </motion.span>
                   </motion.div>
                 )}
 

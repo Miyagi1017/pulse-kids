@@ -85,3 +85,98 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* =====================================================================
+   Thèmes : 🌸 Kawaii (par défaut) · 🍃 Aquarelle (paysages peints, lumière dorée)
+   Les couleurs du design system sont des variables : chaque thème les redéfinit.
+   ===================================================================== */
+:root,
+:root[data-theme='kawaii'] {
+  --color-creme: #fff6fb;
+  --color-encre: #47386b;
+  --color-doux: #8577a6;
+  --color-soleil: #ffd36b;
+  --color-soleil-clair: #fff2cf;
+  --color-corail: #ff7fa3;
+  --color-corail-clair: #ffe2ec;
+  --color-menthe: #3cc49c;
+  --color-menthe-clair: #dbf6ed;
+  --color-ciel: #6db8ff;
+  --color-ciel-clair: #e2f0ff;
+  --color-lavande: #a08aff;
+  --color-lavande-clair: #efe9ff;
+  --color-rose: #ff9ec7;
+  --color-rose-clair: #ffe6f1;
+  --color-nuit: #4a3d8f;
+  --sticker-border: #ffffff;
+  --backdrop: linear-gradient(180deg, #ffe9f3 0%, #f3ecff 45%, #fff6fb 100%);
+}
+
+:root[data-theme='aquarelle'] {
+  --color-creme: #f7f1e3;
+  --color-encre: #2f3a2c;
+  --color-doux: #6b775c;
+  --color-soleil: #efbf4f;
+  --color-soleil-clair: #faecc8;
+  --color-corail: #d9785a;
+  --color-corail-clair: #f6dccf;
+  --color-menthe: #5f9f62;
+  --color-menthe-clair: #e1eed6;
+  --color-ciel: #4f8fc9;
+  --color-ciel-clair: #dce8f3;
+  --color-lavande: #7f74b0;
+  --color-lavande-clair: #e9e6f3;
+  --color-rose: #dc8e98;
+  --color-rose-clair: #f6e1e3;
+  --color-nuit: #2b3656;
+  --sticker-border: #fffaf0;
+  --backdrop: linear-gradient(180deg, #a9d2ee 0%, #cfe6f2 38%, #f6ecd6 72%, #f7f1e3 100%);
+}
+
+body {
+  background: var(--backdrop), var(--color-creme);
+  background-attachment: fixed;
+}
+
+/* Tuiles « autocollant » : bord blanc épais, ombre douce, légère inclinaison. */
+.sticker {
+  border: 5px solid var(--sticker-border);
+  box-shadow: 0 6px 0 rgb(0 0 0 / 0.06), 0 14px 30px -14px rgb(71 56 107 / 0.35);
+}
+:root[data-theme='aquarelle'] .sticker {
+  border-width: 3px;
+  box-shadow: 0 2px 0 rgb(47 58 44 / 0.06), 0 16px 32px -18px rgb(47 58 44 / 0.4);
+}
+
+/* Décor animé : uniquement des transformations (fluide même sur une petite tablette). */
+@keyframes petal-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.9; }
+  100% { transform: translate3d(var(--drift, 60px), 110vh, 0) rotate(540deg); opacity: 0.7; }
+}
+@keyframes petal-sway {
+  0%, 100% { margin-left: 0; }
+  50% { margin-left: 28px; }
+}
+.petal {
+  position: absolute;
+  top: 0;
+  animation: petal-fall var(--dur, 14s) linear infinite, petal-sway 3.2s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes cloud-drift {
+  from { transform: translate3d(-30vw, 0, 0); }
+  to { transform: translate3d(110vw, 0, 0); }
+}
+.cloud {
+  position: absolute;
+  animation: cloud-drift var(--dur, 120s) linear infinite;
+  will-change: transform;
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.bob {
+  animation: bob 4s ease-in-out infinite;
+}
