@@ -9,7 +9,8 @@
     "render": "remotion render src/index.ts",
     "render:all": "node scripts/render-all.mjs",
     "intro": "node scripts/render-intro.mjs",
-    "publish:videos": "node scripts/publish-videos.mjs"
+    "publish:videos": "node scripts/publish-videos.mjs",
+    "voices": "npx tsx scripts/export-voice-lines.ts && .venv/Scripts/python scripts/generate_voices.py"
   },
   "dependencies": {
     "@remotion/cli": "4.0.541",

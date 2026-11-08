@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src", "remotion.config.ts"]
+  "include": ["src", "scripts/*.ts", "remotion.config.ts"]
 }

@@ -28,3 +28,8 @@ video/intro/.hyperframes/
 # Outils locaux
 .claude/
 skills-lock.json
+
+# Voix off (modèle et audios régénérables)
+video/.venv/
+video/.tts/
+video/public/voice/

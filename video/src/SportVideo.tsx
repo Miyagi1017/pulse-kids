@@ -1,13 +1,14 @@
 import { linearTiming, TransitionSeries } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
 import { slide } from '@remotion/transitions/slide';
-import { AbsoluteFill, getStaticFiles, interpolate, OffthreadVideo, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Audio, getStaticFiles, interpolate, OffthreadVideo, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
 import type { SportMove, SportTip } from '../../src/data/sport';
 import { mascotForMove } from '../../src/lib/mascots';
 import { POSES, poseFor } from '../../src/lib/poses';
 import { FONT } from './fonts';
 import { FrameMascot } from './FrameMascot';
 import { KawaiiBackground } from './KawaiiBackground';
+import { BRAVO_LINE, COUNT_LINES, titleLine, voiceDuration, voiceFile } from './voice';
 
 export const FPS = 30;
 export const WIDTH = 1280;
@@ -26,8 +27,23 @@ const SOFT = '#8577a6';
 const hasIntro = () => getStaticFiles().some((f) => f.name === INTRO_FILE);
 const moveFrames = (m: SportMove) => m.seconds * FPS;
 
+const VOICE_DELAY = 10;
+/** La scène dure au moins le temps de la phrase, plus une petite respiration. */
+const fitVoice = (min: number, text: string) => Math.max(min, Math.ceil((voiceDuration(text) ?? 0) * FPS) + VOICE_DELAY + 24);
+const titleFrames = (tip: SportTip) => fitVoice(TITLE, titleLine(tip));
+const bravoFrames = () => fitVoice(BRAVO, BRAVO_LINE);
+
+function Voice({ text, from = VOICE_DELAY }: { text: string; from?: number }) {
+  if (voiceDuration(text) === null) return null;
+  return (
+    <Sequence from={from} layout="none">
+      <Audio src={staticFile(voiceFile(text))} />
+    </Sequence>
+  );
+}
+
 function segments(tip: SportTip): number[] {
-  return [...(hasIntro() ? [INTRO] : []), TITLE, ...tip.moves.map(moveFrames), BRAVO];
+  return [...(hasIntro() ? [INTRO] : []), titleFrames(tip), ...tip.moves.map(moveFrames), bravoFrames()];
 }
 
 export function sportVideoFrames(tip: SportTip): number {
@@ -47,6 +63,7 @@ function TitleScene({ tip }: { tip: SportTip }) {
   const pop = usePop();
   return (
     <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 56, padding: 60, fontFamily: FONT, color: INK }}>
+      <Voice text={titleLine(tip)} />
       <div style={{ transform: `scale(${pop})` }}>
         <FrameMascot animal={mascotForMove(tip.moves[0])} mood="cheer" size={360} />
       </div>
@@ -94,6 +111,10 @@ function MoveScene({ move, index, count }: { move: SportMove; index: number; cou
 
   return (
     <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 44, padding: '40px 70px', fontFamily: FONT, color: INK }}>
+      <Voice text={move.text} />
+      {COUNT_LINES.map((line, i) => (
+        <Voice key={line} text={line} from={total - (3 - i) * fps} />
+      ))}
       <div style={{ position: 'relative', width: 440, display: 'flex', justifyContent: 'center', transform: `scale(${pop})` }}>
         <FrameMascot animal={mascotForMove(move)} gesture={move.anim} size={380} />
         <div style={{ ...card, position: 'absolute', right: 0, bottom: 10, width: 112, height: 112, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 62 }}>{move.emoji}</div>
@@ -127,6 +148,7 @@ function BravoScene({ tip }: { tip: SportTip }) {
   const t = frame / fps;
   return (
     <AbsoluteFill style={{ alignItems: 'center', justifyContent: 'center', fontFamily: FONT, color: INK }}>
+      <Voice text={BRAVO_LINE} />
       {Array.from({ length: 48 }, (_, i) => {
         const a = (i * 137.5 * Math.PI) / 180;
         const speed = 340 + (i % 7) * 70;
@@ -159,7 +181,7 @@ export function SportVideo({ tip }: { tip: SportTip }) {
             <TransitionSeries.Transition presentation={fade()} timing={timing} />
           </>
         )}
-        <TransitionSeries.Sequence durationInFrames={TITLE}>
+        <TransitionSeries.Sequence durationInFrames={titleFrames(tip)}>
           <TitleScene tip={tip} />
         </TransitionSeries.Sequence>
         {tip.moves.flatMap((move, i) => [
@@ -169,7 +191,7 @@ export function SportVideo({ tip }: { tip: SportTip }) {
           </TransitionSeries.Sequence>
         ])}
         <TransitionSeries.Transition presentation={fade()} timing={timing} />
-        <TransitionSeries.Sequence durationInFrames={BRAVO}>
+        <TransitionSeries.Sequence durationInFrames={bravoFrames()}>
           <BravoScene tip={tip} />
         </TransitionSeries.Sequence>
       </TransitionSeries>
