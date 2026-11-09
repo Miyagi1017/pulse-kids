@@ -5,7 +5,7 @@
 import { copyFileSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
-const OUT = 'out';
+const OUT = process.env.RENDER_OUT ?? 'out';
 const DEST = '../public/videos';
 mkdirSync(DEST, { recursive: true });
 

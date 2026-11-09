@@ -22,7 +22,7 @@ const INTRO_FILE = 'intro.mp4';
 const INTRO = 75; // générique HTML rendu avec HyperFrames (facultatif)
 const TITLE = 105;
 const BRAVO = 120;
-const TRANSITION = 18;
+export const TRANSITION = 18;
 
 const INK = '#47386b';
 const TEAL_RING = '#16c7c0';
@@ -30,15 +30,15 @@ const BRAVO_OUTLINE = '#2f7fd0';
 
 const hasIntro = () => getStaticFiles().some((f) => f.name === INTRO_FILE);
 
-const VOICE_DELAY = 10;
+export const VOICE_DELAY = 10;
 const GAP = 14;
 const BREATH = 24; // silence minimal entre deux refrains : la musique reprend le dessus
 const COUNTDOWN = 3 * FPS;
-const END_PAUSE = 24;
+export const END_PAUSE = 24;
 
-const framesOf = (text: string) => Math.ceil((voiceDuration(text) ?? 0) * FPS);
+export const framesOf = (text: string) => Math.ceil((voiceDuration(text) ?? 0) * FPS);
 
-interface Spoken {
+export interface Spoken {
   text: string;
   from: number;
 }
@@ -101,7 +101,7 @@ function speechIntervals(tip: SportTip): [number, number][] {
   });
 }
 
-function Voices({ lines }: { lines: Spoken[] }) {
+export function Voices({ lines }: { lines: Spoken[] }) {
   return (
     <>
       {lines
@@ -158,7 +158,7 @@ interface Shot {
 const FLOOR = 112; // les personnages restent au-dessus du sous-titre
 
 /** Plan large, moyen, serré. Quand les jambes comptent, on ne s'approche pas trop pour les garder à l'image. */
-function shotFor(move: SportMove, index: number): Shot {
+export function shotFor(move: Pick<SportMove, 'anim'>, index: number): Shot {
   const legsMatter = ['saut', 'course', 'tourne'].includes(move.anim);
   const kind = index % 3;
   if (kind === 0) return { zoom: 1, originX: 50, kidFirst: true };
@@ -167,7 +167,7 @@ function shotFor(move: SportMove, index: number): Shot {
 }
 
 /** Le décor et les personnages bougent ensemble ; le léger travelling évite un plan figé. */
-function Camera({ shot, duration, seed, children }: { shot: Pick<Shot, 'zoom' | 'originX'>; duration: number; seed: number; children: ReactNode }) {
+export function Camera({ shot, duration, seed, children }: { shot: Pick<Shot, 'zoom' | 'originX'>; duration: number; seed: number; children: ReactNode }) {
   const frame = useCurrentFrame();
   const drift = 1 + 0.035 * interpolate(frame, [0, duration], [0, 1], { extrapolateRight: 'clamp' });
   return (
@@ -188,7 +188,7 @@ function Slot({ first, children }: { first: boolean; children: ReactNode }) {
 }
 
 /** L'enfant et la mascotte côte à côte ; l'enfant part une fraction de seconde après, comme s'il imitait. */
-function Duo({ animal, seed, kidFirst, gesture, kidMood, animalMood, signs }: { animal: Animal; seed: number; kidFirst: boolean; gesture?: SportMove['anim']; kidMood?: Mood; animalMood?: Mood; signs?: ReactNode }) {
+export function Duo({ animal, seed, kidFirst, gesture, kidMood, animalMood, signs }: { animal: Animal; seed: number; kidFirst: boolean; gesture?: SportMove['anim']; kidMood?: Mood; animalMood?: Mood; signs?: ReactNode }) {
   return (
     <>
       <Slot first={kidFirst}>
@@ -202,7 +202,7 @@ function Duo({ animal, seed, kidFirst, gesture, kidMood, animalMood, signs }: { 
   );
 }
 
-function usePop(delay = 0) {
+export function usePop(delay = 0) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return spring({ frame: frame - delay, fps, config: { damping: 11, stiffness: 170 } });
@@ -219,7 +219,7 @@ function PoseName({ name, detail, pop }: { name: string; detail?: string; pop: n
 }
 
 /** Gros titre brillant : lettres blanches, contour de couleur, relief. */
-function GlossTitle({ children, size, outline }: { children: string; size: number; outline: string }) {
+export function GlossTitle({ children, size, outline }: { children: string; size: number; outline: string }) {
   return (
     <span
       style={{
@@ -325,23 +325,27 @@ function BravoScene({ tip }: { tip: SportTip }) {
   );
 }
 
-const timing = linearTiming({ durationInFrames: TRANSITION, easing: Easing.inOut(Easing.cubic) });
+export const timing = linearTiming({ durationInFrames: TRANSITION, easing: Easing.inOut(Easing.cubic) });
 
 const MUSIC_UNDER_VOICE = 0.13; // assez bas pour que la voix reste bien au premier plan
 const MUSIC_ALONE = 0.3; // la musique respire entre les phrases
 const MUSIC_DUCK = 12;
 const MUSIC_FADE = 45;
 
-export function SportVideo({ tip }: { tip: SportTip }) {
-  const intro = hasIntro();
-  const total = sportVideoFrames(tip);
-  const speech = speechIntervals(tip);
-  const seed = seedOf(tip);
-  const musicVolume = (f: number) => {
+/** Le volume de la musique image par image : plus bas quand la voix parle. */
+export function musicVolumeFor(speech: [number, number][], total: number) {
+  return (f: number) => {
     const distance = speech.reduce((best, [a, b]) => Math.min(best, f < a ? a - f : f > b ? f - b : 0), MUSIC_DUCK);
     const level = interpolate(distance, [0, MUSIC_DUCK], [MUSIC_UNDER_VOICE, MUSIC_ALONE]);
     return level * interpolate(f, [0, MUSIC_FADE, total - MUSIC_FADE, total], [0, 1, 1, 0], { extrapolateRight: 'clamp' });
   };
+}
+
+export function SportVideo({ tip }: { tip: SportTip }) {
+  const intro = hasIntro();
+  const total = sportVideoFrames(tip);
+  const seed = seedOf(tip);
+  const musicVolume = musicVolumeFor(speechIntervals(tip), total);
   return (
     <AbsoluteFill>
       <Audio src={staticFile('music.wav')} volume={musicVolume} />
