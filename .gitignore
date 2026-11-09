@@ -33,3 +33,5 @@ skills-lock.json
 video/.venv/
 video/.tts/
 video/public/voice/
+video/public/music.wav
+video/out-v2/

@@ -9,8 +9,10 @@
     "render": "remotion render src/index.ts",
     "render:all": "node scripts/render-all.mjs",
     "intro": "node scripts/render-intro.mjs",
+    "textures": "node scripts/generate-textures.cjs",
+    "music": ".venv/Scripts/python scripts/generate_music.py",
     "publish:videos": "node scripts/publish-videos.mjs",
-    "voices": "npx tsx scripts/export-voice-lines.ts && .venv/Scripts/python scripts/generate_voices.py"
+    "voices": "npx tsx scripts/export-voice-lines.ts && \".venv/Scripts/python\" scripts/generate_voices.py"
   },
   "dependencies": {
     "@remotion/cli": "4.0.541",

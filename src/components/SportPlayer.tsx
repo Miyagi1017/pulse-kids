@@ -183,6 +183,7 @@ export function SportPlayer({
                 ))}
               </ol>
               <p className="text-doux font-medium max-w-md">⚠️ {rule}</p>
+              {tip.adulte && <p className="text-doux text-sm max-w-md">🧑‍🍼 Pour l’adulte : {tip.adulte}</p>}
               <p className="text-doux text-sm max-w-md">🩹 Bouge doucement. Si quelque chose fait mal, on arrête et on le dit à un adulte.</p>
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={start} className="shadow-bonbon px-10 py-5 rounded-3xl bg-corail text-white text-2xl font-bold flex items-center gap-3">
                 <Play className="w-8 h-8" /> C’est parti !
