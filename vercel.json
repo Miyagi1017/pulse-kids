@@ -3,6 +3,11 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/today.ts": { "maxDuration": 30 },
+    "api/health.ts": { "maxDuration": 10 },
+    "api/cron/daily.ts": { "maxDuration": 60 }
+  },
   "crons": [{ "path": "/api/cron/daily", "schedule": "0 4 * * *" }],
   "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }],
   "headers": [

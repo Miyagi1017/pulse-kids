@@ -1,6 +1,7 @@
 import { aiThemeSchema, todaySchema, type AiTheme, type Today, type VideoScene } from '../shared/schemas.js';
 import { generateJson } from './ai.js';
-import { cacheGet, cacheSet, once } from './cache.js';
+import { cacheGet, cacheSet, failureGet, failureSet, once } from './cache.js';
+import { globalCap } from './rateLimit.js';
 import { factFor, frenchDate, seasonFor, type Season } from '../shared/dailyContent.js';
 import { todayParis } from './date.js';
 import { getSpacePhoto } from './space.js';
@@ -79,7 +80,15 @@ Réponds UNIQUEMENT avec ce JSON :
 ]}`;
 }
 
-async function getAiTheme(day: string, season: Season, weather: Weather | null): Promise<AiTheme | null> {
+/** Au plus 20 générations IA par heure pour toute l'app, quoi qu'il arrive. */
+export const AI_GLOBAL_CAP = { key: 'ai:global', limit: 20, windowSeconds: 3600 };
+
+export async function getAiTheme(
+  day: string,
+  season: Season,
+  weather: Weather | null,
+  generate: typeof generateJson = generateJson
+): Promise<AiTheme | null> {
   const key = `theme:${day}`;
   const valid = (raw: unknown) => {
     const r = aiThemeSchema.safeParse(raw);
@@ -87,9 +96,15 @@ async function getAiTheme(day: string, season: Season, weather: Weather | null):
   };
   const cached = await cacheGet(key, valid);
   if (cached) return cached;
+  const failKey = `theme-fail:${day}`;
+  if (await failureGet(failKey)) return null;
   return once(key, async () => {
-    const result = await generateJson(themePrompt(day, season, weather), valid);
-    if (!result) return null;
+    await globalCap(AI_GLOBAL_CAP.key, AI_GLOBAL_CAP.limit, AI_GLOBAL_CAP.windowSeconds);
+    const result = await generate(themePrompt(day, season, weather), valid);
+    if (!result) {
+      await failureSet(failKey);
+      return null;
+    }
     await cacheSet(key, result.value);
     return result.value;
   });

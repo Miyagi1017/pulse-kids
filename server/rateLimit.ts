@@ -1,4 +1,4 @@
-import { db } from './db.js';
+import { db, hasDatabase } from './db.js';
 import { HttpError } from './http.js';
 
 /**
@@ -25,4 +25,28 @@ export async function rateLimit(key: string, limit: number, windowSeconds: numbe
       'Retry-After': String(retry)
     });
   }
+}
+
+const memoryWindows = new Map<string, { count: number; start: number }>();
+
+/**
+ * Plafond global (toutes IP confondues). En base si elle existe ; sinon compteur de l'instance,
+ * pour qu'il y ait toujours une limite même sans DATABASE_URL.
+ */
+export async function globalCap(key: string, limit: number, windowSeconds: number, now = Date.now()): Promise<void> {
+  if (hasDatabase()) return rateLimit(key, limit, windowSeconds);
+  const w = memoryWindows.get(key);
+  if (!w || now - w.start >= windowSeconds * 1000) {
+    memoryWindows.set(key, { count: 1, start: now });
+    return;
+  }
+  w.count += 1;
+  if (w.count > limit) {
+    const retry = Math.max(1, Math.ceil((w.start + windowSeconds * 1000 - now) / 1000));
+    throw new HttpError(429, `Trop de demandes. Réessaie dans ${retry} secondes.`, { 'Retry-After': String(retry) });
+  }
+}
+
+export function resetGlobalCaps() {
+  memoryWindows.clear();
 }
