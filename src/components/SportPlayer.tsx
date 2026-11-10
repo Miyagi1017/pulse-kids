@@ -19,6 +19,30 @@ const introHop = jump(30, 0.9);
 
 type Phase = { name: 'intro' } | { name: 'move'; index: number } | { name: 'bravo' };
 
+/** Étape du départ où la voix lit encore la consigne (avant 3, 2, 1). */
+const LISTEN = -1;
+
+/** Le décompte de départ, en très gros : 👂 pendant la consigne, puis 3, 2, 1, « Partez ! ». */
+function ReadyGo({ step }: { step: number }) {
+  const label = step === LISTEN ? '👂' : step > 0 ? String(step) : 'Partez !';
+  return (
+    <div className="relative w-28 h-28 flex items-center justify-center" role="status" aria-live="assertive" aria-label={step === LISTEN ? 'Écoute la consigne' : label}>
+      <AnimatePresence mode="popLayout">
+        <motion.span
+          key={step}
+          initial={{ scale: 0.3, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 1.6, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 380, damping: 16 }}
+          className={`absolute font-bold leading-none ${step > 0 ? 'text-7xl' : step === 0 ? 'text-3xl whitespace-nowrap' : 'text-6xl'}`}
+        >
+          {label}
+        </motion.span>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /** Cercle qui se vide pendant le mouvement : on voit le temps qu'il reste sans savoir lire. */
 function Countdown({ left, total }: { left: number; total: number }) {
   const r = 44;
@@ -66,6 +90,11 @@ export function SportPlayer({
   const [videoFailed, setVideoFailed] = useState(false);
   const videoUrl = sportVideoUrl(tip.id);
   const [cue, setCue] = useState(0);
+  /**
+   * Le départ de chaque mouvement : la voix lit la consigne (LISTEN), puis compte 3, 2, 1
+   * et dit « Partez ! » (0). `null` : le chrono tourne.
+   */
+  const [ready, setReady] = useState<number | null>(null);
   const pose = phase.name === 'move' ? poseFor(tip.moves[phase.index]) : 'respire';
 
   // Les 3 consignes défilent doucement pendant le mouvement.
@@ -93,19 +122,47 @@ export function SportPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tip.id]);
 
-  // Début de chaque mouvement : la voix donne la consigne, le chrono démarre.
+  // Début de chaque mouvement : la voix lit la consigne, puis le décompte de départ.
   useEffect(() => {
     if (phase.name !== 'move') return;
     const move = tip.moves[phase.index];
     setPlaying(true);
+    setReady(LISTEN);
     soundEffects.playPop();
-    say(move.text);
+    const consigne = /[.!?…]$/.test(move.text.trim()) ? move.text.trim() : `${move.text.trim()}.`;
+    const text = `${phase.index === 0 ? '' : 'Mouvement suivant ! '}${consigne} Prêt ?`;
+    let started = false;
+    const go = () => {
+      if (started) return;
+      started = true;
+      setSpeaking(false);
+      setReady((r) => (r === LISTEN ? 3 : r));
+    };
+    setSpeaking(true);
+    speakFrenchText(personalize(text, name), { rate: 0.95, pitch: 1.15, onEnd: go, onError: go });
+    // Filet de sécurité : certains navigateurs n'envoient jamais la fin de la voix.
+    const safety = setTimeout(go, Math.max(3000, text.length * 85));
+    return () => clearTimeout(safety);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
+  // Le décompte de départ : 3, 2, 1 à voix haute, puis « Partez ! » et le chrono démarre.
+  useEffect(() => {
+    if (phase.name !== 'move' || !playing || ready === null || ready === LISTEN) return;
+    if (ready > 0) {
+      soundEffects.playTick();
+      speakFrenchText(String(ready), { rate: 1, pitch: 1.15 });
+    } else {
+      soundEffects.playPop();
+      speakFrenchText('Partez !', { rate: 1, pitch: 1.2 });
+    }
+    const t = setTimeout(() => setReady(ready > 0 ? ready - 1 : null), ready > 0 ? 1000 : 800);
+    return () => clearTimeout(t);
+  }, [ready, playing, phase]);
+
   // Le chrono : 3, 2, 1 annoncés à voix haute, puis mouvement suivant.
   useEffect(() => {
-    if (phase.name !== 'move' || !playing) return;
+    if (phase.name !== 'move' || !playing || ready !== null) return;
     if (left <= 0) {
       const last = phase.index === tip.moves.length - 1;
       if (last) {
@@ -126,7 +183,7 @@ export function SportPlayer({
     }, 1000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [left, playing, phase]);
+  }, [left, playing, phase, ready]);
 
   /** Durée et mouvement changent ensemble : le chrono ne voit jamais un 0 périmé. */
   function goMove(index: number) {
@@ -135,7 +192,21 @@ export function SportPlayer({
   }
   const start = () => goMove(0);
   const skip = () => {
-    if (phase.name === 'move') setLeft(0);
+    if (phase.name !== 'move') return;
+    // Pendant le décompte, « suivant » saute le décompte ; ensuite, il passe au mouvement suivant.
+    if (ready !== null) {
+      stopSpeaking();
+      setSpeaking(false);
+      setReady(null);
+    } else setLeft(0);
+  };
+  const togglePlay = () => {
+    soundEffects.playPop();
+    stopSpeaking();
+    setSpeaking(false);
+    // Reprendre pendant la consigne : on enchaîne directement sur le décompte.
+    if (!playing && ready === LISTEN) setReady(3);
+    setPlaying((p) => !p);
   };
 
   return (
@@ -222,15 +293,11 @@ export function SportPlayer({
               {/* Consignes détaillées, une après l'autre (placement · respiration · sensation) */}
               <div className="flex items-center justify-center gap-5">
                 <div className="text-corail">
-                  <Countdown left={left} total={tip.moves[phase.index].seconds} />
+                  {ready === null ? <Countdown left={left} total={tip.moves[phase.index].seconds} /> : <ReadyGo step={ready} />}
                 </div>
                 <nav className="flex items-center gap-5">
                   <button
-                    onClick={() => {
-                      soundEffects.playPop();
-                      setPlaying((p) => !p);
-                      stopSpeaking();
-                    }}
+                    onClick={togglePlay}
                     className="press shadow-bonbon w-20 h-20 rounded-full bg-corail text-white flex items-center justify-center"
                     aria-label={playing ? 'Pause' : 'Reprendre'}
                   >
