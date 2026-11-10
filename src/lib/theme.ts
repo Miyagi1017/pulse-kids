@@ -16,7 +16,8 @@ export const nextTheme = (t: Theme): Theme => THEMES[(THEMES.indexOf(t) + 1) % T
 
 /** Le fond animé kawaii qui correspond au thème choisi. */
 export const kawaiiScene = (t: Theme) => (t === 'fille' ? ('kawaiiFille' as const) : t === 'garcon' ? ('kawaiiGarcon' as const) : ('kawaii' as const));
-const KEY = 'pulse_kids_theme';
+/** La clé finit par « _v3 » : `purgeLegacyStorage()` ne supprime que les anciennes versions. */
+const KEY = 'pulse_kids_theme_v3';
 
 function readTheme(): Theme {
   try {

@@ -63,6 +63,7 @@ export function SportPlayer({
   const [playing, setPlaying] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const [watching, setWatching] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
   const videoUrl = sportVideoUrl(tip.id);
   const [cue, setCue] = useState(0);
   const pose = phase.name === 'move' ? poseFor(tip.moves[phase.index]) : 'respire';
@@ -194,6 +195,7 @@ export function SportPlayer({
                     soundEffects.playPop();
                     stopSpeaking();
                     setSpeaking(false);
+                    setVideoFailed(false);
                     setWatching(true);
                   }}
                   className="press shadow-bonbon px-7 py-3 rounded-2xl bg-white text-xl font-bold"
@@ -280,7 +282,18 @@ export function SportPlayer({
       {/* La vidéo animée de l'activité, en plein écran */}
       {watching && videoUrl && (
         <div className="fixed inset-0 z-50 bg-encre/95 flex items-center justify-center p-3" role="dialog" aria-modal="true" aria-label={`Vidéo : ${tip.title}`}>
-          <video src={videoUrl} controls autoPlay playsInline preload="auto" onEnded={() => setWatching(false)} className="max-w-full max-h-full rounded-2xl" />
+          {videoFailed ? (
+            <div className="bg-white rounded-3xl shadow-bonbon px-6 py-8 max-w-sm text-center">
+              <p className="text-5xl mb-3" aria-hidden>🎬</p>
+              <p className="text-xl font-bold">La vidéo ne démarre pas.</p>
+              <p className="text-doux mt-1">Pas de souci, on peut jouer sans elle !</p>
+              <button onClick={() => setWatching(false)} className="press shadow-bonbon mt-4 px-6 py-3 rounded-2xl bg-corail text-white text-xl font-bold">
+                C’est parti !
+              </button>
+            </div>
+          ) : (
+            <video src={videoUrl} controls autoPlay playsInline preload="auto" onError={() => setVideoFailed(true)} onEnded={() => setWatching(false)} className="max-w-full max-h-full rounded-2xl" />
+          )}
           <button onClick={() => setWatching(false)} className="press absolute top-4 right-4 w-14 h-14 rounded-full bg-white shadow-bonbon text-2xl font-bold" aria-label="Fermer la vidéo">
             ✕
           </button>

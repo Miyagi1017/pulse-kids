@@ -2,7 +2,7 @@
   "name": "pulse-kids",
   "private": true,
   "version": "2.0.0",
-  "description": "Le journal animé des p'tits curieux : une actualité positive par jour en dessin animé interactif pour les enfants de 5 ans.",
+  "description": "Le journal animé des p'tits curieux : vidéos, contes, activités et explications animées pour les enfants de 5 à 8 ans.",
   "type": "module",
   "engines": {
     "node": ">=22"

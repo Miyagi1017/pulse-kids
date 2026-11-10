@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { personalize, type Tale } from '../data/format';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
+import { AGE_INFO, narrationRate, type AgeBand } from '../lib/age';
 import { SpeakButton, TopBar } from './ui';
 import { TaleScene } from './TaleScene';
 import { sceneFor, ThemeScene } from './ThemeScene';
@@ -15,7 +16,7 @@ import { mascotForScene } from '../lib/mascots';
  * (enchaînement automatique des pages en mode écoute). Version « soir » : fond nuit,
  * voix plus lente, pas de confettis, berceuse à la fin.
  */
-export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: Tale; name: string; onBack: () => void; onFinished: () => void; onNext: () => void }) {
+export function TaleReader({ tale, name, age = 'petit', onBack, onFinished, onNext }: { tale: Tale; name: string; age?: AgeBand; onBack: () => void; onFinished: () => void; onNext: () => void }) {
   const night = tale.kind === 'soir';
   const [page, setPage] = useState(0);
   const [listening, setListening] = useState(false);
@@ -38,13 +39,14 @@ export function TaleReader({ tale, name, onBack, onFinished, onNext }: { tale: T
     }
     const text = page === 0 ? `${title}. ${pages[0]}` : pages[page];
     speakFrenchText(text, {
-      rate: night ? 0.75 : 0.88,
-      pitch: night ? 1.0 : 1.12,
+      // L'âge règle la vitesse : plus lente pour les 5–6 ans, et toujours plus lente le soir.
+      rate: night ? narrationRate(age) - 0.06 : age === 'petit' ? 0.84 : 0.92,
+      pitch: night ? 1.0 : AGE_INFO[age].pitch,
       onEnd: () => setTimeout(() => setPage((p) => p + 1), night ? 900 : 500),
       onError: () => setListening(false)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listening, page]);
+  }, [listening, page, age]);
 
   useEffect(() => {
     if (!isEnd) return;

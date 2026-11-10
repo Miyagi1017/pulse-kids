@@ -35,3 +35,11 @@ video/.tts/
 video/public/voice/
 video/public/music.wav
 video/out-v2/
+
+# Chansons : rendus intermédiaires (images, mix, timings)
+song/
+
+# Outil d’orchestration d’agents (état local, hors app)
+hive/
+roster.json
+roster-backups/

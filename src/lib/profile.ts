@@ -3,10 +3,13 @@
  * Rien n'est envoyé au serveur (le prénom est inséré localement dans les textes).
  */
 import { useCallback, useState } from 'react';
+import { readAge, type AgeBand } from './age';
 
 export interface Profile {
   name: string;
   avatar: string;
+  /** 🐣 5–6 ans ou 🦊 7–8 ans : adapte les textes et la voix (jamais envoyé au serveur). */
+  age: AgeBand;
 }
 
 export const AVATARS = ['🦊', '🐼', '🦁', '🐸', '🐙', '🦄', '🐢', '🐧', '🐰', '🐻'];
@@ -44,10 +47,12 @@ export function cleanName(input: string): string {
 export function useProfile() {
   const [profile, setProfileState] = useState<Profile | null>(() => {
     const p = read<Profile>(PROFILE_KEY);
-    return p && cleanName(p.name) ? { name: cleanName(p.name), avatar: AVATARS.includes(p.avatar) ? p.avatar : AVATARS[0] } : null;
+    return p && cleanName(p.name)
+      ? { name: cleanName(p.name), avatar: AVATARS.includes(p.avatar) ? p.avatar : AVATARS[0], age: readAge(p.age) }
+      : null;
   });
   const setProfile = useCallback((p: Profile) => {
-    const next = { name: cleanName(p.name), avatar: p.avatar };
+    const next = { name: cleanName(p.name), avatar: p.avatar, age: readAge(p.age) };
     write(PROFILE_KEY, next);
     setProfileState(next);
   }, []);

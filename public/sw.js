@@ -3,7 +3,7 @@
  * - Assets (JS/CSS/polices/icônes) : cache d'abord (fichiers versionnés par Vite).
  * - /api : jamais mis en cache (données personnelles), sauf l'édition du jour.
  */
-const VERSION = 'pk-v5';
+const VERSION = 'pk-v6';
 const SHELL = ['/', '/index.html', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {

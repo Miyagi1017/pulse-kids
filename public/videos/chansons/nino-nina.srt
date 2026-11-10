@@ -1,0 +1,19 @@
+1
+00:00:00,900 --> 00:00:04,715
+Range, range, range les jouets,
+
+2
+00:00:04,900 --> 00:00:08,814
+Un, deux, trois, dans le panier !
+
+3
+00:00:08,934 --> 00:00:12,749
+Range, range, range les jouets,
+
+4
+00:00:12,900 --> 00:00:17,154
+La chambre est toute rangée !
+
+5
+00:00:19,300 --> 00:00:21,062
+Bravo !

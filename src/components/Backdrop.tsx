@@ -124,12 +124,12 @@ const PETALS = Array.from({ length: 10 }, (_, i) => ({
 function Kawaii() {
   return (
     <>
-      <div className="cloud top-[6%]" style={{ ['--dur' as string]: '140s', animationDelay: '-30s' }}>
+      <div className="cloud top-[6%] opacity-45" style={{ ['--dur' as string]: '140s', animationDelay: '-30s' }}>
         <div className="bob">
           <FaceCloud size={96} />
         </div>
       </div>
-      <div className="cloud top-[30%] opacity-80" style={{ ['--dur' as string]: '190s', animationDelay: '-120s' }}>
+      <div className="cloud top-[30%] opacity-35" style={{ ['--dur' as string]: '190s', animationDelay: '-120s' }}>
         <div className="bob" style={{ animationDelay: '-2s' }}>
           <FaceCloud size={70} />
         </div>
