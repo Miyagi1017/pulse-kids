@@ -1,6 +1,6 @@
 import { useEffect, type MouseEvent } from 'react';
 import { motion } from 'motion/react';
-import { Pencil, WifiOff } from 'lucide-react';
+import { Pencil, Play, WifiOff } from 'lucide-react';
 import type { Profile } from '../lib/profile';
 import type { Today } from '../../shared/schemas';
 import type { SportTip } from '../data/sport';
@@ -9,6 +9,7 @@ import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot as AnimalMascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
 import { nextTheme, THEME_INFO, type Theme } from '../lib/theme';
+import { AGE_INFO, otherAge, type AgeBand } from '../lib/age';
 import { KawaiiFace } from './Backdrop';
 import { Habitudes } from './Habitudes';
 import { personalize } from '../data/format';
@@ -16,11 +17,15 @@ import { SECTION_STYLE, type Section } from './ui';
 import { soundEffects } from '../utils/soundEffects';
 import { burst, Mascot, pointOf, sayHello } from './fx';
 import { jump, LIFT, PRESS, wiggle as wiggleMove } from '../lib/motion';
+import { ExplainAnim } from './ExplainAnim';
+import { explicationOfTheDay } from '../data/explications';
+import { ALL_CHANSONS, mediaFor, paletteFor, type Chanson } from '../data/chansons';
+import { ComptineStage } from '../comptines/ComptineStage';
 
 interface HomeProps {
   profile: Profile;
   today: Today;
-  counts: Record<Exclude<Section, 'video'>, { total: number; done: number }>;
+  counts: Record<Exclude<Section, 'video' | 'explications'>, { total: number; done: number }>;
   offline: boolean;
   onOpen: (s: Section) => void;
   onEditProfile: () => void;
@@ -37,6 +42,18 @@ interface HomeProps {
   lireCount: { total: number; done: number };
   theme: Theme;
   onTheme: (t: Theme) => void;
+  /** 🐣 5–6 ans ou 🦊 7–8 ans : adapte les textes et la voix. */
+  age: AgeBand;
+  onAge: () => void;
+  onExplications: () => void;
+  explicationsCount: { total: number; done: number };
+  /** La chanson animée du jour (épisode vidéo court). */
+  /** La chanson mise en avant (tirée au sort à chaque chargement). */
+  chanson: Chanson;
+  onChanson: () => void;
+  /** Toutes les comptines. */
+  onComptines: () => void;
+  chansonDone: boolean;
 }
 
 function greeting(): string {
@@ -44,7 +61,7 @@ function greeting(): string {
   return h >= 18 || h < 5 ? 'Bonsoir' : 'Bonjour';
 }
 
-const TILE_LABEL: Record<Exclude<Section, 'video'>, string> = { contes: 'Contes', activites: 'Activités', soir: 'Contes du soir' };
+const TILE_LABEL: Record<'contes' | 'activites' | 'soir', string> = { contes: 'Contes', activites: 'Activités', soir: 'Contes du soir' };
 
 const tile = {
   hidden: { opacity: 0, y: 24, scale: 0.96 },
@@ -67,7 +84,7 @@ function journalSummary(today: Pick<Today, 'scenes'>, name: string): { emoji: st
   });
 }
 
-export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme }: HomeProps) {
+export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, chanson, onChanson, onComptines, chansonDone }: HomeProps) {
   const kawaii = theme !== 'aquarelle';
   const open = (s: Section, e: MouseEvent<HTMLButtonElement>, emojis: string[]) => {
     soundEffects.playPop();
@@ -82,7 +99,8 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
     const t = setTimeout(() => sayHello(greeting(), profile.name, { once: true }), 600);
     return () => clearTimeout(t);
   }, [profile.name]);
-  const small: Exclude<Section, 'video'>[] = isEvening ? ['soir', 'contes', 'activites'] : ['contes', 'activites', 'soir'];
+  const small: ('soir' | 'contes' | 'activites')[] = isEvening ? ['soir', 'contes', 'activites'] : ['contes', 'activites', 'soir'];
+  const question = explicationOfTheDay(today.date);
 
   return (
     <main className="min-h-dvh max-w-3xl mx-auto px-4 sm:px-6 pb-10" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}>
@@ -130,6 +148,25 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
           <Pencil className="w-5 h-5" />
         </button>
       </header>
+
+      {/* Le contenu est adapté à l'âge : 5–6 ans ou 7–8 ans, changeable à tout moment */}
+      <div className="flex items-center justify-between gap-2 -mt-2 mb-4">
+        <span className="text-sm font-semibold text-doux">
+          Contenu adapté : {AGE_INFO[age].emoji} {AGE_INFO[age].label}
+        </span>
+        <button
+          onClick={(e) => {
+            soundEffects.playSparkle();
+            const p = pointOf(e);
+            burst(p.x, p.y, [AGE_INFO[otherAge(age)].emoji, '✨'], 7);
+            onAge();
+          }}
+          className="press text-sm font-bold text-ciel underline underline-offset-4 decoration-2 px-2 py-1"
+          aria-label={`Changer d’âge : passer à ${AGE_INFO[otherAge(age)].label}`}
+        >
+          Changer d’âge
+        </button>
+      </div>
 
       {offline && (
         <p role="status" className="mb-4 flex items-center gap-2 rounded-2xl bg-ciel-clair text-ciel px-4 py-2 font-medium">
@@ -217,6 +254,83 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
           🎬 Toutes les vidéos et le journal ➜
         </button>
       </div>
+
+      {/* La chanson animée du jour : un épisode court, fabriqué en local */}
+      <motion.button
+        custom={2}
+        variants={tile}
+        initial="hidden"
+        animate="show"
+        whileHover="hover"
+        whileTap={TAP}
+        onClick={(e) => {
+          soundEffects.playPop();
+          const p = pointOf(e);
+          burst(p.x, p.y, ['🎵', '🎶', '⭐', '✨'], 9);
+          onChanson();
+        }}
+        className="sticker w-full rounded-[2rem] bg-white p-3 mb-4 flex items-center gap-4 text-left"
+      >
+        <span className="relative shrink-0 w-32 sm:w-44 aspect-video rounded-2xl overflow-hidden bg-nuit">
+          {chanson.comptine ? (
+            <ComptineStage comptine={chanson.comptine.spec} timing={chanson.comptine.timing} palette={paletteFor(theme)} className="w-full h-full" />
+          ) : (
+            <img src={mediaFor(chanson, theme)?.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
+          )}
+          <span className="absolute inset-0 bg-encre/25 flex items-center justify-center text-white">
+            <Play className="w-8 h-8" fill="currentColor" />
+          </span>
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-sm font-bold text-corail">🎵 Une comptine au hasard</span>
+          <span className="block text-xl sm:text-2xl font-bold leading-tight">
+            {chanson.emoji} {chanson.title}
+          </span>
+          <span className="block text-sm text-doux mt-0.5">
+            {Math.round(chanson.duration)} s · à chanter avec les gestes {chansonDone ? '· ✓' : ''}
+          </span>
+        </span>
+      </motion.button>
+
+      <div className="flex justify-end -mt-2 mb-4">
+        <button
+          onClick={() => {
+            soundEffects.playPop();
+            onComptines();
+          }}
+          className="text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1"
+        >
+          🎵 Les {ALL_CHANSONS.length} comptines ➜
+        </button>
+      </div>
+
+      {/* Les explications animées : « pourquoi ? comment ? » en 3 étapes dessinées */}
+      <motion.button
+        custom={2}
+        variants={tile}
+        initial="hidden"
+        animate="show"
+        whileHover="hover"
+        whileTap={TAP}
+        onClick={(e) => {
+          soundEffects.playPop();
+          const p = pointOf(e);
+          burst(p.x, p.y, ['💡', '✨', '🌈', '⭐'], 9);
+          onExplications();
+        }}
+        className="sticker w-full rounded-[2rem] bg-ciel text-white p-4 sm:p-5 text-left mb-4 flex items-center gap-4 relative overflow-hidden"
+      >
+        <motion.span variants={wiggle} className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white/25 overflow-hidden" aria-hidden>
+          <ExplainAnim anim={question.anim} className="w-full h-full" />
+        </motion.span>
+        <span className="flex-1 min-w-0">
+          <span className="inline-block bg-white/25 rounded-full px-3 py-1 text-sm font-semibold mb-1">💡 Les explications animées</span>
+          <span className="block text-xl sm:text-2xl font-bold leading-tight">Pourquoi ? Comment ?</span>
+          <span className="block opacity-90 font-medium mt-1">
+            {explicationsCount.done > 0 ? `${explicationsCount.done} / ${explicationsCount.total} comprises · ` : ''}3 étapes animées et un petit quiz
+          </span>
+        </span>
+      </motion.button>
 
       {/* Les 3 bibliothèques */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

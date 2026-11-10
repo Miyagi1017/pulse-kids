@@ -1,7 +1,7 @@
 {
   "name": "Pulse Kids — Le journal des p’tits curieux",
   "short_name": "Pulse Kids",
-  "description": "Une actualité positive par jour, en dessin animé interactif, pour les enfants de 5 ans.",
+  "description": "Une actualité positive par jour, en dessin animé interactif, pour les enfants de 5 à 8 ans.",
   "lang": "fr",
   "start_url": "/",
   "display": "standalone",

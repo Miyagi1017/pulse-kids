@@ -1,0 +1,1142 @@
+[
+{
+"famille": "yoga",
+"title": "La montagne",
+"but": "Tenir debout bien droit et sentir ses pieds au sol.",
+"etapes": [
+"Mets-toi debout, pieds joints, bien à plat.",
+"Laisse tes bras le long du corps, paumes vers tes cuisses.",
+"Respire doucement par le nez, cinq fois.",
+"Imagine que le haut de ta tête touche le ciel, comme le sommet d'une montagne."
+],
+"histoire": "Tu es une grande montagne, solide et calme.",
+"adulte": "Garder les pieds à plat. Si l'enfant tient mal debout, un mur derrière lui aide.",
+"anims": [
+"etire",
+"etire",
+"calme",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "L'arbre",
+"but": "Garder l'équilibre sur une jambe et se concentrer.",
+"etapes": [
+"Tiens-toi debout près d'un mur, si besoin.",
+"Mets ton poids sur un pied.",
+"Pose l'autre pied contre le mollet de la jambe d'appui, jamais sur le genou.",
+"Joins les mains au-dessus de la tête et tiens cinq respirations, puis change de côté."
+],
+"histoire": "Tu es un grand arbre qui reste droit, même quand le vent souffle.",
+"adulte": "Le pied ne se pose jamais sur le genou. Garder un mur à portée pour se rattraper.",
+"anims": [
+"etire",
+"balance",
+"etire",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "Le chat et la vache",
+"but": "Bouger doucement le dos au rythme de la respiration.",
+"etapes": [
+"Mets-toi à quatre pattes : mains sous les épaules, genoux sous les hanches.",
+"En respirant, creuse le dos et lève la tête (la vache).",
+"En soufflant, fais le gros dos et rentre le menton (le chat).",
+"Répète six fois, très lentement."
+],
+"histoire": "Le chat fait le gros dos, puis la vache souffle doucement.",
+"adulte": "Ne jamais tirer la tête en arrière. Mouvement doux, sans forcer.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "Le chien tête en bas",
+"but": "Allonger le dos et les jambes en se sentant léger.",
+"etapes": [
+"Mets tes mains au sol, un peu devant les épaules.",
+"Pose les pieds au sol, écartés de la largeur des hanches.",
+"Pousse les fesses vers le plafond : ton corps fait un V.",
+"Garde la tête relâchée et respire trois fois. Tu peux plier les genoux."
+],
+"histoire": "Le chien s'étire comme sur un toboggan.",
+"adulte": "Pas de poids sur la tête ni sur le cou : la tête reste relâchée. Genoux pliés permis.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"calme"
+]
+},
+{
+"famille": "yoga",
+"title": "Le guerrier",
+"but": "Renforcer les jambes et tenir droit avec un calme solide.",
+"etapes": [
+"Écarte les pieds, environ un grand pas.",
+"Tourne un pied vers l'extérieur et plie ce genou.",
+"Tends les bras à l'horizontale, comme les branches d'un arbre.",
+"Regarde ta main de devant et tiens trois respirations. Change de côté."
+],
+"histoire": "Tu es un chevalier qui protège son château.",
+"adulte": "Le genou plié reste au-dessus du pied, jamais en avant des orteils. Ne pas bloquer le genou de la jambe arrière.",
+"anims": [
+"etire",
+"tourne",
+"etire",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "L'enfant",
+"but": "Se calmer et ralentir la respiration.",
+"etapes": [
+"Mets-toi à genoux, puis assieds-toi sur tes talons.",
+"Penche le buste vers l'avant, bras allongés devant toi.",
+"Pose le front ou une main au sol.",
+"Respire doucement pendant cinq respirations."
+],
+"histoire": "L'enfant se repose dans son nid, bien au chaud.",
+"adulte": "Si les genoux ou les chevilles gênent, mettre un coussin sous les fesses ou arrêter.",
+"anims": [
+"calme",
+"calme",
+"etire",
+"calme"
+]
+},
+{
+"famille": "yoga",
+"title": "Le cobra",
+"but": "Renforcer le dos et ouvrir la poitrine.",
+"etapes": [
+"Allonge-toi sur le ventre, pieds allongés derrière toi.",
+"Pose les mains sous les épaules, coudes près du corps.",
+"En respirant, redresse doucement le buste, les hanches restent au sol.",
+"Regarde devant toi, tiens trois respirations, puis redescends."
+],
+"histoire": "Le petit serpent se dresse doucement au soleil.",
+"adulte": "Ne monter que jusqu'où c'est confortable. Ne pas tirer la tête en arrière.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "Le triangle",
+"but": "Étirer le côté du corps et les jambes.",
+"etapes": [
+"Écarte les pieds, jambes bien tendues.",
+"Tourne un pied vers l'extérieur.",
+"Penche le corps vers ce côté, main sur la jambe ou la cheville.",
+"Lève l'autre bras vers le plafond et tiens trois respirations."
+],
+"histoire": "Tu es une maison en triangle, avec un toit qui pointe vers le ciel.",
+"adulte": "Ne pas forcer : la main reste sur la jambe si l'enfant ne peut pas descendre plus bas.",
+"anims": [
+"etire",
+"tourne",
+"etire",
+"etire"
+]
+},
+{
+"famille": "yoga",
+"title": "La chaise",
+"but": "Renforcer les cuisses et apprendre à s'accroupir sans tomber.",
+"etapes": [
+"Debout, pieds écartés à la largeur des hanches.",
+"Lève les bras au-dessus de la tête, en V.",
+"Plie les genoux comme pour t'asseoir sur une chaise invisible.",
+"Tiens trois respirations, puis remonte doucement."
+],
+"histoire": "Tu t'assois sur une chaise magique qui ne tombe jamais.",
+"adulte": "Genoux dans l'axe des pieds, dos droit. Remonter sans à-coup.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "detente",
+"title": "Le ventre ballon",
+"but": "Respirer avec le ventre pour se détendre.",
+"etapes": [
+"Allonge-toi sur le dos, sur le tapis.",
+"Pose une main sur ton ventre.",
+"Inspire par le nez en gonflant le ventre comme un ballon.",
+"Souffle par la bouche en le dégonflant lentement. Répète cinq fois."
+],
+"histoire": "Ton ventre est un ballon qui se gonfle et se dégonfle doucement.",
+"adulte": "Ne jamais retenir son souffle. Si l'enfant se sent étourdi, reprendre une respiration normale.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "La fleur qui sent",
+"but": "Apprendre à respirer lentement par le nez.",
+"etapes": [
+"Assieds-toi en tailleur, dos droit mais détendu.",
+"Imagine une fleur dans ta main, approche-la du nez.",
+"Inspire lentement par le nez, comme pour sentir la fleur.",
+"Souffle doucement par la bouche, comme un petit vent. Répète trois fois."
+],
+"histoire": "La fleur sent très bon, et tu respires son parfum.",
+"adulte": "Respiration calme, sans forcer l'inspiration. Ne pas retenir l'air.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "Le papillon",
+"but": "Se calmer en se tapotant doucement.",
+"etapes": [
+"Assieds-toi, plantes des pieds l'une contre l'autre.",
+"Croise les bras sur ta poitrine, mains sur les épaules.",
+"Tapote doucement, une main puis l'autre, comme des ailes.",
+"Continue vingt tapotements en respirant calmement."
+],
+"histoire": "Le papillon bat doucement ses ailes sur une fleur.",
+"adulte": "Tapotements légers, jamais de coups. Arrêter si l'enfant se sent mal à l'aise.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "La tortue dans sa carapace",
+"but": "Relâcher les épaules et la nuque.",
+"etapes": [
+"Tiens-toi debout ou assieds-toi, dos droit.",
+"Rentre doucement la tête entre les épaules, comme une tortue.",
+"Tiens deux respirations, sans forcer.",
+"Ressors la tête lentement et laisse les épaules tomber."
+],
+"histoire": "La tortue rentre dans sa carapace, puis ressort tranquillement.",
+"adulte": "Mouvement lent, sans pression sur la nuque. Ne jamais forcer la tête vers le bas.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "L'étoile de mer",
+"but": "Relâcher tout le corps.",
+"etapes": [
+"Allonge-toi sur le dos, bras et jambes bien écartés.",
+"Imagine que tu es une étoile de mer sur le sable.",
+"Laisse tes mains et tes pieds se poser, sans rien tenir.",
+"Respire tranquillement cinq fois."
+],
+"histoire": "L'étoile de mer se repose au soleil sur le sable chaud.",
+"adulte": "Ne rien forcer : juste se laisser aller. Ne pas se relever brusquement.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "La marionnette molle",
+"but": "Sentir le corps lourd et détendu.",
+"etapes": [
+"Tiens-toi debout, pieds écartés de la largeur des épaules.",
+"Plie doucement les genoux.",
+"Laisse le buste pendre vers le sol, bras et tête relâchés.",
+"Remonte lentement, une vertèbre après l'autre, comme une marionnette qu'on relève."
+],
+"histoire": "La marionnette n'a plus de fils : elle se laisse tomber doucement.",
+"adulte": "Remonter lentement, sans rebond ni balancement. Garder les genoux légèrement pliés.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "Le petit nuage",
+"but": "Imaginer et respirer calmement.",
+"etapes": [
+"Assieds-toi, jambes croisées, dos droit.",
+"Lève les bras en arrondi au-dessus de ta tête, comme un nuage.",
+"Inspire en imaginant le nuage qui monte doucement dans le ciel.",
+"Souffle en laissant les bras descendre. Répète cinq fois."
+],
+"histoire": "Ton nuage flotte tranquillement dans le ciel bleu.",
+"adulte": "Bras levés sans forcer. Si l'enfant a mal aux épaules, les garder plus bas.",
+"anims": [
+"calme",
+"etire",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "La pluie douce",
+"but": "Se détendre par des gestes doux sur le corps.",
+"etapes": [
+"Assieds-toi confortablement, dos droit.",
+"Tapote doucement tes bras avec le bout des doigts, du poignet à l'épaule.",
+"Continue sur les épaules, comme une pluie douce.",
+"Termine par une respiration lente."
+],
+"histoire": "La petite pluie tombe doucement sur la forêt.",
+"adulte": "Caresses et tapotements légers, jamais de coups. Respecter si l'enfant ne veut pas être touché.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "Le bonhomme qui se repose",
+"but": "Se poser et se détendre en silence.",
+"etapes": [
+"Assieds-toi, dos droit mais sans raideur.",
+"Pose tes bras sur tes genoux, paumes vers le haut.",
+"Ferme les yeux si tu veux.",
+"Respire calmement pendant une minute."
+],
+"histoire": "Le bonhomme prend une pause au soleil, rien à faire.",
+"adulte": "Position assise confortable, sur un coussin si besoin. Rester calme, sans bouger.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "detente",
+"title": "La bougie qui souffle",
+"but": "Contrôler le souffle en douceur.",
+"etapes": [
+"Assieds-toi, tiens une bougie imaginaire devant ta bouche.",
+"Inspire lentement par le nez.",
+"Souffle doucement pour éteindre la flamme, sans la faire trembler.",
+"Répète trois fois, puis reste tranquille."
+],
+"histoire": "Tu souffles doucement sur la petite flamme pour l'éteindre.",
+"adulte": "Souffle doux, jamais de souffle fort ni de retenue d'air. Arrêter si l'enfant se sent étourdi.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "taichi",
+"title": "La vague des bras",
+"but": "Bouger lentement et sentir la fluidité.",
+"etapes": [
+"Tiens-toi debout, pieds écartés, genoux souples.",
+"Lève les bras devant toi, doucement, comme une vague qui monte.",
+"Laisse-les redescendre sur les côtés, comme l'eau qui retombe.",
+"Répète cinq fois, lentement."
+],
+"histoire": "La vague monte et redescend sur la plage.",
+"adulte": "Mouvement lent et continu. Bras levés sans forcer les épaules.",
+"anims": [
+"balance",
+"etire",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "Le cygne",
+"but": "Garder son équilibre en avançant doucement.",
+"etapes": [
+"Tiens-toi debout, pieds écartés, genoux souples.",
+"Avance un pied devant l'autre, sans sauter.",
+"Arrondis les bras comme les ailes d'un cygne.",
+"Glisse lentement sur l'eau, les pieds avancent doucement."
+],
+"histoire": "Le cygne glisse doucement sur le lac, sans faire de vagues.",
+"adulte": "Pas de sauts. Garder un appui, un mur ou une chaise, si l'équilibre est difficile.",
+"anims": [
+"balance",
+"saut",
+"balance",
+"course"
+]
+},
+{
+"famille": "taichi",
+"title": "Le ciel et la terre",
+"but": "Relier le haut et le bas du corps avec lenteur.",
+"etapes": [
+"Debout, pieds écartés, bras le long du corps.",
+"Lève les bras en cercle au-dessus de la tête : c'est le ciel.",
+"Redescends les bras en arc devant toi jusqu'aux pieds : c'est la terre.",
+"Répète trois fois, en respirant calmement."
+],
+"histoire": "Le ciel est tout en haut, la terre est tout en bas, et tu relies les deux.",
+"adulte": "Mouvement doux, sans à-coup. Plier les genoux en descendant si besoin.",
+"anims": [
+"balance",
+"etire",
+"balance",
+"calme"
+]
+},
+{
+"famille": "taichi",
+"title": "Le nuage qui glisse",
+"but": "Pousser en douceur avec les bras et marcher lentement.",
+"etapes": [
+"Debout, pieds écartés, bras arrondis devant la poitrine.",
+"Avance un pied, lentement.",
+"Pousse doucement le nuage devant toi avec les paumes.",
+"Ramène le pied et répète quatre fois de chaque côté."
+],
+"histoire": "Tu pousses doucement un gros nuage pour le faire avancer dans le ciel.",
+"adulte": "Pas lents, sans courir. Garder l'équilibre en regardant devant soi.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "La grue",
+"but": "Tenir sur une jambe et ouvrir les bras comme des ailes.",
+"etapes": [
+"Tiens-toi debout près d'un mur, si besoin.",
+"Pose ton poids sur une jambe bien droite.",
+"Plie l'autre jambe et lève le genou sur le côté.",
+"Ouvre les bras comme les ailes d'une grue, tiens trois respirations."
+],
+"histoire": "La grue se pose sur une patte au bord de l'étang, ailes ouvertes.",
+"adulte": "Le genou levé ne touche pas l'autre jambe. Se tenir au mur si l'enfant vacille.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "Pousser la porte",
+"but": "Pousser avec calme et fluidité.",
+"etapes": [
+"Debout, pieds écartés, un pied un peu devant.",
+"Mets les deux mains devant la poitrine, paumes face à face.",
+"Pousse doucement les mains vers l'avant, comme pour ouvrir une grande porte.",
+"Ramène les mains vers la poitrine, lentement. Répète six fois."
+],
+"histoire": "Tu pousses une grande porte qui grince doucement.",
+"adulte": "Pousser doucement, sans secousse. Ne pas pousser contre un adulte ou un objet dur.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "L'arc et la flèche",
+"but": "Tenir une position stable et concentrée.",
+"etapes": [
+"Écarte les pieds, bien plus large que les épaules.",
+"Plie un genou et garde l'autre jambe tendue.",
+"Tends un bras à l'horizontale, comme l'arc.",
+"Ramène l'autre main vers ta joue, comme pour tirer la corde. Tiens trois respirations."
+],
+"histoire": "Tu es un archer qui vise le centre de la cible, très calme.",
+"adulte": "Pas de vrai arc ni de flèche. Genou plié au-dessus du pied.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "Le bambou qui plie",
+"but": "Se pencher doucement sur le côté, sans raideur.",
+"etapes": [
+"Debout, pieds écartés, bras le long du corps.",
+"Penche doucement le buste sur le côté, comme un bambou dans le vent.",
+"Tiens deux respirations, puis remonte lentement.",
+"Refais de l'autre côté."
+],
+"histoire": "Le bambou plie au vent, mais il ne casse jamais.",
+"adulte": "Pencher seulement jusqu'où c'est confortable. Ne jamais tomber en arrière brusquement.",
+"anims": [
+"balance",
+"etire",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "Le ruisseau",
+"but": "Marcher de côté en suivant un rythme calme.",
+"etapes": [
+"Debout, pieds joints, bras souples le long du corps.",
+"Fais un petit pas de côté, puis rejoins l'autre pied.",
+"Balance les bras doucement, comme l'eau qui coule.",
+"Continue quatre pas vers la droite, puis quatre vers la gauche."
+],
+"histoire": "Tu traverses le ruisseau en passant d'une pierre à l'autre, tranquillement.",
+"adulte": "Toujours un pied au sol. Espace dégagé autour de l'enfant.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "taichi",
+"title": "Le lotus qui s'ouvre",
+"but": "Se mettre à l'aise accroupi et ouvrir les bras lentement.",
+"etapes": [
+"Accroupis-toi, pieds à plat, bras serrés devant la poitrine.",
+"Joins les mains au-dessus de la tête, comme un bourgeon.",
+"Ouvre les bras lentement vers les côtés, comme les pétales d'une fleur.",
+"Referme les pétales et répète trois fois."
+],
+"histoire": "Le lotus dort dans l'eau, puis s'ouvre au soleil.",
+"adulte": "Accroupi seulement si les pieds restent à plat. S'appuyer sur un mur si besoin.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "etirements",
+"title": "Toucher ses orteils doucement",
+"but": "Étirer l'arrière des jambes et le dos.",
+"etapes": [
+"Debout, pieds écartés, genoux bien souples.",
+"Plie doucement le buste vers l'avant, bras qui pendent.",
+"Laisse la tête et les bras tomber vers le sol.",
+"Tiens cinq secondes, puis remonte lentement."
+],
+"histoire": "Tu cherches les petits poissons sous l'eau, tout en bas.",
+"adulte": "Genoux toujours légèrement pliés, pas de rebond. Remonter lentement.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "L'épaule douce",
+"but": "Étirer l'épaule et le haut du dos.",
+"etapes": [
+"Tends un bras devant toi, à hauteur de la poitrine.",
+"Croise-le vers le côté opposé.",
+"Prends le coude avec l'autre main et tire doucement vers la poitrine.",
+"Tiens cinq respirations, puis change de côté."
+],
+"histoire": "Tu fais un petit câlin à ton épaule.",
+"adulte": "Tirer doucement, jamais brusquement. Arrêter si l'enfant ressent une douleur.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "Le cou du hibou",
+"but": "Détendre la nuque et le cou sans forcer.",
+"etapes": [
+"Assieds-toi ou tiens-toi debout, dos droit.",
+"Laisse l'épaule basse et penche doucement l'oreille vers l'épaule.",
+"Tiens dix secondes en respirant.",
+"Reviens au centre, puis penche de l'autre côté."
+],
+"histoire": "Le hibou tourne doucement la tête pour regarder la lune.",
+"adulte": "Pencher l'oreille vers l'épaule seulement. Ne jamais tourner la tête brusquement ni tirer avec la main.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "Le roseau qui se penche",
+"but": "Étirer les côtés du corps.",
+"etapes": [
+"Debout, pieds écartés, bras levés au-dessus de la tête.",
+"Joins les mains ou garde-les écartées.",
+"Penche le corps doucement sur le côté, comme un roseau au vent.",
+"Tiens cinq respirations, puis reviens au centre et refais de l'autre côté."
+],
+"histoire": "Tu es un roseau qui plie doucement au vent.",
+"adulte": "Pencher seulement jusqu'où c'est confortable. Pas de rebond.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "La fenêtre",
+"but": "Étirer un côté du corps, l'autre restant détendu.",
+"etapes": [
+"Debout, pieds écartés.",
+"Lève un bras au-dessus de la tête, comme le battant d'une fenêtre qui s'ouvre.",
+"Penche le corps de l'autre côté, sans tourner.",
+"Tiens cinq respirations, puis change de bras."
+],
+"histoire": "La fenêtre s'ouvre et laisse entrer l'air frais.",
+"adulte": "Ne pas forcer le bras levé. Garder le dos droit en penchant.",
+"anims": [
+"etire",
+"etire",
+"tourne",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "Le chat en boule",
+"but": "Se relâcher et arrondir le dos doucement.",
+"etapes": [
+"Assieds-toi sur le tapis, dos rond et détendu.",
+"Ramène les genoux contre la poitrine.",
+"Entoure tes jambes avec tes bras, comme un chat qui dort.",
+"Balance-toi doucement d'avant en arrière, cinq respirations."
+],
+"histoire": "Le chat roule en boule pour faire la sieste.",
+"adulte": "Balancement lent, pas de rebond. Éviter si le dos ou les genoux sont douloureux.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "Le coffre qui s'ouvre",
+"but": "Ouvrir la poitrine et redresser le dos.",
+"etapes": [
+"Tiens-toi debout, pieds écartés.",
+"Écarte les bras à l'horizontale, paumes vers le ciel.",
+"Ouvre la poitrine et regarde légèrement vers le haut.",
+"Tiens cinq respirations, puis ramène les bras devant toi."
+],
+"histoire": "Le coffre s'ouvre pour laisser sortir un trésor : ton cœur content.",
+"adulte": "Regard vers le haut sans cambrer le dos. Pas de pression sur la nuque.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"etire"
+]
+},
+{
+"famille": "etirements",
+"title": "Le genou du lion",
+"but": "Étirer le bas du dos et les fesses.",
+"etapes": [
+"Allonge-toi sur le dos, jambes allongées.",
+"Ramène un genou vers la poitrine avec les mains.",
+"Garde l'autre jambe bien au sol.",
+"Tiens cinq respirations, puis repose le pied doucement."
+],
+"histoire": "Le lion ramène sa patte contre lui pour se reposer.",
+"adulte": "Garder la tête posée au sol. Tirer doucement, jamais fort.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"calme"
+]
+},
+{
+"famille": "etirements",
+"title": "Le poisson qui s'étire",
+"but": "Étirer tout le long du corps, des doigts aux orteils.",
+"etapes": [
+"Allonge-toi sur le dos, bras le long du corps.",
+"Étends les bras au-dessus de la tête, le long du sol.",
+"Pointe les orteils, comme un poisson qui nage.",
+"Tiens cinq secondes, puis repose les bras."
+],
+"histoire": "Le poisson nage tout droit dans l'eau claire.",
+"adulte": "Garder la tête au sol, ne pas soulever la nuque. Ne pas forcer.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"calme"
+]
+},
+{
+"famille": "education",
+"title": "La marche sur la ligne",
+"but": "Marcher en gardant l'équilibre sur une ligne droite.",
+"etapes": [
+"Pose le ruban au sol, bien droit.",
+"Mets un pied sur la ligne, le talon touchant les orteils de l'autre pied.",
+"Avance ainsi, pas après pas, les bras le long du corps.",
+"Refais le trajet trois fois en regardant devant, pas tes pieds."
+],
+"histoire": "Tu marches comme un funambule sur un fil très droit.",
+"adulte": "Espace dégagé autour de la ligne. Ne pas courir. Un adulte près de l'enfant.",
+"anims": [
+"course",
+"balance",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "Le miroir",
+"but": "Imiter les gestes de l'adulte pour apprendre à regarder et bouger.",
+"etapes": [
+"Mets-toi face à un adulte, à un pas de distance.",
+"L'adulte lève un bras, tu lèves le bras du même côté, comme dans un miroir.",
+"Alterne les gestes : bras, jambes, pieds.",
+"Change de rôle : c'est l'enfant qui montre et l'adulte qui imite."
+],
+"histoire": "Ton reflet dans le miroir fait exactement les mêmes gestes que toi.",
+"adulte": "Gestes lents et doux. Pas de mouvement brusque ni de poussée.",
+"anims": [
+"course",
+"course",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "Touche ta tête, tes genoux",
+"but": "Apprendre à situer ses parties du corps.",
+"etapes": [
+"Tiens-toi debout, pieds à plat.",
+"L'adulte dit une partie du corps : « Touche ta tête ! »",
+"L'enfant pose la main sur cette partie, puis la reprend.",
+"Enchaîne avec le coude, le genou, le pied, l'épaule, le ventre."
+],
+"histoire": "Le petit robot doit trouver toutes ses pièces.",
+"adulte": "Gestes lents, pas de pression sur une partie du corps. Respecter la pudeur de l'enfant.",
+"anims": [
+"course",
+"course",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "Le tonneau",
+"but": "Sentir son corps rouler et se retrouver.",
+"etapes": [
+"Allonge-toi sur le dos, bras au-dessus de la tête, jambes serrées.",
+"Roule doucement sur le côté, comme un tonneau.",
+"Continue à rouler lentement jusqu'à l'autre côté.",
+"Reviens sur le dos et reste quelques secondes."
+],
+"histoire": "Le tonneau roule doucement sur la colline.",
+"adulte": "Rouler sur le côté uniquement, sur un tapis épais. Ne jamais rouler sur la tête ou le cou.",
+"anims": [
+"calme",
+"course",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "Lancer et attraper",
+"but": "Coordonner ses mains et ses yeux.",
+"etapes": [
+"Tiens une balle souple dans les deux mains, debout, pieds écartés.",
+"Lance-la doucement vers le haut, pas trop haut.",
+"Attrape-la avec les deux mains.",
+"Répète dix fois, puis une fois avec une seule main."
+],
+"histoire": "La balle monte jusqu'au ciel et redescend dans tes mains.",
+"adulte": "Balle souple seulement, jamais dure. Rester à distance d'un autre enfant.",
+"anims": [
+"course",
+"course",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "Passer sous la corde",
+"but": "Plier les genoux en gardant le dos plat.",
+"etapes": [
+"Tiens-toi debout devant une corde tenue basse par deux adultes ou posée sur deux chaises.",
+"Plie les genoux, garde le dos plat et les bras devant toi.",
+"Passe sous la corde en avançant doucement.",
+"Reviens, puis refais le passage quatre fois."
+],
+"histoire": "Tu es un petit lièvre qui passe sous la barrière sans la toucher.",
+"adulte": "Corde basse et bien fixée. Dos plat, jamais penché en arrière. Pas de course.",
+"anims": [
+"course",
+"course",
+"course",
+"course"
+]
+},
+{
+"famille": "comportement",
+"title": "Les émotions en gestes",
+"but": "Mettre un nom sur ce qu'on ressent et le montrer avec le corps.",
+"etapes": [
+"Mettez-vous en cercle, face à l'adulte.",
+"L'adulte dit une émotion : joyeux, triste, fâché ou surpris.",
+"Chaque enfant la montre avec son corps : joie bras en l'air, tristesse épaules basses.",
+"Chacun essaie une émotion, à son rythme, sans obligation."
+],
+"histoire": "Ton corps a un langage pour chaque émotion.",
+"adulte": "Ne jamais demander de montrer une émotion qu'un enfant ne veut pas jouer. Arrête si un enfant est triste ou contrarié, et reste près de lui.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Le compte des doigts",
+"but": "Calmer sa respiration en suivant ses doigts.",
+"etapes": [
+"Lève une main, doigts écartés, comme une étoile.",
+"Avec l'index de l'autre main, suis le bord d'un doigt en montant.",
+"Inspire en montant, souffle en descendant de l'autre côté du doigt.",
+"Fais le tour de la main, lentement, cinq doigts."
+],
+"histoire": "Tu suis les doigts de ta main pour sentir ta respiration monter et descendre.",
+"adulte": "Respiration calme, sans retenir l'air. Arrête si un enfant est contrarié ou se sent étourdi.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Le feu rouge",
+"but": "Attendre calmement son tour, en arrêtant son corps.",
+"etapes": [
+"Tiens-toi debout, pieds à plat, à côté des autres.",
+"L'adulte dit « feu vert » : tu avances d'un pas.",
+"L'adulte dit « feu rouge » : tu lèves une main, paume devant, et tu t'arrêtes.",
+"Tiens la pose trois secondes, puis reprends le jeu. Joue dix tours."
+],
+"histoire": "Le feu rouge dit stop, et tu attends que le feu passe au vert.",
+"adulte": "Jeu sans élimination : personne n'est mis de côté. Arrête si un enfant est contrarié de s'arrêter, et propose-lui le rôle du feu vert.",
+"anims": [
+"calme",
+"course",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Écouter les petits bruits",
+"but": "Écouter attentivement un son et le reconnaître.",
+"etapes": [
+"Ferme les yeux ou regarde le sol.",
+"L'adulte fait un petit bruit avec un objet, puis s'arrête.",
+"Lève la main derrière l'oreille, en coquille, pour mieux entendre.",
+"Chacun dit ce qu'il a entendu, à son tour."
+],
+"histoire": "Tes oreilles captent le petit bruit, comme une coquille qui écoute la mer.",
+"adulte": "Bruits doux seulement, jamais près des oreilles. Arrête si un enfant a peur d'un son ou se sent contrarié.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Ma bulle autour de moi",
+"but": "Comprendre l'espace de chacun et respecter celui des autres.",
+"etapes": [
+"Tiens-toi debout, bras arrondis devant toi.",
+"Imagine une grande bulle autour de toi, aussi large que tes bras.",
+"Avance dans la classe sans toucher la bulle des autres.",
+"Si ta bulle touche celle d'un camarade, dites « bulle » et reculez tous les deux."
+],
+"histoire": "Ta bulle est à toi, la bulle de ton camarade est à lui.",
+"adulte": "Jeu lent, sans contact forcé. Arrête si un enfant n'aime pas être proche des autres ou se sent contrarié.",
+"anims": [
+"calme",
+"calme",
+"course",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Le ballon qui passe",
+"but": "Partager et attendre son tour en jouant.",
+"etapes": [
+"Mettez-vous en cercle, et passe la balle à ton voisin.",
+"La balle passe de main en main, dans le même sens.",
+"Attends que la balle arrive chez toi avant de la toucher.",
+"Quand la balle a fait le tour, dites « c'est tour de » et changez de sens."
+],
+"histoire": "La balle fait le tour du cercle pour que chacun joue à son tour.",
+"adulte": "Balle souple seulement. Ne jamais forcer un enfant à lancer. Arrête si un enfant est contrarié de ne pas recevoir la balle.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "La colère qui redescend",
+"but": "Reconnaître la colère et la faire baisser dans son corps.",
+"etapes": [
+"Dis : « je suis fâché », et serre les poings très fort pendant trois secondes.",
+"Respire par le nez, puis souffle par la bouche.",
+"Ouvre les mains doucement, doigts écartés, comme une fleur qui s'ouvre.",
+"Répète trois fois, puis dis comment tu te sens maintenant."
+],
+"histoire": "La colère est comme un gros nuage : elle passe quand on respire.",
+"adulte": "Serrer les poings sans frapper, jamais contre un camarade ni un adulte. Si un enfant est très fâché, arrête le jeu et reste près de lui, calme.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Lever la main pour parler",
+"but": "Attendre son tour pour parler, avec un geste simple.",
+"etapes": [
+"Assieds-toi, dos droit et pieds à plat.",
+"Quand tu as une question, lève la main, doigts serrés.",
+"Attends que l'adulte te voie et te donne la parole.",
+"Dis ta question quand c'est ton tour, puis baisse la main."
+],
+"histoire": "Ta main levée dit : « j'ai une question, je patiente.",
+"adulte": "Pas de classement ni de mise en avant. L'adulte répond à chacun. Arrête si un enfant est gêné d'être regardé ou contrarié.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Le bonjour de la main",
+"but": "Dire bonjour et au revoir aux autres avec gentillesse.",
+"etapes": [
+"Mets-toi face à un camarade, à deux pas.",
+"Lève la main et dis « bonjour » avec un grand sourire.",
+"Le camarade répond avec sa main, à son tour.",
+"Dis « au revoir » en faisant un petit geste de la main."
+],
+"histoire": "Ta main dit bonjour à ton ami, de loin, en souriant.",
+"adulte": "Saluer sans contact obligé : une main levée suffit. Respecter un enfant qui préfère ne pas saluer ; arrête si un enfant est contrarié.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "comportement",
+"title": "Les applaudissements",
+"but": "Féliciter tout le groupe de façon juste et chaleureuse.",
+"etapes": [
+"Mets-toi debout, pieds à plat.",
+"Lève les mains devant la poitrine, paumes face à face.",
+"Applaudis doucement trois fois, sans bruit fort.",
+"Dis à voix haute ce qui t'a plu : « bravo pour ton dessin »."
+],
+"histoire": "Tes mains font du bruit ensemble pour dire bravo à tout le groupe.",
+"adulte": "Applaudir tout le groupe, jamais un seul enfant ni un classement. Arrête si un enfant est gêné ou contrarié.",
+"anims": [
+"calme",
+"calme",
+"calme",
+"calme"
+]
+},
+{
+"famille": "yoga",
+"title": "Le pont",
+"but": "Renforcer les fesses et le dos, ouvrir la poitrine.",
+"etapes": [
+"Allonge-toi sur le dos, genoux pliés, pieds à plat.",
+"Bras le long du corps, paumes vers le sol.",
+"Pousse dans les pieds et lève les hanches vers le plafond.",
+"Tiens trois respirations, puis redescends doucement."
+],
+"histoire": "Le pont s'élève au-dessus de la rivière, puis redescend.",
+"adulte": "Les épaules et la tête restent sur le tapis : seul le bassin monte. Pas de poids sur la nuque.",
+"anims": [
+"calme",
+"etire",
+"etire",
+"calme"
+]
+},
+{
+"famille": "etirements",
+"title": "Le chat qui s'étire",
+"but": "Étirer tout le corps, des pieds aux mains.",
+"etapes": [
+"Tiens-toi debout, pieds à plat.",
+"Lève les bras au-dessus de la tête, paumes qui se touchent.",
+"Étire-toi vers le haut comme un chat au réveil.",
+"Tiens cinq secondes, puis laisse les bras retomber."
+],
+"histoire": "Le chat se réveille et s'étire très loin.",
+"adulte": "Étirement sans pointe sur la nuque ni bras bloqués. Ne pas se pencher en arrière.",
+"anims": [
+"etire",
+"etire",
+"etire",
+"calme"
+]
+},
+{
+"famille": "education",
+"title": "Le flamant rose",
+"but": "Garder son équilibre sur une jambe.",
+"etapes": [
+"Tiens-toi debout, pieds joints.",
+"Écarte les bras à l'horizontale, comme les ailes du flamant.",
+"Plie un genou et lève ce pied sur le côté, sans toucher l'autre jambe.",
+"Tiens cinq secondes sur une jambe, puis change."
+],
+"histoire": "Le flamant rose tient bon sur sa patte, sans bouger.",
+"adulte": "Un mur ou une chaise à portée de main. Ne pas tenir plus de dix secondes au début.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+},
+{
+"famille": "education",
+"title": "Le crabe",
+"but": "Renforcer les bras et les jambes en marchant de côté.",
+"etapes": [
+"Assieds-toi sur le tapis, mains au sol derrière toi.",
+"Soulève les fesses, pieds et mains au sol, ventre vers le ciel.",
+"Avance sur le côté, une main puis un pied, lentement.",
+"Fais quatre pas de côté dans un sens, puis dans l'autre."
+],
+"histoire": "Le petit crabe se faufile de côté sur le sable.",
+"adulte": "Tête droite, pas de poids sur la nuque. S'arrêter si les poignets gênent.",
+"anims": [
+"calme",
+"etire",
+"course",
+"course"
+]
+},
+{
+"famille": "education",
+"title": "L'ours qui marche",
+"but": "Renforcer les bras et coordonner mains et pieds.",
+"etapes": [
+"Mets-toi à quatre pattes : mains sous les épaules, genoux un peu décollés du sol.",
+"Avance une main et la jambe opposée, lentement.",
+"Continue en alternant, comme un ours qui marche dans la forêt.",
+"Fais quatre pas, puis repose les genoux."
+],
+"histoire": "L'ours avance tranquillement dans la forêt.",
+"adulte": "Dos droit, sans creux. S'arrêter si les poignets gênent.",
+"anims": [
+"calme",
+"course",
+"course",
+"calme"
+]
+},
+{
+"famille": "education",
+"title": "Le funambule",
+"but": "Marcher en équilibre sur une ligne étroite, bras écartés.",
+"etapes": [
+"Mets un pied devant l'autre, talon contre orteils, sur la ligne.",
+"Écarte les bras à l'horizontale pour garder l'équilibre.",
+"Regarde devant toi, pas tes pieds.",
+"Avance de cinq pas, puis fais demi-tour."
+],
+"histoire": "Le funambule marche sur son fil très haut, les bras ouverts.",
+"adulte": "Ligne au sol seulement, à faible hauteur. Un adulte à côté.",
+"anims": [
+"balance",
+"balance",
+"balance",
+"balance"
+]
+}
+]

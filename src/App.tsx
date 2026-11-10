@@ -6,6 +6,12 @@ import { Library } from './components/Library';
 import { TaleReader } from './components/TaleReader';
 import { ActivityPlayer } from './components/ActivityPlayer';
 import { VideoPlayer } from './components/DailyVideo';
+import { ExplicationPlayer, ExplicationsList, safeExplication } from './components/Explications';
+import { ChansonPlayer } from './components/ChansonPlayer';
+import { chansonOf, randomChanson, CHANSON_DU_JOUR } from './data/chansons';
+import { Comptines } from './components/Comptines';
+import { EXPLICATIONS } from './data/explications';
+import { otherAge } from './lib/age';
 import { JamyLinks } from './components/JamyLinks';
 import { BurstLayer } from './components/fx';
 import { Backdrop } from './components/Backdrop';
@@ -47,6 +53,10 @@ type View =
   | { name: 'home' }
   | { name: 'profile' }
   | { name: 'video' }
+  | { name: 'explications' }
+  | { name: 'explication'; id: string }
+  | { name: 'chanson'; id: string }
+  | { name: 'comptines' }
   | { name: 'player'; index: number }
   | { name: 'library'; section: 'contes' | 'activites' | 'soir' }
   | { name: 'tale'; section: 'contes' | 'soir'; id: string }
@@ -107,6 +117,8 @@ export default function App() {
   const featuredIndex = Math.floor(videoPick * playlist.length);
   // Jeu surprise de l'onglet Activités : une aventure ou un jeu, tiré au sort à chaque chargement.
   const [surprisePick] = useState(() => Math.random());
+  // Comptine mise en avant sur l'accueil : tirée au sort à chaque chargement (de préférence pas encore chantée).
+  const [chansonPick, setChansonPick] = useState(() => randomChanson(done));
   const sportToday = useMemo(() => sportOfTheDay(today.date), [today.date]);
   // Défi de l'accueil : tiré au sort à chaque chargement (défis + mini-défis), stable pendant la visite.
   const [sportPick] = useState(() => {
@@ -118,6 +130,7 @@ export default function App() {
     const c = (ids: { id: string }[]) => ({ total: ids.length, done: ids.filter((i) => done.has(i.id)).length });
     return { contes: c(CONTES), activites: c(ACTIVITES), soir: c(CONTES_DU_SOIR) };
   }, [done]);
+  const explicationsCount = useMemo(() => ({ total: EXPLICATIONS.length, done: EXPLICATIONS.filter((e) => done.has(e.id)).length }), [done]);
 
   /** Prochain contenu de la liste (en priorité un pas encore fait). */
   const nextId = (list: { id: string }[], current: string) => {
@@ -180,8 +193,57 @@ export default function App() {
       break;
     }
     case 'player':
-      screen = <VideoPlayer playlist={playlist} startIndex={Math.max(0, view.index)} name={profile.name} onBack={() => setView({ name: 'video' })} onWatched={markDone} />;
+      screen = <VideoPlayer playlist={playlist} startIndex={Math.max(0, view.index)} name={profile.name} age={profile.age} onBack={() => setView({ name: 'video' })} onWatched={markDone} />;
       break;
+    case 'explications':
+      screen = <ExplicationsList done={done} age={profile.age} onBack={home} onPick={(id) => setView({ name: 'explication', id })} />;
+      break;
+    case 'chanson': {
+      const chanson = chansonOf(view.id) ?? CHANSON_DU_JOUR;
+      const another = () => {
+        const next = randomChanson(done, chanson.id);
+        setChansonPick(next);
+        setView({ name: 'chanson', id: next.id });
+      };
+      screen = (
+        <ChansonPlayer
+          key={chanson.id}
+          chanson={chanson}
+          name={profile.name}
+          theme={theme}
+          onBack={home}
+          onDone={() => markDone(chanson.id)}
+          onAnother={another}
+          onList={() => setView({ name: 'comptines' })}
+        />
+      );
+      break;
+    }
+    case 'comptines':
+      screen = (
+        <Comptines
+          done={done}
+          onBack={home}
+          onPlay={(id) => setView({ name: 'chanson', id })}
+          onSurprise={() => setView({ name: 'chanson', id: randomChanson(done).id })}
+        />
+      );
+      break;
+    case 'explication': {
+      const explication = safeExplication(view.id);
+      screen = (
+        <ExplicationPlayer
+          key={explication.id}
+          explication={explication}
+          name={profile.name}
+          age={profile.age}
+          onBack={() => setView({ name: 'explications' })}
+          onDone={() => markDone(explication.id)}
+          onNext={() => setView({ name: 'explication', id: nextId(EXPLICATIONS, explication.id) })}
+        />
+      );
+      break;
+    }
     case 'library': {
       const items =
         view.section === 'activites'
@@ -250,6 +312,7 @@ export default function App() {
           key={tale.id}
           tale={tale}
           name={profile.name}
+          age={profile.age}
           onBack={() => setView({ name: 'library', section: view.section })}
           onFinished={() => markDone(tale.id)}
           onNext={() => setView({ name: 'tale', section: view.section, id: nextId(list, tale.id) })}
@@ -354,7 +417,7 @@ export default function App() {
           today={journal}
           counts={counts}
           offline={!online}
-          onOpen={(s: Section) => setView(s === 'video' ? { name: 'video' } : { name: 'library', section: s })}
+          onOpen={(s: Section) => setView(s === 'video' ? { name: 'video' } : s === 'explications' ? { name: 'explications' } : { name: 'library', section: s })}
           onEditProfile={() => setView({ name: 'profile' })}
           sport={sportPick}
           sportDone={done.has(sportPick.id)}
@@ -366,11 +429,19 @@ export default function App() {
           lireCount={{ total: LECTURES.length, done: LECTURES.filter((l) => done.has(l.id)).length }}
           theme={theme}
           onTheme={setTheme}
+          age={profile.age}
+          onAge={() => setProfile({ ...profile, age: otherAge(profile.age) })}
+          onExplications={() => setView({ name: 'explications' })}
+          explicationsCount={explicationsCount}
+          chanson={chansonPick}
+          onChanson={() => setView({ name: 'chanson', id: chansonPick.id })}
+          onComptines={() => setView({ name: 'comptines' })}
+          chansonDone={done.has(chansonPick.id)}
         />
       );
   }
 
-  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
+  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'explication' ? `explication-${view.id}` : view.name === 'chanson' ? `chanson-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
 
   return (
     <MotionConfig reducedMotion="user">

@@ -7,11 +7,10 @@ import { HttpError, json, route } from '../../server/http.js';
  * Tâche planifiée Vercel (vercel.json → crons) : prépare chaque matin la vidéo du jour
  * (photo NASA + thème IA mis en cache), pour que le premier enfant n'attende pas.
  */
-function authorized(req: Request): boolean {
+export function authorized(req: Request): boolean {
   const secret = process.env.CRON_SECRET;
-  // Sans secret : la route ne fait que préchauffer le cache du jour (1 génération max/jour),
-  // donc l'appeler n'a pas d'effet nuisible. Dès que CRON_SECRET existe, il est exigé.
-  if (!secret) return true;
+  // Sans CRON_SECRET la route reste fermée : elle déclenche l'IA payante et des DELETE en base.
+  if (!secret) return false;
   const got = Buffer.from(req.headers.get('authorization') ?? '');
   const want = Buffer.from(`Bearer ${secret}`);
   return got.length === want.length && timingSafeEqual(got, want);

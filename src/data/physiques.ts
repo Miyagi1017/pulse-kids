@@ -5,16 +5,25 @@
  * Ce sont des jeux de mouvement doux, pas des soins.
  * Format d'un mouvement : "emoji~consigne~secondes~animation".
  */
+import GUIDEES from './guidees.json';
 import type { JamyVideo } from './jamy';
 import type { MoveAnim, SportMove, SportTip } from './sport';
 
-export type PhysiqueCat = 'defoule' | 'force' | 'adresse' | 'seance';
+export type PhysiqueCat = 'defoule' | 'force' | 'adresse' | 'seance' | Famille;
+
+type Famille = 'yoga' | 'detente' | 'taichi' | 'etirements' | 'education' | 'comportement';
 
 export const PHYSIQUE_CATS: Record<PhysiqueCat, { label: string; emoji: string; color: string; tip: string }> = {
   defoule: { label: 'Se défouler', emoji: '🔥', color: 'bg-corail-clair', tip: 'Quand on a trop d’énergie, on bouge très fort, puis on se calme.' },
   force: { label: 'Devenir fort', emoji: '💪', color: 'bg-soleil-clair', tip: 'Des muscles forts protègent ton dos et t’aident à grimper.' },
   adresse: { label: 'Adresse', emoji: '🎯', color: 'bg-ciel-clair', tip: 'L’adresse, c’est quand les yeux, les mains et les pieds travaillent ensemble.' },
-  seance: { label: 'Mini-séances', emoji: '⏱️', color: 'bg-menthe-clair', tip: 'On réveille son corps, on bouge, puis on revient au calme.' }
+  seance: { label: 'Mini-séances', emoji: '⏱️', color: 'bg-menthe-clair', tip: 'On réveille son corps, on bouge, puis on revient au calme.' },
+  yoga: { label: 'Yoga', emoji: '🧘', color: 'bg-menthe-clair', tip: 'Le yoga apprend à tenir une position en respirant calmement.' },
+  detente: { label: 'Détente', emoji: '🌬️', color: 'bg-ciel-clair', tip: 'Respirer doucement aide le corps et la tête à se calmer.' },
+  taichi: { label: 'Tai-chi', emoji: '☯️', color: 'bg-soleil-clair', tip: 'Au tai-chi, on bouge lentement, comme dans l’eau.' },
+  etirements: { label: 'Étirements', emoji: '🙆', color: 'bg-corail-clair', tip: 'On s’étire doucement, sans jamais forcer.' },
+  education: { label: 'Éducation physique', emoji: '🏃', color: 'bg-ciel-clair', tip: 'Courir, viser, attraper : tout le corps apprend.' },
+  comportement: { label: 'Vivre ensemble', emoji: '💛', color: 'bg-soleil-clair', tip: 'On apprend à attendre, à écouter et à dire ce qu’on ressent.' }
 };
 
 /** Consignes générales par type de geste : toujours justes, quel que soit le jeu. */
@@ -114,14 +123,31 @@ export interface ActivitePhysique extends SportTip {
   categorie: PhysiqueCat;
 }
 
-export const PHYSIQUES: ActivitePhysique[] = DATA.map(([categorie, emoji, title, spec], i) => ({
+/** Même exercice que la version guidée d'Angela, qui est plus détaillée : on n'en garde qu'une. */
+const REMPLACEES = new Set(['Le pont', 'Le crabe pressé', 'Le funambule du salon']);
+
+const BASE: ActivitePhysique[] = DATA.map(([categorie, emoji, title, spec], i) => ({
   id: `physique-${String(i + 1).padStart(2, '0')}`,
   categorie,
   emoji,
   title,
   tip: PHYSIQUE_CATS[categorie].tip,
   moves: parseMoves(spec)
+})).filter((a) => !REMPLACEES.has(a.title));
+
+/** Activités guidées d'Angela : étapes détaillées, histoire pour l'enfant et conseil pour l'adulte. */
+const GUIDEE_SECONDS = 15;
+const guidees: ActivitePhysique[] = (GUIDEES as { famille: Famille; title: string; but: string; etapes: string[]; histoire: string; adulte: string; anims: MoveAnim[] }[]).map((a, i) => ({
+  id: `physique-${DATA.length + i + 1}`,
+  categorie: a.famille,
+  emoji: PHYSIQUE_CATS[a.famille].emoji,
+  title: a.title,
+  tip: `${a.histoire} ${a.but}`,
+  adulte: a.adulte,
+  moves: a.etapes.map((text, s) => ({ emoji: PHYSIQUE_CATS[a.famille].emoji, text, seconds: GUIDEE_SECONDS, anim: a.anims[s], cues: CUES[a.anims[s]] }))
 }));
+
+export const PHYSIQUES: ActivitePhysique[] = [...BASE, ...guidees];
 
 export const isPhysique = (id: string) => id.startsWith('physique-');
 

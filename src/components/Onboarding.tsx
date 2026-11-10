@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Volume2 } from 'lucide-react';
 import { AVATARS, cleanName, type Profile } from '../lib/profile';
+import { AGE_BANDS, AGE_INFO, readAge, type AgeBand } from '../lib/age';
 import { soundEffects, speakFrenchText } from '../utils/soundEffects';
 import { markGreeted } from './fx';
 
-/** Premier lancement (ou changement de prénom) : grand champ, avatars, un seul bouton. */
+/** Premier lancement (ou changement de prénom) : grand champ, avatars, âge, un seul bouton. */
 export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDone: (p: Profile) => void }) {
   const [name, setName] = useState(initial?.name ?? '');
   const [avatar, setAvatar] = useState(initial?.avatar ?? AVATARS[0]);
+  const [age, setAge] = useState<AgeBand>(readAge(initial?.age));
   const valid = cleanName(name).length > 0;
 
   return (
@@ -23,9 +25,9 @@ export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDo
           const clean = cleanName(name);
           speakFrenchText(`Bonjour ${clean} ! Bienvenue dans Pulse Kids !`, { rate: 0.9, pitch: 1.15 });
           markGreeted();
-          onDone({ name: clean, avatar });
+          onDone({ name: clean, avatar, age });
         }}
-        className="w-full max-w-md bg-white rounded-[2rem] shadow-bonbon p-6 sm:p-8 text-center space-y-6"
+        className="w-full max-w-md bg-white rounded-[2rem] shadow-bonbon p-6 sm:p-8 text-center space-y-4"
       >
         <div className="text-7xl float" aria-hidden>
           {avatar}
@@ -93,6 +95,37 @@ export function Onboarding({ initial, onDone }: { initial?: Profile | null; onDo
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <p className="text-doux mb-3">Quel âge as-tu ?</p>
+          <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Choisis ton âge">
+            {AGE_BANDS.map((band) => {
+              const info = AGE_INFO[band];
+              const active = age === band;
+              return (
+                <button
+                  type="button"
+                  key={band}
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => {
+                    soundEffects.playPop();
+                    setAge(band);
+                    speakFrenchText(info.spoken, { rate: 0.9, pitch: 1.2 });
+                  }}
+                  className={`press rounded-2xl p-3 text-center transition-colors ${active ? 'bg-ciel text-white ring-4 ring-ciel-clair' : 'bg-creme text-encre'}`}
+                >
+                  <span className="block text-3xl" aria-hidden>
+                    {info.emoji}
+                  </span>
+                  <span className="block font-bold leading-tight">{info.label}</span>
+                  <span className={`block text-xs leading-snug mt-1 ${active ? 'text-white/85' : 'text-doux'}`}>{info.hint}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-doux mt-2">Cela adapte les vidéos, les explications animées et la vitesse de la voix des histoires. Tu pourras changer à tout moment.</p>
         </div>
 
         <button

@@ -33,3 +33,39 @@ export function once<T>(key: string, fn: () => Promise<T>): Promise<T> {
   inflight.set(key, p);
   return p;
 }
+
+/**
+ * Cache d'échec : quand la génération IA échoue, on s'en souvient quelques minutes
+ * pour ne pas relancer les fournisseurs à chaque requête.
+ */
+export const FAILURE_TTL_SECONDS = 15 * 60;
+const failures = new Map<string, number>();
+
+export async function failureGet(key: string, now = Date.now()): Promise<boolean> {
+  const until = failures.get(key);
+  if (until !== undefined) {
+    if (until > now) return true;
+    failures.delete(key);
+  }
+  if (!hasDatabase()) return false;
+  const rows = (await db()`
+    select 1 from daily_cache where key = ${key} and created_at > now() - make_interval(secs => ${FAILURE_TTL_SECONDS})
+  `) as unknown[];
+  if (rows.length === 0) return false;
+  failures.set(key, now + FAILURE_TTL_SECONDS * 1000);
+  return true;
+}
+
+export async function failureSet(key: string, now = Date.now()): Promise<void> {
+  failures.set(key, now + FAILURE_TTL_SECONDS * 1000);
+  if (!hasDatabase()) return;
+  await db()`
+    insert into daily_cache (key, data) values (${key}, 'true'::jsonb)
+    on conflict (key) do update set data = excluded.data, created_at = now()
+  `;
+}
+
+/** Pour les tests. */
+export function resetFailures() {
+  failures.clear();
+}

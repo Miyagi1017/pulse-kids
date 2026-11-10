@@ -2,20 +2,21 @@ import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { soundEffects } from '../utils/soundEffects';
 
-export type Section = 'video' | 'contes' | 'activites' | 'soir';
+export type Section = 'video' | 'contes' | 'activites' | 'soir' | 'explications';
 
 /** Couleur de chaque espace : repère visuel immédiat pour un enfant qui ne lit pas encore. */
 export const SECTION_STYLE: Record<Section, { label: string; emoji: string; strong: string; soft: string; text: string }> = {
-  video: { label: 'La vidéo du jour', emoji: '🎬', strong: 'bg-corail', soft: 'bg-corail-clair', text: 'text-corail' },
+  video: { label: 'Les vidéos', emoji: '🎬', strong: 'bg-corail', soft: 'bg-corail-clair', text: 'text-corail' },
   contes: { label: 'Les contes', emoji: '📖', strong: 'bg-soleil', soft: 'bg-soleil-clair', text: 'text-amber-600' },
   activites: { label: 'Les activités', emoji: '🧩', strong: 'bg-menthe', soft: 'bg-menthe-clair', text: 'text-menthe' },
-  soir: { label: 'Les contes du soir', emoji: '🌙', strong: 'bg-lavande', soft: 'bg-lavande-clair', text: 'text-lavande' }
+  soir: { label: 'Les contes du soir', emoji: '🌙', strong: 'bg-lavande', soft: 'bg-lavande-clair', text: 'text-lavande' },
+  explications: { label: 'Les explications animées', emoji: '💡', strong: 'bg-ciel', soft: 'bg-ciel-clair', text: 'text-ciel' }
 };
 
 export function TopBar({ title, emoji, onBack, dark = false, right }: { title: string; emoji: string; onBack: () => void; dark?: boolean; right?: ReactNode }) {
   return (
     <header
-      className={`sticky top-0 z-20 flex items-center gap-3 px-4 py-3 sm:px-6 ${dark ? 'bg-nuit/95 text-white' : 'bg-creme/95 text-encre'}`}
+      className={`sticky top-0 z-20 flex items-center gap-3 px-4 py-3 sm:px-6 ${dark ? 'bg-nuit/95 text-white' : 'bg-creme/95 backdrop-blur-sm text-encre'}`}
       style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
     >
       <button

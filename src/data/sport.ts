@@ -27,6 +27,8 @@ export interface SportTip {
   title: string;
   tip: string;
   moves: SportMove[];
+  /** Conseil de sécurité pour l'adulte qui accompagne. */
+  adulte?: string;
 }
 
 type Row = [string, string, string, string];
