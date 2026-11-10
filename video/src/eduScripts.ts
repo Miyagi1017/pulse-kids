@@ -37,7 +37,7 @@ export const BYE_LINE = 'Bravo, à bientôt !';
 export const EDU_SCRIPTS: Record<string, EduScript> = {
   'physique-61': {
     animal: 'cerf',
-    intro: 'Aujourd’hui, on joue à la montagne.',
+    intro: 'Hop ! Le cerf devient une montagne. Et toi ?',
     learn: 'Tu vas apprendre à tenir bien droit.',
     learnLabel: 'Tenir droit',
     stepSeconds: 16,
@@ -92,7 +92,7 @@ export const EDU_SCRIPTS: Record<string, EduScript> = {
   },
   'physique-95': {
     animal: 'tigre',
-    intro: 'Aujourd’hui, on joue au chat en boule.',
+    intro: 'Où est passé le tigre ? Il est tout rond, comme un chat !',
     learn: 'Tu vas apprendre à arrondir ton dos.',
     learnLabel: 'Dos tout rond',
     stepSeconds: 16,
@@ -109,7 +109,7 @@ export const EDU_SCRIPTS: Record<string, EduScript> = {
   },
   'physique-105': {
     animal: 'singe',
-    intro: 'Aujourd’hui, on joue aux émotions en gestes.',
+    intro: 'Regarde le singe. Bras en l’air : il est joyeux !',
     learn: 'Tu vas apprendre à nommer tes émotions.',
     learnLabel: 'Nommer ses émotions',
     stepSeconds: 13,
