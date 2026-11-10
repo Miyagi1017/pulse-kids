@@ -8,7 +8,8 @@ import { ActivityPlayer } from './components/ActivityPlayer';
 import { VideoPlayer } from './components/DailyVideo';
 import { ExplicationPlayer, ExplicationsList, safeExplication } from './components/Explications';
 import { ChansonPlayer } from './components/ChansonPlayer';
-import { CHANSON_DU_JOUR } from './data/chansons';
+import { chansonOf, randomChanson, CHANSON_DU_JOUR } from './data/chansons';
+import { Comptines } from './components/Comptines';
 import { EXPLICATIONS } from './data/explications';
 import { otherAge } from './lib/age';
 import { JamyLinks } from './components/JamyLinks';
@@ -54,7 +55,8 @@ type View =
   | { name: 'video' }
   | { name: 'explications' }
   | { name: 'explication'; id: string }
-  | { name: 'chanson' }
+  | { name: 'chanson'; id: string }
+  | { name: 'comptines' }
   | { name: 'player'; index: number }
   | { name: 'library'; section: 'contes' | 'activites' | 'soir' }
   | { name: 'tale'; section: 'contes' | 'soir'; id: string }
@@ -115,6 +117,8 @@ export default function App() {
   const featuredIndex = Math.floor(videoPick * playlist.length);
   // Jeu surprise de l'onglet Activités : une aventure ou un jeu, tiré au sort à chaque chargement.
   const [surprisePick] = useState(() => Math.random());
+  // Comptine mise en avant sur l'accueil : tirée au sort à chaque chargement (de préférence pas encore chantée).
+  const [chansonPick, setChansonPick] = useState(() => randomChanson(done));
   const sportToday = useMemo(() => sportOfTheDay(today.date), [today.date]);
   // Défi de l'accueil : tiré au sort à chaque chargement (défis + mini-défis), stable pendant la visite.
   const [sportPick] = useState(() => {
@@ -194,15 +198,34 @@ export default function App() {
     case 'explications':
       screen = <ExplicationsList done={done} age={profile.age} onBack={home} onPick={(id) => setView({ name: 'explication', id })} />;
       break;
-    case 'chanson':
+    case 'chanson': {
+      const chanson = chansonOf(view.id) ?? CHANSON_DU_JOUR;
+      const another = () => {
+        const next = randomChanson(done, chanson.id);
+        setChansonPick(next);
+        setView({ name: 'chanson', id: next.id });
+      };
       screen = (
         <ChansonPlayer
-          key={CHANSON_DU_JOUR.id}
-          chanson={CHANSON_DU_JOUR}
+          key={chanson.id}
+          chanson={chanson}
           name={profile.name}
           theme={theme}
           onBack={home}
-          onDone={() => markDone(CHANSON_DU_JOUR.id)}
+          onDone={() => markDone(chanson.id)}
+          onAnother={another}
+          onList={() => setView({ name: 'comptines' })}
+        />
+      );
+      break;
+    }
+    case 'comptines':
+      screen = (
+        <Comptines
+          done={done}
+          onBack={home}
+          onPlay={(id) => setView({ name: 'chanson', id })}
+          onSurprise={() => setView({ name: 'chanson', id: randomChanson(done).id })}
         />
       );
       break;
@@ -410,13 +433,15 @@ export default function App() {
           onAge={() => setProfile({ ...profile, age: otherAge(profile.age) })}
           onExplications={() => setView({ name: 'explications' })}
           explicationsCount={explicationsCount}
-          onChanson={() => setView({ name: 'chanson' })}
-          chansonDone={done.has(CHANSON_DU_JOUR.id)}
+          chanson={chansonPick}
+          onChanson={() => setView({ name: 'chanson', id: chansonPick.id })}
+          onComptines={() => setView({ name: 'comptines' })}
+          chansonDone={done.has(chansonPick.id)}
         />
       );
   }
 
-  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'explication' ? `explication-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
+  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'explication' ? `explication-${view.id}` : view.name === 'chanson' ? `chanson-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
 
   return (
     <MotionConfig reducedMotion="user">

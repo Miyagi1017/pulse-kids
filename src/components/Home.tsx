@@ -19,7 +19,8 @@ import { burst, Mascot, pointOf, sayHello } from './fx';
 import { jump, LIFT, PRESS, wiggle as wiggleMove } from '../lib/motion';
 import { ExplainAnim } from './ExplainAnim';
 import { explicationOfTheDay } from '../data/explications';
-import { CHANSON_DU_JOUR, mediaFor } from '../data/chansons';
+import { ALL_CHANSONS, mediaFor, paletteFor, type Chanson } from '../data/chansons';
+import { ComptineStage } from '../comptines/ComptineStage';
 
 interface HomeProps {
   profile: Profile;
@@ -47,7 +48,11 @@ interface HomeProps {
   onExplications: () => void;
   explicationsCount: { total: number; done: number };
   /** La chanson animée du jour (épisode vidéo court). */
+  /** La chanson mise en avant (tirée au sort à chaque chargement). */
+  chanson: Chanson;
   onChanson: () => void;
+  /** Toutes les comptines. */
+  onComptines: () => void;
   chansonDone: boolean;
 }
 
@@ -79,7 +84,7 @@ function journalSummary(today: Pick<Today, 'scenes'>, name: string): { emoji: st
   });
 }
 
-export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, onChanson, chansonDone }: HomeProps) {
+export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, chanson, onChanson, onComptines, chansonDone }: HomeProps) {
   const kawaii = theme !== 'aquarelle';
   const open = (s: Section, e: MouseEvent<HTMLButtonElement>, emojis: string[]) => {
     soundEffects.playPop();
@@ -267,19 +272,37 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
         className="sticker w-full rounded-[2rem] bg-white p-3 mb-4 flex items-center gap-4 text-left"
       >
         <span className="relative shrink-0 w-32 sm:w-44 aspect-video rounded-2xl overflow-hidden bg-nuit">
-          <img src={mediaFor(CHANSON_DU_JOUR, theme).poster} alt="" className="w-full h-full object-cover" loading="lazy" />
+          {chanson.comptine ? (
+            <ComptineStage comptine={chanson.comptine.spec} timing={chanson.comptine.timing} palette={paletteFor(theme)} className="w-full h-full" />
+          ) : (
+            <img src={mediaFor(chanson, theme)?.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
+          )}
           <span className="absolute inset-0 bg-encre/25 flex items-center justify-center text-white">
             <Play className="w-8 h-8" fill="currentColor" />
           </span>
         </span>
         <span className="flex-1 min-w-0">
-          <span className="block text-sm font-bold text-corail">🎵 La chanson du jour</span>
-          <span className="block text-xl sm:text-2xl font-bold leading-tight">{CHANSON_DU_JOUR.title}</span>
+          <span className="block text-sm font-bold text-corail">🎵 Une comptine au hasard</span>
+          <span className="block text-xl sm:text-2xl font-bold leading-tight">
+            {chanson.emoji} {chanson.title}
+          </span>
           <span className="block text-sm text-doux mt-0.5">
-            {Math.round(CHANSON_DU_JOUR.duration)} s · à chanter ensemble {chansonDone ? '· ✓' : ''}
+            {Math.round(chanson.duration)} s · à chanter avec les gestes {chansonDone ? '· ✓' : ''}
           </span>
         </span>
       </motion.button>
+
+      <div className="flex justify-end -mt-2 mb-4">
+        <button
+          onClick={() => {
+            soundEffects.playPop();
+            onComptines();
+          }}
+          className="text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1"
+        >
+          🎵 Les {ALL_CHANSONS.length} comptines ➜
+        </button>
+      </div>
 
       {/* Les explications animées : « pourquoi ? comment ? » en 3 étapes dessinées */}
       <motion.button

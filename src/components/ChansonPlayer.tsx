@@ -5,17 +5,38 @@ import confetti from 'canvas-confetti';
 import { BigQuiz } from './Quiz';
 import { TopBar } from './ui';
 import { soundEffects } from '../utils/soundEffects';
-import { mediaFor, type Chanson } from '../data/chansons';
+import { mediaFor, paletteFor, type Chanson } from '../data/chansons';
 import type { Theme } from '../lib/theme';
+import { ComptineStage } from '../comptines/ComptineStage';
 
 /**
- * Le lecteur de chanson : une vidéo courte avec des paroles qui s'allument (karaoké),
- * puis une question de compréhension et une petite mission à refaire à la maison.
+ * Le lecteur de chanson : une vidéo courte (ou une comptine dessinée en direct sur sa bande-son)
+ * avec des paroles qui s'allument (karaoké), puis une question de compréhension et une petite
+ * mission à refaire à la maison.
  * Le son démarre sur un geste (règle des navigateurs), d'où le gros bouton central.
  */
-export function ChansonPlayer({ chanson, name, theme, onBack, onDone }: { chanson: Chanson; name: string; theme: Theme; onBack: () => void; onDone: () => void }) {
+export function ChansonPlayer({
+  chanson,
+  name,
+  theme,
+  onBack,
+  onDone,
+  onAnother,
+  onList
+}: {
+  chanson: Chanson;
+  name: string;
+  theme: Theme;
+  onBack: () => void;
+  onDone: () => void;
+  /** Une autre chanson, tirée au hasard. */
+  onAnother?: () => void;
+  /** Toutes les comptines. */
+  onList?: () => void;
+}) {
   const media = mediaFor(chanson, theme);
-  const ref = useRef<HTMLVideoElement>(null);
+  const anim = chanson.comptine;
+  const ref = useRef<HTMLMediaElement>(null);
   const quizRef = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
@@ -65,35 +86,67 @@ export function ChansonPlayer({ chanson, name, theme, onBack, onDone }: { chanso
   return (
     <div className="min-h-dvh flex flex-col">
       <TopBar
-        title="La chanson"
+        title={anim ? 'La comptine' : 'La chanson'}
         emoji="🎵"
         onBack={onBack}
         right={
-          <span className="rounded-full bg-white shadow-bonbon px-3 py-1.5 text-sm font-semibold text-doux">
-            {Math.round(chanson.duration)} s
-          </span>
+          onAnother ? (
+            <button
+              onClick={() => {
+                soundEffects.playPop();
+                onAnother();
+              }}
+              className="press shadow-bonbon h-12 px-4 rounded-2xl bg-corail text-white font-semibold flex items-center gap-2"
+            >
+              🎲 <span className="hidden sm:inline">Une autre</span>
+            </button>
+          ) : (
+            <span className="rounded-full bg-white shadow-bonbon px-3 py-1.5 text-sm font-semibold text-doux">{Math.round(chanson.duration)} s</span>
+          )
         }
       />
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 pb-8 flex flex-col gap-3">
         <div className="relative rounded-[2rem] overflow-hidden shadow-bonbon bg-nuit">
-          <video
-            ref={ref}
-            key={media.video}
-            src={media.video}
-            poster={media.poster}
-            playsInline
-            preload="metadata"
-            className="w-full aspect-video block"
-            onClick={toggle}
-            onPlay={() => setPlaying(true)}
-            onPause={() => setPlaying(false)}
-            onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
-            onEnded={() => {
-              setPlaying(false);
-              setEnded(true);
-            }}
-          />
+          {anim ? (
+            <>
+              <ComptineStage comptine={anim.spec} timing={anim.timing} palette={paletteFor(theme)} media={ref} className="w-full aspect-video" />
+              <audio
+                ref={ref as React.RefObject<HTMLAudioElement>}
+                key={anim.audio}
+                src={anim.audio}
+                preload="auto"
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+                onEnded={() => {
+                  setPlaying(false);
+                  setEnded(true);
+                }}
+              />
+              <button type="button" onClick={toggle} className="absolute inset-0" aria-label={playing ? 'Pause' : 'Lecture'} />
+            </>
+          ) : (
+            media && (
+              <video
+                ref={ref as React.RefObject<HTMLVideoElement>}
+                key={media.video}
+                src={media.video}
+                poster={media.poster}
+                playsInline
+                preload="metadata"
+                className="w-full aspect-video block"
+                onClick={toggle}
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)}
+                onEnded={() => {
+                  setPlaying(false);
+                  setEnded(true);
+                }}
+              />
+            )
+          )}
           {!playing && !ended && (
             <button onClick={play} className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-encre/30 text-white" aria-label="Lancer la chanson">
               <motion.span
@@ -174,10 +227,27 @@ export function ChansonPlayer({ chanson, name, theme, onBack, onDone }: { chanso
               <p className="text-2xl font-bold mt-1">Bravo {name} !</p>
               <p className="mt-3 rounded-2xl bg-menthe-clair px-4 py-3 text-lg font-semibold">📌 {chanson.retiens}</p>
               <p className="mt-3 rounded-2xl bg-soleil-clair px-4 py-3 text-left">🎯 <strong>À toi :</strong> {chanson.geste}</p>
-              <button onClick={replay} className="press shadow-bonbon mt-4 bg-corail text-white px-6 py-3 rounded-2xl text-xl font-bold">
-                Rechanter 🎵
-              </button>
+              <div className="mt-4 flex flex-wrap justify-center gap-3">
+                <button onClick={replay} className="press shadow-bonbon bg-white px-6 py-3 rounded-2xl text-xl font-bold">
+                  Rechanter 🎵
+                </button>
+                {onAnother && (
+                  <button onClick={onAnother} className="press shadow-bonbon bg-corail text-white px-6 py-3 rounded-2xl text-xl font-bold">
+                    🎲 Une autre comptine
+                  </button>
+                )}
+              </div>
             </motion.div>
+          )}
+          {ended && onAnother && !solved && (
+            <button onClick={onAnother} className="press self-center shadow-bonbon bg-corail text-white px-6 py-3 rounded-2xl text-lg font-bold">
+              🎲 Une autre comptine
+            </button>
+          )}
+          {onList && (
+            <button onClick={onList} className="self-center text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1">
+              🎵 Toutes les comptines ➜
+            </button>
           )}
         </div>
 

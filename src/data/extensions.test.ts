@@ -110,13 +110,13 @@ test('chansons animées : vidéo et affiche présentes, paroles ordonnées, quiz
   for (const c of CHANSONS) {
     assert.ok(c.duration >= 10 && c.duration <= 120, `${c.id} : durée (${c.duration})`);
     for (const theme of ['fille', 'garcon'] as const) {
-      const media = c.medias[theme];
+      const media = c.medias![theme];
       assert.match(media.video, /^\/videos\/chansons\/[a-z0-9-]+\.mp4$/, `${c.id} : chemin vidéo (${theme})`);
       assert.match(media.poster, /^\/videos\/chansons\/[a-z0-9-]+\.jpg$/, `${c.id} : affiche (${theme})`);
       assert.ok(existsSync(`public${media.video}`), `${c.id} : le MP4 ${theme} n'est pas dans public/`);
       assert.ok(existsSync(`public${media.poster}`), `${c.id} : l'affiche ${theme} n'est pas dans public/`);
     }
-    assert.notEqual(c.medias.fille.video, c.medias.garcon.video, `${c.id} : deux vidéos distinctes`);
+    assert.notEqual(c.medias!.fille.video, c.medias!.garcon.video, `${c.id} : deux vidéos distinctes`);
 
     assert.ok(c.lyrics.length >= 3, `${c.id} : paroles`);
     let previous = -1;
@@ -156,4 +156,41 @@ test('trouver une explication ne renvoie jamais rien, et la question du jour cha
   const b = explicationOfTheDay('2026-01-02');
   assert.notEqual(a.id, b.id, 'la question du jour change d’un jour à l’autre');
   assert.ok(EXPLICATIONS.includes(a) && EXPLICATIONS.includes(b));
+});
+
+test('comptines : 100 comptines complètes, jouables et accompagnées de leur bande-son', async () => {
+  const { COMPTINES, GESTE_INFO } = await import('./comptines');
+  const { COMPTINES_CHANSONS } = await import('./chansons');
+  const { decor, objet } = await import('../comptines/decor');
+  const { comptineFrame } = await import('../comptines/stage');
+  assert.equal(COMPTINES.length, 100, '100 comptines');
+  assert.equal(new Set(COMPTINES.map((c) => c.id)).size, 100, 'ids uniques');
+  assert.equal(new Set(COMPTINES.map((c) => c.title)).size, 100, 'titres uniques');
+  for (const c of COMPTINES) {
+    for (const l of [...c.lines, c.shout]) assert.ok(l.trim().length >= 3 && l.length <= 52, `${c.id} : ligne trop longue ou vide « ${l} »`);
+    for (const g of c.gestes) assert.ok(GESTE_INFO[g], `${c.id} : geste inconnu ${g}`);
+    assert.ok(c.objets.length >= 1, `${c.id} : au moins un objet`);
+    for (const o of c.objets) assert.ok(objet(o, 0, 0).length > 20, `${c.id} : objet inconnu ${o}`);
+    assert.ok(decor(c.decor, 0).length > 100, `${c.id} : décor inconnu ${c.decor}`);
+    assert.ok(c.retiens.length > 10, `${c.id} : phrase à retenir`);
+  }
+  for (const ch of COMPTINES_CHANSONS) {
+    const a = ch.comptine!;
+    assert.equal(a.timing.lines.length, 5, `${ch.id} : 4 lignes + cri final`);
+    let prev = 0;
+    for (const [s, e] of a.timing.lines) {
+      assert.ok(s >= prev && e > s, `${ch.id} : horaires ordonnés`);
+      prev = e;
+    }
+    assert.ok(a.timing.duration > prev, `${ch.id} : la fin vient après le cri final`);
+    assert.ok(existsSync(`public${a.audio}`), `${ch.id} : bande-son absente (npx tsx scripts/comptines/build.ts)`);
+    const q = ch.quiz;
+    assert.equal(new Set(q.choices).size, 3, `${ch.id} : 3 réponses différentes`);
+    assert.ok(q.choices.every((x) => x.length > 0), `${ch.id} : réponse vide`);
+    assert.ok(q.answer >= 0 && q.answer < 3, `${ch.id} : index de réponse`);
+    for (const t of [0.5, a.timing.lines[2][0] + 0.3, a.timing.lines[4][0] + 0.5, a.timing.duration - 0.2]) {
+      const svg = comptineFrame(a.spec, a.timing, t, 'garcon');
+      assert.ok(svg.startsWith('<svg') && !/NaN|undefined/.test(svg), `${ch.id} : image invalide à ${t.toFixed(1)} s`);
+    }
+  }
 });
