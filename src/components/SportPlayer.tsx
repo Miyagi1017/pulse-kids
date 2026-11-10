@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Pause, Play, SkipForward } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import type { SportTip } from '../data/sport';
+import type { SportMove, SportTip } from '../data/sport';
+import { moveGuide, NUMBER_WORDS, speechSeconds, type MoveGuide } from '../lib/guide';
 import { personalize } from '../data/format';
 import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
 import { SpeakButton, TopBar } from './ui';
@@ -17,10 +18,26 @@ import { ThemeScene, type SceneTheme } from './ThemeScene';
 const introFloat = float(12, 1.6);
 const introHop = jump(30, 0.9);
 
-type Phase = { name: 'intro' } | { name: 'move'; index: number } | { name: 'bravo' };
+type Phase = { name: 'intro' } | { name: 'move'; index: number } | { name: 'rest'; next: number } | { name: 'bravo' };
+
+/** Durée de la petite pause entre deux mouvements. */
+const REST_MS = 4500;
 
 /** Étape du départ où la voix lit encore la consigne (avant 3, 2, 1). */
 const LISTEN = -1;
+
+/** Le chiffre que la voix vient de compter (répétitions), en très gros. */
+function CountBubble({ n }: { n: number }) {
+  return (
+    <div className="relative w-28 h-28 flex items-center justify-center rounded-full bg-white shadow-bonbon" role="status" aria-live="polite" aria-label={`On compte : ${n}`}>
+      <AnimatePresence mode="popLayout">
+        <motion.span key={n} initial={{ scale: 0.4, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 1.5, opacity: 0 }} transition={{ type: 'spring', stiffness: 400, damping: 15 }} className="absolute text-6xl font-bold">
+          {n}
+        </motion.span>
+      </AnimatePresence>
+    </div>
+  );
+}
 
 /** Le décompte de départ, en très gros : 👂 pendant la consigne, puis 3, 2, 1, « Partez ! ». */
 function ReadyGo({ step }: { step: number }) {
@@ -83,7 +100,6 @@ export function SportPlayer({
   scene?: SceneTheme;
 }) {
   const [phase, setPhase] = useState<Phase>({ name: 'intro' });
-  const [left, setLeft] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [speaking, setSpeaking] = useState(false);
   const [watching, setWatching] = useState(false);
@@ -92,26 +108,40 @@ export function SportPlayer({
   const [cue, setCue] = useState(0);
   /**
    * Le départ de chaque mouvement : la voix lit la consigne (LISTEN), puis compte 3, 2, 1
-   * et dit « Partez ! » (0). `null` : le chrono tourne.
+   * et dit « Partez ! » (0). `null` : le mouvement est en cours, guidé à voix haute.
    */
   const [ready, setReady] = useState<number | null>(null);
+  /** Temps écoulé dans le mouvement (ms), et le chiffre que la voix vient de compter. */
+  const [elapsed, setElapsed] = useState(0);
+  const [counted, setCounted] = useState<number | null>(null);
+  const nextEvent = useRef(0);
+  const moveIndex = phase.name === 'move' ? phase.index : phase.name === 'rest' ? phase.next : 0;
   const pose = phase.name === 'move' ? poseFor(tip.moves[phase.index]) : 'respire';
+  const cuesOf = (m: SportMove) => m.cues ?? POSES[poseFor(m)].cues;
+  const guide: MoveGuide = useMemo(() => {
+    const m = tip.moves[moveIndex];
+    return moveGuide(m, moveIndex, tip.moves.length, cuesOf(m));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tip, moveIndex]);
+  const left = Math.max(0, Math.ceil(guide.seconds - elapsed / 1000));
 
-  // Les 3 consignes défilent doucement pendant le mouvement.
+  // Les 3 consignes : en mode « libre », la voix les lit une par une (et on les surligne) ;
+  // sinon elles défilent doucement.
   useEffect(() => {
     setCue(0);
   }, [phase]);
   useEffect(() => {
-    if (phase.name !== 'move' || !playing) return;
-    const t = setInterval(() => setCue((c) => (c + 1) % 3), 3800);
+    if (phase.name !== 'move' || !playing || guide.mode === 'libre') return;
+    const t = setInterval(() => setCue((c) => (c + 1) % 3), 4500);
     return () => clearInterval(t);
-  }, [phase, playing]);
+  }, [phase, playing, guide.mode]);
 
-  const say = (text: string) => {
+  /** La voix guide : plus lente, pour que l'enfant ait le temps de comprendre. */
+  const say = (text: string, rate = 0.82) => {
     setSpeaking(true);
-    speakFrenchText(personalize(text, name), { rate: 0.95, pitch: 1.15, onEnd: () => setSpeaking(false), onError: () => setSpeaking(false) });
+    speakFrenchText(personalize(text, name), { rate, pitch: 1.15, onEnd: () => setSpeaking(false), onError: () => setSpeaking(false) });
   };
-  const introText = `${tip.title.replace(/^Séance (\d+) · /, 'Séance $1 : ')} ! ${tip.tip} ${rule} Si quelque chose fait mal, on arrête. C’est parti !`;
+  const introText = `${tip.title.replace(/^Séance (\d+) · /, 'Séance $1 : ')} ! ${tip.tip} ${rule} Si quelque chose fait mal, on arrête. Quand tu es prêt, appuie sur « C’est parti ».`;
 
   useEffect(() => {
     const t = setTimeout(() => say(introText), 400);
@@ -122,83 +152,111 @@ export function SportPlayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tip.id]);
 
-  // Début de chaque mouvement : la voix lit la consigne, puis le décompte de départ.
+  // Début de chaque mouvement : la voix explique quoi faire et comment on va compter, puis le départ.
   useEffect(() => {
     if (phase.name !== 'move') return;
-    const move = tip.moves[phase.index];
     setPlaying(true);
     setReady(LISTEN);
+    setElapsed(0);
+    setCounted(null);
+    nextEvent.current = 0;
     soundEffects.playPop();
-    const consigne = /[.!?…]$/.test(move.text.trim()) ? move.text.trim() : `${move.text.trim()}.`;
-    const text = `${phase.index === 0 ? '' : 'Mouvement suivant ! '}${consigne} Prêt ?`;
+    const text = `${guide.intro} Prêt ?`;
     let started = false;
+    let pause: ReturnType<typeof setTimeout> | undefined;
     const go = () => {
       if (started) return;
       started = true;
       setSpeaking(false);
-      setReady((r) => (r === LISTEN ? 3 : r));
+      // Un petit silence avant le décompte : le temps de se mettre en place.
+      pause = setTimeout(() => setReady((r) => (r === LISTEN ? 3 : r)), 900);
     };
     setSpeaking(true);
-    speakFrenchText(personalize(text, name), { rate: 0.95, pitch: 1.15, onEnd: go, onError: go });
+    speakFrenchText(personalize(text, name), { rate: 0.82, pitch: 1.15, onEnd: go, onError: go });
     // Filet de sécurité : certains navigateurs n'envoient jamais la fin de la voix.
-    const safety = setTimeout(go, Math.max(3000, text.length * 85));
-    return () => clearTimeout(safety);
+    const safety = setTimeout(go, Math.max(4000, speechSeconds(text) * 1300));
+    return () => {
+      clearTimeout(safety);
+      if (pause) clearTimeout(pause);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // Le décompte de départ : 3, 2, 1 à voix haute, puis « Partez ! » et le chrono démarre.
+  // Le décompte de départ : 3, 2, 1 à voix haute (lentement), puis « Partez ! ».
   useEffect(() => {
     if (phase.name !== 'move' || !playing || ready === null || ready === LISTEN) return;
     if (ready > 0) {
       soundEffects.playTick();
-      speakFrenchText(String(ready), { rate: 1, pitch: 1.15 });
+      speakFrenchText(NUMBER_WORDS[ready], { rate: 0.9, pitch: 1.15 });
     } else {
       soundEffects.playPop();
       speakFrenchText('Partez !', { rate: 1, pitch: 1.2 });
     }
-    const t = setTimeout(() => setReady(ready > 0 ? ready - 1 : null), ready > 0 ? 1000 : 800);
+    const t = setTimeout(() => setReady(ready > 0 ? ready - 1 : null), ready > 0 ? 1300 : 1000);
     return () => clearTimeout(t);
   }, [ready, playing, phase]);
 
-  // Le chrono : 3, 2, 1 annoncés à voix haute, puis mouvement suivant.
+  // L'horloge du mouvement (4 fois par seconde : la voix tombe pile au bon moment).
   useEffect(() => {
     if (phase.name !== 'move' || !playing || ready !== null) return;
-    if (left <= 0) {
+    const t = setInterval(() => setElapsed((e) => e + 250), 250);
+    return () => clearInterval(t);
+  }, [phase, playing, ready]);
+
+  // Ce que la voix dit pendant le mouvement : compter, respirer, conseils, encouragements, fin.
+  useEffect(() => {
+    if (phase.name !== 'move' || ready !== null) return;
+    while (nextEvent.current < guide.events.length && guide.events[nextEvent.current].at * 1000 <= elapsed) {
+      const e = guide.events[nextEvent.current++];
+      if (e.count) {
+        soundEffects.playTick();
+        setCounted(e.count);
+      }
+      const k = cuesOf(tip.moves[phase.index]).indexOf(e.say);
+      if (k >= 0) setCue(k);
+      say(e.say, e.count ? 0.95 : e.calm ? 0.72 : 0.85);
+    }
+    if (elapsed >= guide.seconds * 1000) {
       const last = phase.index === tip.moves.length - 1;
       if (last) {
         setPhase({ name: 'bravo' });
         soundEffects.playFanfare();
         confetti({ particleCount: 140, spread: 100, origin: { y: 0.6 } });
-        say(`Bravo ${name} ! ${title === 'Le sport du jour' ? 'Tu as réussi le défi du jour.' : 'Séance réussie.'} Ton corps te dit merci !`);
+        setTimeout(() => say(`Bravo ${name} ! ${title === 'Le sport du jour' ? 'Tu as réussi le défi du jour.' : 'Séance réussie.'} Ton corps te dit merci !`), 900);
         onDone();
-      } else goMove(phase.index + 1);
-      return;
+      } else setPhase({ name: 'rest', next: phase.index + 1 });
     }
-    const t = setTimeout(() => {
-      if (left <= 4 && left > 1) {
-        soundEffects.playTick();
-        speakFrenchText(String(left - 1), { rate: 1, pitch: 1.1 });
-      }
-      setLeft((l) => l - 1);
-    }, 1000);
-    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [left, playing, phase, ready]);
+  }, [elapsed, ready, phase]);
 
-  /** Durée et mouvement changent ensemble : le chrono ne voit jamais un 0 périmé. */
+  // Petite pause entre deux mouvements : on souffle, puis la voix explique le suivant.
+  useEffect(() => {
+    if (phase.name !== 'rest' || !playing) return;
+    const breathe = setTimeout(() => say('Petite pause. Respire bien.', 0.78), 1100);
+    const t = setTimeout(() => goMove(phase.next), REST_MS);
+    return () => {
+      clearTimeout(breathe);
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, playing]);
+
   function goMove(index: number) {
-    setLeft(tip.moves[index].seconds);
+    setElapsed(0);
     setPhase({ name: 'move', index });
   }
   const start = () => goMove(0);
   const skip = () => {
+    stopSpeaking();
+    setSpeaking(false);
+    if (phase.name === 'rest') return goMove(phase.next);
     if (phase.name !== 'move') return;
-    // Pendant le décompte, « suivant » saute le décompte ; ensuite, il passe au mouvement suivant.
-    if (ready !== null) {
-      stopSpeaking();
-      setSpeaking(false);
-      setReady(null);
-    } else setLeft(0);
+    // Pendant le décompte, « suivant » saute le décompte ; ensuite, il termine le mouvement.
+    if (ready !== null) setReady(null);
+    else {
+      nextEvent.current = guide.events.length;
+      setElapsed(guide.seconds * 1000);
+    }
   };
   const togglePlay = () => {
     soundEffects.playPop();
@@ -293,7 +351,13 @@ export function SportPlayer({
               {/* Consignes détaillées, une après l'autre (placement · respiration · sensation) */}
               <div className="flex items-center justify-center gap-5">
                 <div className="text-corail">
-                  {ready === null ? <Countdown left={left} total={tip.moves[phase.index].seconds} /> : <ReadyGo step={ready} />}
+                  {ready !== null ? (
+                    <ReadyGo step={ready} />
+                  ) : guide.mode === 'compte' && counted !== null && left > 1 ? (
+                    <CountBubble n={counted} />
+                  ) : (
+                    <Countdown left={left} total={guide.seconds} />
+                  )}
                 </div>
                 <nav className="flex items-center gap-5">
                   <button
@@ -321,6 +385,22 @@ export function SportPlayer({
                   </motion.li>
                 ))}
               </ol>
+            </motion.section>
+          )}
+
+          {phase.name === 'rest' && (
+            <motion.section key={`rest-${phase.next}`} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={SPRING_SOFT} className="flex flex-col items-center gap-4">
+              <motion.span className="text-[6rem] leading-none" animate={{ scale: [1, 1.12, 1] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }} aria-hidden>
+                😮‍💨
+              </motion.span>
+              <h2 className="text-3xl sm:text-4xl font-bold">Petite pause</h2>
+              <p className="text-xl text-doux">Respire bien… Ensuite : {tip.moves[phase.next].emoji}</p>
+              <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
+                Mouvement {phase.next + 1} / {tip.moves.length} dans un instant
+              </span>
+              <button onClick={skip} className="press shadow-bonbon px-6 py-3 rounded-2xl bg-white text-lg font-bold flex items-center gap-2">
+                <SkipForward className="w-5 h-5" /> Je suis prêt
+              </button>
             </motion.section>
           )}
 
