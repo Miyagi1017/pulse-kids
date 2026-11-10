@@ -136,7 +136,7 @@ Tout fonctionne sans configuration. Options (voir `.env.example`) :
 | `AI_BASE_URL` + `AI_MODEL` (+ `AI_API_KEY`) | Autre fournisseur compatible OpenAI (Ollama local, Groq, OpenRouter…) |
 | `GEMINI_API_KEY` | Gemini (propriétaire), en dernier recours |
 | `NASA_API_KEY` | Clé NASA perso (sinon `DEMO_KEY` puis la bibliothèque d’images sans clé) |
-| `CRON_SECRET` | Protège la tâche planifiée |
+| `CRON_SECRET` | **Obligatoire** pour la tâche planifiée : sans lui, `/api/cron/daily` répond 401 |
 
 | Commande | Rôle |
 |---|---|

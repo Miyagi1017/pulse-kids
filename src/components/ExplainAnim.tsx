@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type ComponentProps } from 'react';
 import { motion } from 'motion/react';
 import type { AnimId } from '../data/explications';
 
@@ -16,11 +16,27 @@ import type { AnimId } from '../data/explications';
 const loop = (duration: number, delay = 0, repeatDelay = 0) => ({ duration, delay, repeat: Infinity, repeatDelay, ease: 'easeInOut' as const });
 const flow = (duration: number, delay = 0) => ({ duration, delay, repeat: Infinity, ease: 'linear' as const });
 
+type CircleProps = ComponentProps<typeof motion.circle>;
+
+/**
+ * motion.circle qui part de la première image de son animation.
+ * Sans valeur de départ explicite, motion écrit cx/cy/r = "undefined" sur la première frame
+ * (erreurs SVG dans la console et un cercle qui saute).
+ */
+function MCircle({ animate, initial, ...props }: CircleProps) {
+  const start =
+    animate && typeof animate === 'object' && !Array.isArray(animate)
+      ? Object.fromEntries(Object.entries(animate).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]))
+      : {};
+  const init = initial && typeof initial === 'object' && !Array.isArray(initial) ? { ...start, ...initial } : initial ?? start;
+  return <motion.circle {...props} initial={init as CircleProps['initial']} animate={animate} />;
+}
+
 /** Un soleil tout simple, avec un halo qui respire. */
 function Sun({ x = 160, y = 40, r = 18 }: { x?: number; y?: number; r?: number }) {
   return (
     <g>
-      <motion.circle cx={x} cy={y} r={r} fill="var(--color-soleil)" opacity={0.35} animate={{ r: [r, r + 7], opacity: [0.4, 0] }} transition={loop(3)} />
+      <MCircle cx={x} cy={y} r={r} fill="var(--color-soleil)" opacity={0.35} animate={{ r: [r, r + 7], opacity: [0.4, 0] }} transition={loop(3)} />
       {Array.from({ length: 8 }, (_, i) => (
         <rect key={i} x={x - 2} y={y - r - 9} width={4} height={7} rx={2} fill="var(--color-soleil)" transform={`rotate(${i * 45} ${x} ${y})`} />
       ))}
@@ -46,7 +62,7 @@ function Pluie() {
       <Sun x={46} y={40} r={16} />
       {/* l'eau s'évapore et monte */}
       {[76, 102, 128].map((x, i) => (
-        <motion.circle key={x} cx={x} cy={148} r={3.5} fill="var(--color-ciel)" animate={{ cy: [148, 96], opacity: [0, 0.9, 0] }} transition={{ duration: 3.2, delay: i * 0.9, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={x} cx={x} cy={148} r={3.5} fill="var(--color-ciel)" animate={{ cy: [148, 96], opacity: [0, 0.9, 0] }} transition={{ duration: 3.2, delay: i * 0.9, repeat: Infinity, ease: 'easeOut' }} />
       ))}
       {/* le nuage */}
       <motion.path d={CLOUD} fill="#e7f2fe" stroke="#c6e1fb" strokeWidth={2} animate={{ x: [-5, 5] }} transition={loop(5)} />
@@ -98,7 +114,7 @@ function Graine() {
       </motion.g>
       {/* gouttes d'arrosage */}
       {[64, 78].map((x, i) => (
-        <motion.circle key={x} cx={x} cy={60} r={3.5} fill="var(--color-ciel)" animate={{ cy: [60, 150], opacity: [0, 1, 0] }} transition={{ duration: 2.4, delay: i * 0.9, repeat: Infinity, repeatDelay: 1.6, ease: 'easeIn' }} />
+        <MCircle key={x} cx={x} cy={60} r={3.5} fill="var(--color-ciel)" animate={{ cy: [60, 150], opacity: [0, 1, 0] }} transition={{ duration: 2.4, delay: i * 0.9, repeat: Infinity, repeatDelay: 1.6, ease: 'easeIn' }} />
       ))}
     </>
   );
@@ -128,12 +144,12 @@ function Ciel() {
         const x = 60 + ((i * 47) % 120);
         const y = 30 + ((i * 61) % 140);
         return (
-          <motion.circle key={i} cx={x} cy={y} r={4} fill="#ffffff" opacity={0.85} animate={{ cx: [x, x + 3, x - 3, x], cy: [y, y - 3, y + 3, y] }} transition={{ duration: 3 + (i % 3), repeat: Infinity, ease: 'easeInOut' }} />
+          <MCircle key={i} cx={x} cy={y} r={4} fill="#ffffff" opacity={0.85} animate={{ cx: [x, x + 3, x - 3, x], cy: [y, y - 3, y + 3, y] }} transition={{ duration: 3 + (i % 3), repeat: Infinity, ease: 'easeInOut' }} />
         );
       })}
       {/* la lumière bleue éparpillée dans tous les sens */}
       {SCATTER.map(([dx, dy], i) => (
-        <motion.circle
+        <MCircle
           key={i}
           cx={118}
           cy={100}
@@ -184,7 +200,7 @@ function ArcEnCiel() {
       {/* les nuages aux deux pieds de l'arc */}
       <ellipse cx={26} cy={162} rx={26} ry={16} fill="#e7f2fe" stroke="#c6e1fb" strokeWidth={2} />
       <ellipse cx={174} cy={162} rx={26} ry={16} fill="#e7f2fe" stroke="#c6e1fb" strokeWidth={2} />
-      <motion.circle cx={100} cy={190} r={4} fill="var(--color-soleil)" animate={{ opacity: [0, 1, 0], scale: [0.5, 1.4, 0.5] }} transition={loop(2.4)} style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
+      <MCircle cx={100} cy={190} r={4} fill="var(--color-soleil)" animate={{ opacity: [0, 1, 0], scale: [0.5, 1.4, 0.5] }} transition={loop(2.4)} style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
     </>
   );
 }
@@ -197,7 +213,7 @@ function Saisons() {
       <circle cx={100} cy={100} r={76} fill="none" stroke="var(--color-lavande)" strokeWidth={2} strokeDasharray="5 7" opacity={0.5} />
       <Sun x={100} y={100} r={26} />
       {/* la Terre, penchée, qui tourne autour du Soleil */}
-      <motion.circle cx={ORBIT[0].x} cy={ORBIT[0].y} r={14} fill="var(--color-ciel)" animate={{ cx: ORBIT.map((p) => p.x), cy: ORBIT.map((p) => p.y) }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} />
+      <MCircle cx={ORBIT[0].x} cy={ORBIT[0].y} r={14} fill="var(--color-ciel)" animate={{ cx: ORBIT.map((p) => p.x), cy: ORBIT.map((p) => p.y) }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} />
       <motion.g animate={{ x: ORBIT.map((p) => p.x - ORBIT[0].x), y: ORBIT.map((p) => p.y - ORBIT[0].y) }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}>
         <line x1={ORBIT[0].x} y1={ORBIT[0].y - 21} x2={ORBIT[0].x} y2={ORBIT[0].y + 21} stroke="#ffffff" strokeWidth={2} strokeLinecap="round" transform={`rotate(-23 ${ORBIT[0].x} ${ORBIT[0].y})`} />
         <ellipse cx={ORBIT[0].x + 5} cy={ORBIT[0].y - 4} rx={6} ry={4} fill="var(--color-menthe)" opacity={0.9} />
@@ -229,7 +245,7 @@ function Lune() {
       <circle cx={64} cy={96} r={44} fill="none" stroke="#ffffff" strokeWidth={1.5} strokeDasharray="4 6" opacity={0.55} />
       {/* étoiles */}
       {Array.from({ length: 9 }, (_, i) => (
-        <motion.circle key={i} cx={12 + ((i * 43) % 180)} cy={10 + ((i * 31) % 96)} r={1.8} fill="#ffffff" animate={{ opacity: [0.2, 1, 0.2] }} transition={loop(2.6 + (i % 3), i * 0.35)} />
+        <MCircle key={i} cx={12 + ((i * 43) % 180)} cy={10 + ((i * 31) % 96)} r={1.8} fill="#ffffff" animate={{ opacity: [0.2, 1, 0.2] }} transition={loop(2.6 + (i % 3), i * 0.35)} />
       ))}
       {/* la Terre */}
       <circle cx={64} cy={96} r={24} fill="var(--color-ciel)" />
@@ -264,7 +280,7 @@ function Volcan() {
       <motion.path d="M116 96 C126 118 128 146 146 178" stroke="#ff8a3d" strokeWidth={6} strokeLinecap="round" fill="none" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 2.2, delay: 0.8, repeat: Infinity, repeatDelay: 1.2, ease: 'easeOut' }} />
       {/* les projections */}
       {[0, 1, 2, 3, 4, 5].map((i) => (
-        <motion.circle
+        <MCircle
           key={i}
           cx={104 + (i - 2.5) * 12}
           cy={60}
@@ -277,7 +293,7 @@ function Volcan() {
       ))}
       {/* la fumée */}
       {[0, 1, 2].map((i) => (
-        <motion.circle key={`s${i}`} cx={104} cy={52} r={6} fill="#ffffff" opacity={0.7} animate={{ cy: [52, 8], r: [6, 18], opacity: [0.7, 0] }} transition={{ duration: 3, delay: i * 0.9, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={`s${i}`} cx={104} cy={52} r={6} fill="#ffffff" opacity={0.7} animate={{ cy: [52, 8], r: [6, 18], opacity: [0.7, 0] }} transition={{ duration: 3, delay: i * 0.9, repeat: Infinity, ease: 'easeOut' }} />
       ))}
       <rect y={182} width={200} height={18} fill="var(--color-menthe)" opacity={0.35} />
     </>
@@ -297,7 +313,7 @@ function Coeur() {
       <path d="M78 74 C88 66 100 74 100 86" fill="none" stroke="#ffffff" strokeWidth={5} strokeLinecap="round" opacity={0.55} />
       {/* le rythme : boum… boum */}
       {[0, 1].map((i) => (
-        <motion.circle key={i} cx={100} cy={100} r={40} fill="none" stroke="var(--color-corail)" strokeWidth={3} animate={{ r: [40, 84], opacity: [0.7, 0] }} transition={{ duration: 1.2, delay: i * 0.16, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={i} cx={100} cy={100} r={40} fill="none" stroke="var(--color-corail)" strokeWidth={3} animate={{ r: [40, 84], opacity: [0.7, 0] }} transition={{ duration: 1.2, delay: i * 0.16, repeat: Infinity, ease: 'easeOut' }} />
       ))}
     </>
   );
@@ -323,7 +339,7 @@ function Digestion() {
       {/* l'estomac qui malaxe */}
       <motion.ellipse cx={102} cy={108} rx={20} ry={14} fill="var(--color-corail)" opacity={0.3} animate={{ scale: [1, 1.14, 1] }} transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }} style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
       {/* le morceau de pomme qui descend */}
-      <motion.circle
+      <MCircle
         cx={FOOD[0].x}
         cy={FOOD[0].y}
         r={6}
@@ -333,7 +349,7 @@ function Digestion() {
       />
       {/* les petits morceaux qui nourrissent le corps */}
       {[0, 1, 2].map((i) => (
-        <motion.circle key={i} cx={100} cy={150} r={3} fill="var(--color-menthe)" initial={{ opacity: 0 }} animate={{ cx: [100, 70 + i * 30], cy: [150, 60 + i * 26], opacity: [0, 1, 0] }} transition={{ duration: 3, delay: i * 0.7, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={i} cx={100} cy={150} r={3} fill="var(--color-menthe)" initial={{ opacity: 0 }} animate={{ cx: [100, 70 + i * 30], cy: [150, 60 + i * 26], opacity: [0, 1, 0] }} transition={{ duration: 3, delay: i * 0.7, repeat: Infinity, ease: 'easeOut' }} />
       ))}
     </>
   );
@@ -386,7 +402,7 @@ function Son() {
       <motion.line x1={86} y1={34} x2={70} y2={92} stroke="#b07a4b" strokeWidth={6} strokeLinecap="round" animate={{ y: [0, 8, 0] }} transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }} />
       {/* les ondes sonores */}
       {[0, 1, 2, 3].map((i) => (
-        <motion.circle key={i} cx={60} cy={110} r={18} fill="none" stroke="var(--color-soleil)" strokeWidth={4} animate={{ r: [18, 92], opacity: [0.9, 0] }} transition={{ duration: 2, delay: i * 0.5, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={i} cx={60} cy={110} r={18} fill="none" stroke="var(--color-soleil)" strokeWidth={4} animate={{ r: [18, 92], opacity: [0.9, 0] }} transition={{ duration: 2, delay: i * 0.5, repeat: Infinity, ease: 'easeOut' }} />
       ))}
       {/* l'enfant qui écoute */}
       <motion.g animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }} style={{ transformBox: 'fill-box', transformOrigin: 'center' }}>
@@ -430,7 +446,7 @@ function Abeille() {
       </motion.g>
       {/* le pollen qui vole */}
       {[0, 1, 2, 3].map((i) => (
-        <motion.circle key={i} cx={74 + i * 8} cy={140} r={2.2} fill="var(--color-soleil)" animate={{ cy: [140, 108], opacity: [0, 1, 0] }} transition={{ duration: 2.8, delay: i * 0.5, repeat: Infinity, ease: 'easeOut' }} />
+        <MCircle key={i} cx={74 + i * 8} cy={140} r={2.2} fill="var(--color-soleil)" animate={{ cy: [140, 108], opacity: [0, 1, 0] }} transition={{ duration: 2.8, delay: i * 0.5, repeat: Infinity, ease: 'easeOut' }} />
       ))}
     </>
   );
