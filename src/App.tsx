@@ -28,6 +28,9 @@ import { ActivitesPhysiques } from './components/ActivitesPhysiques';
 import { LireLibrary, LireReader } from './components/Lire';
 import { LECTURES } from './data/lectures';
 import { AventureScene, AventuresList } from './components/Aventures';
+import { FilmsList } from './components/FilmsList';
+import { FilmPlayer } from './components/FilmPlayer';
+import { FILMS, filmOf, nextFilm } from './films';
 import { AVENTURES } from './data/aventures';
 import { buildPlaylist, TODAY_ID } from './lib/playlist';
 import { FACTS } from '../shared/dailyContent';
@@ -67,6 +70,8 @@ type View =
   | { name: 'lire' }
   | { name: 'aventures' }
   | { name: 'aventure'; id: string }
+  | { name: 'films' }
+  | { name: 'film'; id: string }
   | { name: 'lecture'; id: string }
   | { name: 'sport'; id: string; from?: 'home' };
 
@@ -320,6 +325,23 @@ export default function App() {
       );
       break;
     }
+    case 'films':
+      screen = <FilmsList done={done} onBack={home} onPlay={(id) => setView({ name: 'film', id })} />;
+      break;
+    case 'film': {
+      const film = filmOf(view.id);
+      screen = (
+        <FilmPlayer
+          key={film.id}
+          film={film}
+          name={profile.name}
+          onBack={() => setView({ name: 'films' })}
+          onDone={() => markDone(film.id)}
+          onNext={() => setView({ name: 'film', id: nextFilm(film.id).id })}
+        />
+      );
+      break;
+    }
     case 'sportHub':
       screen = (
         <SportHub
@@ -436,12 +458,14 @@ export default function App() {
           chanson={chansonPick}
           onChanson={() => setView({ name: 'chanson', id: chansonPick.id })}
           onComptines={() => setView({ name: 'comptines' })}
+          onFilms={() => setView({ name: 'films' })}
+          filmsCount={{ total: FILMS.length, done: FILMS.filter((f) => done.has(f.id)).length }}
           chansonDone={done.has(chansonPick.id)}
         />
       );
   }
 
-  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'explication' ? `explication-${view.id}` : view.name === 'chanson' ? `chanson-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
+  const viewKey = view.name === 'tale' || view.name === 'activity' || view.name === 'sport' ? `${view.name}-${'id' in view ? view.id : ''}` : view.name === 'lecture' ? `lecture-${view.id}` : view.name === 'aventure' ? `aventure-${view.id}` : view.name === 'film' ? `film-${view.id}` : view.name === 'explication' ? `explication-${view.id}` : view.name === 'chanson' ? `chanson-${view.id}` : view.name === 'sportHub' ? 'hub' : view.name === 'library' ? `lib-${view.section}` : view.name;
 
   return (
     <MotionConfig reducedMotion="user">
