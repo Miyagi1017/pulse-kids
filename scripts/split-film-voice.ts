@@ -10,7 +10,15 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 
-const EXPECTED: Record<string, number> = { 'film-lune': 7, 'film-chaussettes': 7, 'film-chateau': 6 };
+const EXPECTED: Record<string, number> = {
+  'film-lune': 7,
+  'film-chaussettes': 7,
+  'film-chateau': 6,
+  'film-goutte': 7,
+  'film-fraise': 6,
+  'film-tour': 6,
+  'film-coccinelle': 6
+};
 
 const [filmId, input] = process.argv.slice(2);
 if (!filmId || !input || !(filmId in EXPECTED)) {

@@ -225,6 +225,49 @@ export class FilmAudio {
     this.noise(at, 0.05, { freq: 1800, q: 2, gain: 0.05 });
   }
 
+  /** Gong : « tai » qui monte (petit) ou « kuang » qui descend (grand). */
+  gong(at: number, rising = false, vel = 1) {
+    const f0 = rising ? 420 : 160;
+    this.tone(f0, at, rising ? 0.9 : 2.2, { gain: 0.18 * vel, to: rising ? f0 * 1.25 : f0 * 0.85, attack: 0.004 });
+    this.tone(f0 * 2.76, at, rising ? 0.5 : 1.2, { gain: 0.06 * vel, attack: 0.004 });
+    this.noise(at, 0.25, { freq: 3000, q: 0.7, gain: 0.05 * vel });
+  }
+
+  /** Claquoir de bois (le conteur frappe la table). */
+  clapper(at: number) {
+    this.tone(1800, at, 0.05, { gain: 0.22, attack: 0.001, to: 1200 });
+    this.noise(at, 0.06, { freq: 2500, q: 2, gain: 0.12 });
+  }
+
+  /** Clic de brique : transitoire + résonances vers 2,9 et 4,6 kHz. */
+  brickClick(at: number, vel = 1) {
+    this.noise(at, 0.02, { type: 'highpass', freq: 2000, gain: 0.2 * vel, attack: 0.001 });
+    this.tone(2900, at, 0.07, { gain: 0.1 * vel, attack: 0.001 });
+    this.tone(4600, at, 0.05, { gain: 0.06 * vel, attack: 0.001 });
+  }
+
+  /** Feutre sur tableau blanc : souffle filtré qui suit le geste (durée = trait). */
+  marker(at: number, dur: number, vel = 1) {
+    this.noise(at, dur, { freq: 4200, q: 0.9, gain: 0.05 * vel, attack: 0.04 });
+    this.noise(at, dur, { freq: 900, q: 1.2, gain: 0.025 * vel, attack: 0.04 });
+  }
+
+  /** Pinceau mouillé sur papier. */
+  brushStroke(at: number, dur = 0.6, vel = 1) {
+    this.noise(at, dur, { freq: 1800, to: 900, q: 0.6, gain: 0.04 * vel, attack: 0.12 });
+  }
+
+  /** Bourdonnement d'abeille. */
+  buzz(at: number, dur = 1.2) {
+    this.tone(220, at, dur, { wave: 'sawtooth', gain: 0.035, attack: 0.1, lp: 900, detune: 15 });
+    this.tone(224, at, dur, { wave: 'sawtooth', gain: 0.03, attack: 0.1, lp: 900, detune: -15 });
+  }
+
+  /** Gouttes de pluie : petits « plic » aigus. */
+  drops(at: number, n = 8) {
+    for (let i = 0; i < n; i++) this.tone(1400 + ((i * 337) % 900), at + i * 0.11, 0.06, { gain: 0.06, attack: 0.001, to: 900 });
+  }
+
   /** Ronron de projecteur (cartoon années 30), en boucle. */
   projector(at: number, dur: number) {
     for (let i = 0; i < dur * 24; i++) this.noise(at + i / 24, 0.02, { freq: 900, q: 4, gain: 0.012, bus: 'music' });

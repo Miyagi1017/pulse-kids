@@ -68,7 +68,7 @@ export interface FilmScene {
   dispose?(): void;
 }
 
-export type FilmStyle = 'crayon' | 'rubber-hose' | 'paper-popup';
+export type FilmStyle = 'crayon' | 'rubber-hose' | 'paper-popup' | 'shadow-puppet' | 'brick-toy' | 'whiteboard' | 'watercolor';
 
 export interface Film {
   id: string;
