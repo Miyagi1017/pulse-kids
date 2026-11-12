@@ -54,6 +54,9 @@ interface HomeProps {
   /** Toutes les comptines. */
   onComptines: () => void;
   chansonDone: boolean;
+  /** Les petits films dessinés (un style par film). */
+  onFilms: () => void;
+  filmsCount: { total: number; done: number };
 }
 
 function greeting(): string {
@@ -84,7 +87,7 @@ function journalSummary(today: Pick<Today, 'scenes'>, name: string): { emoji: st
   });
 }
 
-export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, chanson, onChanson, onComptines, chansonDone }: HomeProps) {
+export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, chanson, onChanson, onComptines, chansonDone, onFilms, filmsCount }: HomeProps) {
   const kawaii = theme !== 'aquarelle';
   const open = (s: Section, e: MouseEvent<HTMLButtonElement>, emojis: string[]) => {
     soundEffects.playPop();
@@ -330,6 +333,34 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
             {explicationsCount.done > 0 ? `${explicationsCount.done} / ${explicationsCount.total} comprises · ` : ''}3 étapes animées et un petit quiz
           </span>
         </span>
+      </motion.button>
+
+      {/* Les petits films dessinés */}
+      <motion.button
+        custom={4}
+        variants={tile}
+        initial="hidden"
+        animate="show"
+        whileHover="hover"
+        whileTap={TAP}
+        onClick={(e) => {
+          soundEffects.playPop();
+          const p = pointOf(e);
+          burst(p.x, p.y, ['🎞️', '🖍️', '🧦', '🏰'], 8);
+          onFilms();
+        }}
+        className="sticker w-full rounded-[2rem] bg-gradient-to-r from-amber-300 via-rose-300 to-sky-300 text-encre p-5 mb-4 text-left flex items-center gap-4"
+      >
+        <motion.span variants={wiggle} className="text-6xl leading-none" aria-hidden>
+          🎞️
+        </motion.span>
+        <span className="flex-1">
+          <span className="block text-2xl font-bold leading-tight">Les petits films</span>
+          <span className="block opacity-80 font-medium">
+            {filmsCount.total} films dessinés, un style chacun · touche l’écran pour aider les héros {filmsCount.done > 0 ? `· ${filmsCount.done} ✓` : ''}
+          </span>
+        </span>
+        <span className="hidden sm:inline-flex bg-white text-encre rounded-full px-4 py-2 font-bold">Regarder ➜</span>
       </motion.button>
 
       {/* Les 3 bibliothèques */}

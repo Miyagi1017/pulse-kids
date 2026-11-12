@@ -18,10 +18,16 @@
     "illustrations": "tsx scripts/generate-illustrations.ts",
     "illustrations:review": "tsx scripts/generate-illustrations.ts review",
     "illustrations:publish": "tsx scripts/generate-illustrations.ts publish",
-    "video-images": "tsx scripts/fetch-video-images.ts"
+    "video-images": "tsx scripts/fetch-video-images.ts",
+    "films:voice": "tsx scripts/split-film-voice.ts"
   },
   "dependencies": {
+    "@fontsource/architects-daughter": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/fredoka": "^5.3.0",
+    "@fontsource/im-fell-english-sc": "^5.3.0",
+    "@fontsource/patrick-hand": "^5.3.0",
+    "@fontsource/shrikhand": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@neon/config": "^1.13.0",
     "@neon/env": "^2.1.0",
