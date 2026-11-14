@@ -46,6 +46,11 @@ const BASE: Angles = { root: 0, t: 0, nk: 0, aL: -10, eL: 0, aR: 10, eR: 0, hL: 
 export const full = (p: Partial<Angles>): Angles => ({ ...BASE, ...p });
 
 export const POSES = {
+  allonge: {
+    frames: [{ root: -90, t: 0, aL: -14, aR: 14, hL: -3, hR: 3 }, { root: -90, t: -3, aL: -20, aR: 20, hL: -3, hR: 3, nk: -4 }],
+    tempo: 3,
+    cues: ['Allongé sur le dos, les bras posés le long du corps.', 'Inspire : le ventre monte ; souffle : il redescend tout doucement.', 'Tout ton corps devient lourd et calme, comme une couverture.']
+  },
   respire: {
     frames: [{}, { aL: -28, aR: 28, t: -2, nk: -6 }],
     tempo: 2.6,
@@ -209,7 +214,13 @@ export function facingOf(pose: PoseName): Facing {
 const RULES: [RegExp, PoseName][] = [
   [/chaise invisible/i, 'accroupi'],
   [/ligne imaginaire/i, 'marche'],
-  [/quatre pattes comme un (gros )?ours|marche à quatre pattes/i, 'chien'],
+  [/quatre pattes comme un (gros )?ours|marche à quatre pattes|passe à quatre pattes/i, 'chien'],
+  [/quatre pattes|dos (tout )?rond|dos tout plat/i, 'chat'],
+  [/allonge-toi|couché sur le dos|la mer est toute plate/i, 'allonge'],
+  [/mollet|jambe d['’]appui/i, 'unPied'],
+  [/assis sur tes talons|carapace|assieds-toi par terre|assis par terre/i, 'ballon'],
+  [/plie (bien |un peu )?les genoux|pliant (bien )?les genoux|t[’']asseyais|dans le vide/i, 'accroupi'],
+  [/le long du corps|mets-toi debout|relâche tout ton corps/i, 'respire'],
   [/balance-toi/i, 'balancier'],
   [/câlin|croise les bras/i, 'koala'],
   [/tes muscles/i, 'brasHaut'],

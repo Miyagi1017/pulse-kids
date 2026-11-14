@@ -13,6 +13,7 @@ import { float, jump, POP_IN, SPRING_SOFT } from '../lib/motion';
 import { mascotForMove } from '../lib/mascots';
 import { sportVideoUrl } from '../lib/sportVideos';
 import { Mascot } from './Mascot';
+import { HoseCoach } from './HoseCoach';
 import { ThemeScene, type SceneTheme } from './ThemeScene';
 
 const introFloat = float(12, 1.6);
@@ -340,10 +341,10 @@ export function SportPlayer({
               <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
                 Mouvement {phase.index + 1} / {tip.moves.length}
               </span>
-              {/* L'animal montre le geste ; la bulle garde l'image du mouvement (grenouille, kangourou…) */}
-              <div className="relative">
-                <Mascot animal={mascotForMove(tip.moves[phase.index])} gesture={playing ? tip.moves[phase.index].anim : undefined} size={210} />
-                <span className="absolute -right-8 bottom-0 w-16 h-16 rounded-full bg-white shadow-bonbon flex items-center justify-center text-4xl" aria-hidden>
+              {/* Le coach en dessin animé des années 30 montre le geste ; la bulle garde l'image du mouvement (grenouille, kangourou…) */}
+              <div className="relative w-full max-w-sm">
+                <HoseCoach pose={pose} playing={playing} className="w-full" />
+                <span className="absolute -right-3 -bottom-3 w-16 h-16 rounded-full bg-white shadow-bonbon flex items-center justify-center text-4xl" aria-hidden>
                   {tip.moves[phase.index].emoji}
                 </span>
               </div>

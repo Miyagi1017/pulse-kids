@@ -23,7 +23,12 @@ test('les postures clés sont bien reconnues', () => {
     ['Pieds écartés, genoux pliés : la posture du cavalier', 'cavalier'],
     ['Lève le genou bien haut, puis pousse le pied devant toi, doucement', 'coupDePied'],
     ['Assieds-toi sur une chaise invisible, 5 secondes', 'accroupi'],
-    ['Marche sur une ligne imaginaire, un pied devant l’autre', 'marche']
+    ['Marche sur une ligne imaginaire, un pied devant l’autre', 'marche'],
+    ['Mets-toi à quatre pattes : mains sous les épaules, genoux sous les hanches.', 'chat'],
+    ['Allonge-toi et ferme les yeux', 'allonge'],
+    ['Plie les genoux comme si tu t’asseyais dans le vide', 'accroupi'],
+    ['Rentre dans ta carapace : assis sur tes talons', 'ballon'],
+    ['Laisse tes bras le long du corps, paumes vers tes cuisses.', 'respire']
   ];
   for (const [text, pose] of cases) assert.equal(poseFor({ text, anim: 'calme' }), pose, text);
 });
