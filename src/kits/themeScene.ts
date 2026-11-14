@@ -13,21 +13,21 @@ import { materialFor, type StyleId } from './styles';
 export type SceneTheme = 'animaux' | 'nature' | 'espace' | 'metiers' | 'corps' | 'monde' | 'journal' | 'mer' | 'neige' | 'pluie' | 'fete' | 'nuit' | 'kawaii' | 'kawaiiFille' | 'kawaiiGarcon';
 
 export const SCENE_STYLE: Record<SceneTheme, { style: StyleId; decor: Decor; objets: Objet[] }> = {
-  animaux: { style: 'claymation', decor: 'jardin', objets: ['papillon', 'oiseau', 'fleur'] },
+  animaux: { style: 'isometric-picture-book', decor: 'jardin', objets: ['papillon', 'oiseau', 'fleur'] },
   nature: { style: 'urban-sketch', decor: 'foret', objets: ['feuille', 'papillon', 'fleur'] },
   espace: { style: 'scifi-toon', decor: 'nuit', objets: ['fusee', 'etoile', 'lune'] },
   metiers: { style: 'brick-toy', decor: 'ville', objets: ['cube', 'voiture', 'etoile'] },
   corps: { style: 'rubber-hose', decor: 'chambre', objets: ['balle', 'ballon', 'etoile'] },
-  monde: { style: 'sea-adventure', decor: 'ville', objets: ['bateau', 'oiseau', 'nuage'] },
-  journal: { style: 'newsprint', decor: 'ville', objets: ['soleil', 'nuage', 'note'] },
+  monde: { style: 'transit-map', decor: 'ville', objets: ['bateau', 'oiseau', 'nuage'] },
+  journal: { style: 'caption-news', decor: 'ville', objets: ['soleil', 'nuage', 'note'] },
   mer: { style: 'ukiyoe', decor: 'plage', objets: ['poisson', 'bateau', 'bulle'] },
-  neige: { style: 'blue-white', decor: 'neige', objets: ['flocon', 'etoile', 'flocon'] },
+  neige: { style: 'white-model', decor: 'neige', objets: ['flocon', 'etoile', 'flocon'] },
   pluie: { style: 'risograph', decor: 'jardin', objets: ['goutte', 'nuage', 'goutte'] },
-  fete: { style: 'comic-pop', decor: 'chambre', objets: ['ballon', 'gateau', 'etoile'] },
+  fete: { style: 'memphis-diorama', decor: 'chambre', objets: ['ballon', 'gateau', 'etoile'] },
   nuit: { style: 'paper-lantern', decor: 'nuit', objets: ['etoile', 'lune', 'etoile'] },
-  kawaii: { style: 'felt', decor: 'chambre', objets: ['coeur', 'bulle', 'etoile'] },
-  kawaiiFille: { style: 'origami', decor: 'jardin', objets: ['coeur', 'papillon', 'fleur'] },
-  kawaiiGarcon: { style: 'pixel-8bit', decor: 'chambre', objets: ['fusee', 'voiture', 'etoile'] }
+  kawaii: { style: 'cel-anime-80s', decor: 'chambre', objets: ['coeur', 'bulle', 'etoile'] },
+  kawaiiFille: { style: 'watercolor', decor: 'jardin', objets: ['coeur', 'papillon', 'fleur'] },
+  kawaiiGarcon: { style: 'pixel-rpg', decor: 'chambre', objets: ['fusee', 'voiture', 'etoile'] }
 };
 
 /** Places des objets flottants : dans le ciel, loin du centre où se pose le contenu de la page. */
