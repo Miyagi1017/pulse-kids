@@ -1,51 +1,97 @@
 import { useEffect, useRef } from 'react';
 import type { Comptine } from '../data/comptines';
-import { comptineFrame, type ComptineTiming } from './stage';
+import { createComptineScene, type ComptineScene } from '../kits/comptineScene';
+import { H, W } from '../films/engine';
+import { soundEffects } from '../utils/soundEffects';
+import type { ComptineTiming } from './stage';
+import '../films/fonts';
 
 /**
- * La scène d'une comptine, dessinée en direct : à chaque image, on lit l'heure de la bande-son
- * et on redessine le SVG (sans passer par React, pour rester fluide même sur une tablette).
+ * La scène d'une comptine, dessinée en direct sur un canvas avec les kits de style :
+ * chaque thème a son style (animaux en papier découpé, compter en briques, émotions en ombres…).
+ * Le temps vient de la bande-son, donc l'image reste calée sur le chant.
+ * Pendant la chanson, l'enfant peut toucher les objets qui flottent pour les attraper.
  * Sans élément audio (vignette), la scène est figée à l'instant `still`.
  */
 export function ComptineStage({
   comptine,
   timing,
-  palette,
   media,
   still,
-  className = ''
+  className = '',
+  onCatch
 }: {
   comptine: Comptine;
   timing: ComptineTiming;
-  palette: 'fille' | 'garcon';
+  /** Gardé pour compatibilité : les kits choisissent leurs couleurs selon le thème. */
+  palette?: 'fille' | 'garcon';
   media?: React.RefObject<HTMLMediaElement | null>;
   still?: number;
   className?: string;
+  onCatch?: (total: number) => void;
 }) {
-  const host = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLCanvasElement>(null);
+  const sceneRef = useRef<ComptineScene | null>(null);
 
   useEffect(() => {
-    const el = host.current;
-    if (!el) return;
-    let last = -1;
-    const draw = (t: number) => {
-      // ~30 images/s suffisent (comme la vidéo) : on évite de redessiner pour rien.
-      if (Math.abs(t - last) < 1 / 32 && last >= 0) return;
-      last = t;
-      el.innerHTML = comptineFrame(comptine, timing, t, palette);
-    };
-    if (!media) {
-      draw(still ?? timing.lines[4][0] + 0.8);
-      return;
-    }
+    const cv = ref.current;
+    if (!cv) return;
+    const scene = createComptineScene(comptine, timing);
+    sceneRef.current = scene;
     let raf = 0;
-    const loop = () => {
-      draw(media.current?.currentTime ?? 0);
-      raf = requestAnimationFrame(loop);
+    let cancelled = false;
+    const fit = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.min(1920, Math.round((cv.clientWidth || 640) * dpr));
+      const h = Math.round((w * H) / W);
+      if (cv.width !== w || cv.height !== h) {
+        cv.width = w;
+        cv.height = h;
+      }
+      const g = cv.getContext('2d')!;
+      g.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+      return g;
     };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, [comptine, timing, palette, media, still]);
+    void document.fonts.ready.then(() => {
+      if (cancelled) return;
+      if (!media) {
+        scene.render(fit(), still ?? timing.lines[4][0] + 0.8, true);
+        return;
+      }
+      const loop = () => {
+        scene.render(fit(), media.current?.currentTime ?? 0);
+        raf = requestAnimationFrame(loop);
+      };
+      loop();
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      scene.dispose();
+      sceneRef.current = null;
+    };
+  }, [comptine, timing, media, still]);
 
-  return <div ref={host} className={`[&>svg]:w-full [&>svg]:h-full [&>svg]:block ${className}`} role="img" aria-label={`Dessin animé : ${comptine.title}`} />;
+  const onPointer = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const scene = sceneRef.current;
+    if (!scene || !media?.current) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * W;
+    const y = ((e.clientY - r.top) / r.height) * H;
+    if (scene.tap(x, y, media.current.currentTime)) {
+      soundEffects.playPop();
+      onCatch?.(scene.collected());
+    }
+  };
+
+  return (
+    <canvas
+      ref={ref}
+      onPointerDown={onPointer}
+      className={`block touch-none select-none ${className}`}
+      style={{ aspectRatio: `${W} / ${H}` }}
+      role="img"
+      aria-label={`Dessin animé : ${comptine.title}`}
+    />
+  );
 }

@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react';
+import { createThemeBackdrop, type ThemeBackdrop, W as SW, H as SH } from '../kits/themeScene';
 import { memo } from 'react';
 import { motion } from 'motion/react';
 import { KawaiiFace } from './Backdrop';
@@ -8,7 +10,8 @@ import { KawaiiFace } from './Backdrop';
  * Les animations s'arrêtent d'elles-mêmes si l'appareil demande moins d'animations (MotionConfig).
  */
 
-export type SceneTheme = 'animaux' | 'nature' | 'espace' | 'metiers' | 'corps' | 'monde' | 'journal' | 'mer' | 'neige' | 'pluie' | 'fete' | 'nuit' | 'kawaii' | 'kawaiiFille' | 'kawaiiGarcon';
+export type { SceneTheme } from '../kits/themeScene';
+import type { SceneTheme } from '../kits/themeScene';
 
 const loop = (duration: number, delay = 0) => ({ duration, delay, repeat: Infinity, ease: 'easeInOut' as const });
 
@@ -331,11 +334,71 @@ export function sceneFor(text: string, fallback: SceneTheme = 'nature'): SceneTh
   return fallback;
 }
 
+/**
+ * Le décor de fond d'une page, dessiné avec les kits de style : un style et un décor par thème
+ * (src/kits/themeScene.ts). Il bouge doucement à 12 images/s, s'arrête quand il n'est pas visible,
+ * et reste figé si l'appareil demande moins d'animations. Sans canvas, on garde l'ancien décor animé.
+ */
 export const ThemeScene = memo(function ThemeScene({ theme }: { theme: SceneTheme }) {
-  const Scene = SCENES[theme];
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-70" aria-hidden>
-      <Scene />
-    </div>
-  );
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [fallback, setFallback] = useState(false);
+  useEffect(() => {
+    const cv = ref.current;
+    if (!cv) return;
+    let backdrop: ThemeBackdrop;
+    try {
+      backdrop = createThemeBackdrop(theme);
+    } catch {
+      setFallback(true);
+      return;
+    }
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    let raf = 0,
+      visible = true,
+      alive = true,
+      start = performance.now();
+    const draw = (still: boolean) => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const w = Math.min(1280, Math.round(cv.clientWidth * dpr)),
+        h = Math.min(1280, Math.round(cv.clientHeight * dpr));
+      if (!w || !h) return;
+      if (cv.width !== w || cv.height !== h) {
+        cv.width = w;
+        cv.height = h;
+      }
+      const g = cv.getContext('2d')!;
+      // « Couvrir » : la scène 16:9 remplit le cadre quelle que soit sa forme (portrait sur téléphone).
+      const k = Math.max(w / SW, h / SH);
+      g.setTransform(k, 0, 0, k, (w - SW * k) / 2, (h - SH * k) * 0.35);
+      backdrop.render(g, (performance.now() - start) / 1000, still);
+    };
+    const loop = () => {
+      if (!alive) return;
+      if (visible) draw(false);
+      raf = requestAnimationFrame(loop);
+    };
+    void document.fonts.ready.then(() => {
+      if (!alive) return;
+      start = performance.now();
+      if (reduced) draw(true);
+      else loop();
+    });
+    const io = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(([e]) => (visible = e.isIntersecting && !document.hidden)) : null;
+    io?.observe(cv);
+    return () => {
+      alive = false;
+      cancelAnimationFrame(raf);
+      io?.disconnect();
+      backdrop.dispose();
+    };
+  }, [theme]);
+  if (fallback) {
+    const Scene = SCENES[theme];
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-70" aria-hidden>
+        <Scene />
+      </div>
+    );
+  }
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none opacity-90" aria-hidden />;
 });

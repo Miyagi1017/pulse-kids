@@ -8,6 +8,8 @@ import { soundEffects } from '../utils/soundEffects';
 import { mediaFor, paletteFor, type Chanson } from '../data/chansons';
 import type { Theme } from '../lib/theme';
 import { ComptineStage } from '../comptines/ComptineStage';
+import { styleForComptine } from '../kits/comptineScene';
+import { STYLE_LABEL } from '../kits/materials';
 
 /**
  * Le lecteur de chanson : une vidéo courte (ou une comptine dessinée en direct sur sa bande-son)
@@ -43,6 +45,10 @@ export function ChansonPlayer({
   const [started, setStarted] = useState(false);
   const [ended, setEnded] = useState(false);
   const [solved, setSolved] = useState(false);
+  /** Objets attrapés en les touchant pendant la chanson. */
+  const [caught, setCaught] = useState(0);
+  const animId = anim?.spec.id;
+  useEffect(() => setCaught(0), [animId]);
 
   const line = chanson.lyrics.find((l) => time >= l.start && time <= l.end + 0.25);
   const pct = Math.min(100, (time / chanson.duration) * 100);
@@ -107,10 +113,16 @@ export function ChansonPlayer({
       />
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 pb-8 flex flex-col gap-3">
+        {anim && (
+          <p className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-doux">
+            <span>🎨 {STYLE_LABEL[styleForComptine(anim.spec)]}</span>
+            <span>{caught > 0 ? `⭐ ${caught} attrapé${caught > 1 ? 's' : ''} !` : '👆 Touche les objets pour les attraper'}</span>
+          </p>
+        )}
         <div className="relative rounded-[2rem] overflow-hidden shadow-bonbon bg-nuit">
           {anim ? (
             <>
-              <ComptineStage comptine={anim.spec} timing={anim.timing} palette={paletteFor(theme)} media={ref} className="w-full aspect-video" />
+              <ComptineStage comptine={anim.spec} timing={anim.timing} palette={paletteFor(theme)} media={ref} onCatch={setCaught} className="w-full aspect-video" />
               <audio
                 ref={ref as React.RefObject<HTMLAudioElement>}
                 key={anim.audio}
@@ -124,7 +136,6 @@ export function ChansonPlayer({
                   setEnded(true);
                 }}
               />
-              <button type="button" onClick={toggle} className="absolute inset-0" aria-label={playing ? 'Pause' : 'Lecture'} />
             </>
           ) : (
             media && (

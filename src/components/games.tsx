@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { soundEffects } from '../utils/soundEffects';
 import { burst, pointOf } from './fx';
 import { PRESS, SHAKE, SPRING_BOUNCY } from '../lib/motion';
+import type { Skin } from '../kits/skins';
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -17,7 +18,7 @@ function shuffle<T>(arr: T[]): T[] {
  * Mémoire : on retourne deux cartes ; si elles sont pareilles, elles restent visibles.
  * Toutes les paires trouvées → gagné.
  */
-export function MemoryGame({ pairs, onWin }: { pairs: string[]; onWin: () => void }) {
+export function MemoryGame({ pairs, onWin, skin }: { pairs: string[]; onWin: () => void; skin?: Skin }) {
   const cards = useMemo(() => shuffle([...pairs, ...pairs].map((emoji, i) => ({ key: `${emoji}-${i}`, emoji }))), [pairs]);
   const [open, setOpen] = useState<number[]>([]);
   const [found, setFound] = useState<Set<string>>(new Set());
@@ -62,7 +63,7 @@ export function MemoryGame({ pairs, onWin }: { pairs: string[]; onWin: () => voi
             animate={{ rotateY: visible ? 0 : 180, scale: matched ? [1, 1.12, 1] : 1 }}
             transition={SPRING_BOUNCY}
             className={`relative aspect-square rounded-3xl shadow-bonbon text-5xl sm:text-6xl flex items-center justify-center ${matched ? 'bg-menthe-clair ring-4 ring-menthe' : visible ? 'bg-white' : 'bg-lavande'}`}
-            style={{ transformStyle: 'preserve-3d' }}
+            style={{ transformStyle: 'preserve-3d', ...(matched || !skin ? {} : visible ? skin.card(i) : skin.back(i)) }}
             aria-label={visible ? c.emoji : 'Carte cachée'}
           >
             <span style={{ backfaceVisibility: 'hidden' }}>{visible ? c.emoji : ''}</span>
@@ -82,7 +83,7 @@ export function MemoryGame({ pairs, onWin }: { pairs: string[]; onWin: () => voi
  * Touche tous les… : une grille mélangée ; toucher une bonne réponse l'allume,
  * toucher une mauvaise la fait trembler. Toutes trouvées → gagné.
  */
-export function FindAllGame({ targets, others, onWin, onMiss, hint = false }: { targets: string[]; others: string[]; onWin: () => void; onMiss: (emoji: string) => void; hint?: boolean }) {
+export function FindAllGame({ targets, others, onWin, onMiss, hint = false, skin }: { targets: string[]; others: string[]; onWin: () => void; onMiss: (emoji: string) => void; hint?: boolean; skin?: Skin }) {
   const items = useMemo(() => shuffle([...targets.map((e) => ({ e, ok: true })), ...others.map((e) => ({ e, ok: false }))]), [targets, others]);
   const [found, setFound] = useState<Set<number>>(new Set());
   const [shake, setShake] = useState<number | null>(null);
@@ -105,7 +106,7 @@ export function FindAllGame({ targets, others, onWin, onMiss, hint = false }: { 
 
   return (
     <div className="w-full max-w-md">
-      <p className="mb-3 font-semibold text-doux">
+      <p className="mb-3 font-semibold text-doux" style={skin?.word}>
         {found.size} / {targets.length} trouvés
       </p>
       <div className="grid grid-cols-4 gap-3" role="group">
@@ -117,6 +118,7 @@ export function FindAllGame({ targets, others, onWin, onMiss, hint = false }: { 
             animate={shake === i ? SHAKE : found.has(i) ? { scale: [1, 1.18, 1.05] } : hint && it.ok ? { scale: [1, 1.12, 1], rotate: [0, -6, 6, 0] } : { scale: 1 }}
             transition={hint && it.ok && !found.has(i) ? { duration: 0.9, repeat: Infinity } : undefined}
             className={`aspect-square rounded-3xl shadow-bonbon text-4xl sm:text-5xl flex items-center justify-center ${found.has(i) ? 'bg-menthe-clair ring-4 ring-menthe' : hint && it.ok ? 'bg-soleil-clair ring-4 ring-soleil' : 'bg-white'}`}
+            style={found.has(i) || (hint && it.ok) || !skin ? undefined : skin.card(i)}
             aria-label={it.e}
             aria-pressed={found.has(i)}
           >

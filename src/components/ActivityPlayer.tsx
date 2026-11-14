@@ -10,6 +10,9 @@ import { FindAllGame, MemoryGame } from './games';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
+import { SCENE_STYLE } from '../kits/themeScene';
+import { SKINS } from '../kits/skins';
+import '../films/fonts';
 
 /** Décor par défaut selon la famille de jeu, quand le texte ne donne pas d'indice. */
 const CATEGORY_SCENE: Record<string, SceneTheme> = {
@@ -200,6 +203,8 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
   const cols = activity.kind === 'vf' || round.choices.length === 4 ? 'grid-cols-2' : 'grid-cols-3';
 
   const scene = sceneFor(`${activity.title} ${round.question}`, CATEGORY_SCENE[activity.category] ?? 'nature');
+  // Le jeu prend la matière du style de son décor (papier découpé, crayon, briques, tableau blanc…).
+  const skin = SKINS[SCENE_STYLE[scene].style];
 
   return (
     <div className="min-h-dvh flex flex-col">
@@ -214,7 +219,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
       />
       <main className="relative z-10 flex-1 max-w-2xl w-full mx-auto px-5 py-6 flex flex-col items-center justify-center gap-7 text-center">
         <Mascot animal={mascotForScene(scene)} mood={solved ? 'cheer' : hint ? 'hint' : oops ? 'oops' : speaking ? 'talk' : 'idle'} size={88} />
-        <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux">
+        <span className="rounded-full bg-white shadow-bonbon px-4 py-1.5 font-semibold text-doux" style={skin.chip}>
           {cat.emoji} {cat.label}
         </span>
 
@@ -224,10 +229,10 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
           </motion.div>
         )}
 
-        <h2 className="text-2xl sm:text-4xl font-bold leading-tight">{activity.kind === 'vf' ? activity.statement : round.question}</h2>
+        <h2 className="text-2xl sm:text-4xl font-bold leading-tight" style={skin.question}>{activity.kind === 'vf' ? activity.statement : round.question}</h2>
 
         {activity.kind === 'compte' ? (
-          <div className="bg-white rounded-3xl shadow-bonbon px-4 py-4 flex flex-wrap justify-center gap-1 max-w-full">
+          <div className="bg-white rounded-3xl shadow-bonbon px-4 py-4 flex flex-wrap justify-center gap-1 max-w-full" style={skin.panel}>
             {Array.from({ length: activity.count }, (_, i) => {
               const rank = counted.indexOf(i);
               return (
@@ -254,7 +259,9 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
           </div>
         ) : (
           round.display && (
-            <div className="bg-white rounded-3xl shadow-bonbon px-6 py-5 text-5xl sm:text-6xl leading-snug tracking-wider max-w-full break-words">{round.display}</div>
+            <div className="bg-white rounded-3xl shadow-bonbon px-6 py-5 text-5xl sm:text-6xl leading-snug tracking-wider max-w-full break-words" style={skin.panel}>
+              {round.display}
+            </div>
           )
         )}
 
@@ -282,7 +289,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
         )}
 
         {/* Jeux à grille : mémoire et « touche tous les… » */}
-        {activity.kind === 'memoire' && !solved && <MemoryGame key={activity.id} pairs={activity.pairs} onWin={win} />}
+        {activity.kind === 'memoire' && !solved && <MemoryGame key={activity.id} pairs={activity.pairs} onWin={win} skin={skin} />}
         {activity.kind === 'trouve' && !solved && (
           <FindAllGame
             key={activity.id}
@@ -290,6 +297,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
             others={activity.others}
             onWin={win}
             hint={hint}
+            skin={skin}
             onMiss={() => {
               soundEffects.playOops();
               const n = misses + 1;
@@ -300,7 +308,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
         )}
 
         {round.choices.length > 0 && !(round.steps && solved) && <div className={`grid gap-4 w-full ${cols}`}>
-          {round.choices.map((c) => {
+          {round.choices.map((c, ci) => {
             const used = placed.includes(c.key);
             const isRight = solved && (c.correct || (round.steps && used));
             const isWrong = wrong === c.key;
@@ -313,7 +321,7 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
                 onClick={(e) => answer(c, e)}
                 whileHover={solved ? undefined : LIFT}
                 whileTap={PRESS}
-                style={{ originY: 1 }}
+                style={{ originY: 1, ...(isRight || isWrong || showHint ? {} : skin.card(ci)) }}
                 animate={isWrong ? SHAKE : isRight ? rightBoing : showHint ? { scale: [1, 1.12, 1], rotate: [0, -6, 6, 0] } : {}}
                 transition={showHint ? { duration: 0.9, repeat: Infinity } : undefined}
                 className={`shadow-bonbon rounded-[2rem] flex flex-col items-center justify-center gap-1 p-2 ${activity.kind === 'vf' ? 'py-6' : 'aspect-square'} ${
@@ -322,7 +330,11 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
                 aria-label={c.word || c.emoji}
               >
                 <span className={big}>{c.emoji}</span>
-                {c.word && <span className={`text-sm sm:text-base font-semibold leading-tight ${isRight ? 'text-white' : 'text-doux'}`}>{c.word}</span>}
+                {c.word && (
+                  <span className={`text-sm sm:text-base font-semibold leading-tight ${isRight ? 'text-white' : 'text-doux'}`} style={isRight || isWrong || showHint ? undefined : skin.word}>
+                    {c.word}
+                  </span>
+                )}
               </motion.button>
             );
           })}
