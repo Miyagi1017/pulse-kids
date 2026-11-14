@@ -14,6 +14,8 @@ import { BigQuiz } from './Quiz';
 import { ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
+import { VideoStage, videoPaper, videoPoster } from './VideoStage';
+import { Vignette } from './Vignette';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
 
 const cloud = float(12, 2.8);
@@ -76,6 +78,7 @@ export function VideoPlayer({
   const nextVideo = playlist[videoIndex + 1];
   const quiz = quizFor(video.id);
   const quizPhase = finished && !!quiz && !quizSolved;
+  const paper = videoPaper(video.id);
 
   const next = useCallback(() => setIndex((i) => i + 1), []);
 
@@ -233,6 +236,46 @@ export function VideoPlayer({
                   <X className="w-4 h-4" /> Passer
                 </button>
               </motion.section>
+            ) : !finished && video.mini ? (
+              <motion.section
+                key={`mini-${videoIndex}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex flex-col overflow-y-auto"
+                style={{ background: paper.dark ? '#14121c' : paper.paper, color: paper.dark ? '#fff8ea' : paper.text }}
+              >
+                {/* Le dessin animé de la vidéo, rendu en code dans son style (un des 66). */}
+                <div
+                  className="relative cursor-pointer"
+                  onPointerDown={(e) => {
+                    soundEffects.playSparkle();
+                    burst(e.clientX, e.clientY, ['✨', '⭐'], 6);
+                  }}
+                >
+                  <VideoStage video={video.mini} scene={index} playing={playing} />
+                </div>
+                <div className="flex-1 flex flex-col items-center justify-center gap-3 p-4 sm:p-5 text-center">
+                  <motion.p
+                    key={index}
+                    initial={{ y: 12, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
+                    aria-live="polite"
+                  >
+                    {text}
+                  </motion.p>
+                  <button
+                    onClick={replay}
+                    className="press rounded-full px-4 py-2 text-base font-semibold flex items-center gap-2"
+                    style={{ background: paper.dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.07)' }}
+                    aria-label="Réécouter cette scène"
+                  >
+                    <Volume2 className="w-5 h-5" /> Réécouter
+                  </button>
+                </div>
+              </motion.section>
             ) : !finished ? (
               <motion.section
                 key={`${videoIndex}-${index}`}
@@ -322,7 +365,7 @@ export function VideoPlayer({
                     <p className="text-xl font-semibold">Bravo {name} !</p>
                     <p className="text-lg opacity-90 -mt-2">Vidéo suivante dans {countdown}…</p>
                     <div className="flex items-center gap-3 bg-white/20 rounded-3xl p-3 pr-5">
-                      {nextVideo.thumb ? <img src={nextVideo.thumb} alt="" className="w-24 h-18 object-cover rounded-2xl" /> : <span className="text-5xl">{nextVideo.emoji}</span>}
+                      {nextVideo.mini ? <Vignette id={`poster-${nextVideo.id}`} paint={videoPoster(nextVideo.mini)} className="w-28 rounded-2xl" /> : nextVideo.thumb ? <img src={nextVideo.thumb} alt="" className="w-24 h-18 object-cover rounded-2xl" /> : <span className="text-5xl">{nextVideo.emoji}</span>}
                       <span className="text-2xl font-bold text-left">{nextVideo.title}</span>
                     </div>
                     <div className="flex gap-3">

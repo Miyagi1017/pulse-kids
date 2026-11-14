@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { Onboarding } from './components/Onboarding';
 import { Home } from './components/Home';
+import { videoPoster } from './components/VideoStage';
 import { Library } from './components/Library';
 import { TaleReader } from './components/TaleReader';
 import { ActivityPlayer } from './components/ActivityPlayer';
@@ -169,7 +170,7 @@ export default function App() {
       screen = (
         <Library
           section="video"
-          items={videos.map((v) => ({ id: v.id, emoji: v.emoji, title: v.title, image: v.thumb, category: v.category }))}
+          items={videos.map((v) => ({ id: v.id, emoji: v.emoji, title: v.title, image: v.thumb, paint: v.mini ? videoPoster(v.mini) : undefined, category: v.category }))}
           done={done}
           categories={VIDEO_THEMES}
           onBack={home}

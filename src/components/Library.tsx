@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Shuffle } from 'lucide-react';
 import { SECTION_STYLE, TopBar, type Section } from './ui';
 import { soundEffects } from '../utils/soundEffects';
+import { Vignette, type Paint } from './Vignette';
 
 export interface LibraryItem {
   id: string;
@@ -10,6 +11,8 @@ export interface LibraryItem {
   title: string;
   category?: string;
   image?: string;
+  /** Vignette dessinée en code (prioritaire sur l'image et l'emoji). */
+  paint?: Paint;
 }
 
 export type CategoryLabels = Record<string, { label: string; emoji: string }>;
@@ -91,7 +94,9 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
                       ✓
                     </span>
                   )}
-                  {item.image ? (
+                  {item.paint ? (
+                    <Vignette id={`lib-${item.id}`} paint={item.paint} className="w-full rounded-2xl" ratio="4 / 3" />
+                  ) : item.image ? (
                     <img src={item.image} alt="" loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover rounded-2xl" />
                   ) : (
                     <span className={`w-16 h-16 rounded-2xl ${dark ? 'bg-white/10' : st.soft} flex items-center justify-center text-4xl`} aria-hidden>

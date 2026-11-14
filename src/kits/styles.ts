@@ -115,7 +115,7 @@ export const SPECS = {
   risograph: { label: 'Impression risographie', paper: '#F6F1E6', palette: ['#0078BF', '#FFE800', '#FF48B0', '#F6F1E6', '#2a2a6a'], ink: '#0078BF', outline: 0, misreg: 3, fill: 'riso', post: ['grain'], font: F.bungee, text: '#0078BF', box: 'halo', fps: 12 },
   'sand-animation': { label: 'Dessin dans le sable', paper: '#f3dfae', paper2: '#e0b46a', bg: 'lightbox', ramp: ['#3e2a14', '#6b4a26', '#a07a48', '#d8bc84', '#f3dfae'], ink: '#3e2a14', outline: 0, wobble: 1.4, fill: 'stipple', post: ['vignette'], font: F.serif, text: '#3e2a14', box: 'halo', fps: 12 },
   'scifi-toon': { label: 'Dessin animé de l’espace', paper: '#1b1422', paper2: '#3a2a50', bg: 'stars', bgInk: 'rgba(255,255,255,0.7)', palette: ['#a7c3b1', '#ff4f9a', '#ff9bcb', '#b8f03c', '#52e0e0', '#ff7a2f', '#f4f0ff', '#7a5cff', '#1b1422', '#ffd23f'], ink: '#1b1422', inkFromColor: true, outline: 2.6, fill: 'cel', post: ['vignette'], font: F.bungee, text: '#b8f03c', box: 'band', boxBg: '#1b1422', boxInk: '#b8f03c', fps: 12 },
-  'sea-adventure': { label: 'Aventure en mer', paper: '#f4e6c4', palette: ['#f4e6c4', '#1d1612', '#16a6a3', '#0d7f94', '#ffc531', '#f0503e', '#3fb04a', '#ffffff', '#f39ab0', '#8a5a3a'], ink: '#1d1612', outline: 3, wobble: 0.7, fill: 'flat', post: ['grain'], font: F.shrik, text: '#1d1612', box: 'card', fps: 12 },
+  'sea-adventure': { label: 'Aventure en mer', paper: '#f4e6c4', palette: ['#f4e6c4', '#1d1612', '#16a6a3', '#0d7f94', '#ffc531', '#f0503e', '#3fb04a', '#ffffff', '#f39ab0', '#8a5a3a', '#98a3ad'], ink: '#1d1612', outline: 3, wobble: 0.7, fill: 'flat', post: ['grain'], font: F.shrik, text: '#1d1612', box: 'card', fps: 12 },
   'sheet-music': { label: 'Partition illustrée', paper: '#efe3c6', bg: 'staff', bgInk: 'rgba(42,33,24,0.22)', palette: ['#2a2118', '#c8432a', '#256a8c', '#8a7418', '#8d4423', '#efe3c6', '#e8b84a', '#6a9a5a'], ink: '#2a2118', outline: 1.8, fill: 'wash', post: ['fibers'], font: F.period, text: '#2a2118', box: 'halo', fps: 12 },
   'silent-film': { label: 'Film muet', paper: '#bdb8ad', ramp: ['#121212', '#3a3a3a', '#7d7b77', '#c9c5bb', '#efece4'], ink: '#121212', outline: 2, fill: 'shade', post: ['vignette', 'flicker', 'scratch', 'grain'], font: F.period, text: '#efece4', box: 'band', boxBg: '#121212', boxInk: '#efece4', fps: 16 },
   'silkscreen-poster': { label: 'Affiche sérigraphiée', paper: '#FBE6B4', palette: ['#F6CD98', '#EE9A73', '#9A7FA8', '#3E7079', '#1E3B3F', '#FBE6B4', '#E4EEDC', '#c9504a'], ink: '#1E3B3F', outline: 0, misreg: 3, fill: 'flat', post: ['grain'], font: F.bungee, text: '#1E3B3F', box: 'halo', fps: 12 },
@@ -637,6 +637,13 @@ export function specMaterial(id: SpecStyle, spec: StyleSpec): Material {
           g.lineTo(b[0], b[1]);
           g.closePath();
           g.fill();
+        }
+        // Arête de la pièce pliée : une forme claire reste lisible sur un fond clair.
+        if (!spec.outline && role !== 'sky') {
+          pathPts(g, pts, true);
+          g.strokeStyle = shade(col, -0.28);
+          g.lineWidth = back ? 0.8 : 1.4;
+          g.stroke();
         }
         break;
       }
