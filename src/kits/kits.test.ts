@@ -24,3 +24,13 @@ test('tous les décors, objets et personnages des comptines se construisent', ()
   for (const girl of [false, true]) finite(kid(girl, { armL: 150, armR: -40, tilt: 8, walk: 1, t: 2 }), girl ? 'Nina' : 'Nino');
   finite(cat({ t: 1, tail: 4, tilt: 3 }), 'Mila');
 });
+
+test('chaque style de décor a sa peau de jeu', async () => {
+  const { SCENE_STYLE } = await import('./themeScene');
+  const { SKINS } = await import('./skins');
+  for (const [scene, spec] of Object.entries(SCENE_STYLE)) {
+    const skin = SKINS[spec.style];
+    assert.ok(skin, scene);
+    assert.ok(skin.card(0).background && skin.back(1).background, `${scene} : cartes et dos`);
+  }
+});
