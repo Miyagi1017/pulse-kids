@@ -10,8 +10,8 @@ import { FindAllGame, MemoryGame } from './games';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
-import { SCENE_STYLE } from '../kits/themeScene';
-import { SKINS } from '../kits/skins';
+import { styleForKey } from '../kits/styles';
+import { skinFor } from '../kits/skins';
 import '../films/fonts';
 
 /** Décor par défaut selon la famille de jeu, quand le texte ne donne pas d'indice. */
@@ -204,12 +204,13 @@ export function ActivityPlayer({ activity, name, onBack, onSolved, onNext }: { a
 
   const scene = sceneFor(`${activity.title} ${round.question}`, CATEGORY_SCENE[activity.category] ?? 'nature');
   // Le jeu prend la matière du style de son décor (papier découpé, crayon, briques, tableau blanc…).
-  const skin = SKINS[SCENE_STYLE[scene].style];
+  const style = styleForKey(activity.id);
+  const skin = skinFor(style);
 
   return (
     <div className="min-h-dvh flex flex-col">
       <div className="fixed inset-0 pointer-events-none z-0 opacity-60" aria-hidden>
-        <ThemeScene theme={scene} />
+        <ThemeScene theme={scene} style={style} />
       </div>
       <TopBar
         title={activity.title}

@@ -5,29 +5,22 @@
  * Le temps vient de la bande-son, donc l'image reste calée sur le chant.
  * Nouveau : l'enfant peut attraper les objets en les touchant pendant la chanson (ils éclatent en étoiles).
  */
-import type { Comptine, ComptineTheme, Geste } from '../data/comptines';
+import { COMPTINES, type Comptine, type Geste } from '../data/comptines';
 import type { ComptineTiming } from '../comptines/stage';
-import type { FilmStyle } from '../films/engine';
 import { H, W, clamp, easeInOut, easeOut, lerp } from '../films/engine';
 import { place, type Figure } from './geom';
 import { FEET, cat, decor, kid, objet, type KidPose } from './library';
-import { MATERIALS, type Material } from './materials';
+import type { Material } from './materials';
+import { materialFor, styleAt, styleForKey, type StyleId } from './styles';
 
-/** Un style par thème : on reconnaît la famille de la comptine à son style. */
-export const THEME_STYLE: Record<ComptineTheme, FilmStyle> = {
-  animaux: 'paper-popup',
-  routine: 'crayon',
-  compter: 'brick-toy',
-  couleurs: 'watercolor',
-  corps: 'rubber-hose',
-  meteo: 'whiteboard',
-  nature: 'watercolor',
-  miam: 'paper-popup',
-  coeur: 'shadow-puppet',
-  voyage: 'crayon'
-};
-
-export const styleForComptine = (c: Comptine): FilmStyle => THEME_STYLE[c.theme];
+/**
+ * Chaque comptine a son propre style parmi les 66 (dans l'ordre de la liste : deux comptines voisines
+ * ne se ressemblent jamais). Une comptine qui n'est pas dans la liste prend un style tiré de son id.
+ */
+export function styleForComptine(c: Comptine): StyleId {
+  const i = COMPTINES.findIndex((x) => x.id === c.id);
+  return i >= 0 ? styleAt(i) : styleForKey(c.id);
+}
 
 const backOut = (u: number) => (u <= 0 ? 0 : u >= 1 ? 1 : 1 + 2.7 * (u - 1) ** 3 + 1.7 * (u - 1) ** 2);
 const seg = (t: number, a: number, b: number, f: (u: number) => number = (u) => u) => f(clamp((t - a) / (b - a)));
@@ -108,7 +101,7 @@ interface Live {
 
 export interface ComptineScene {
   material: Material;
-  style: FilmStyle;
+  style: StyleId;
   /** Dessine l'instant t (s) sur ctx, mis à l'échelle W × H. */
   render(ctx: CanvasRenderingContext2D, t: number, still?: boolean): void;
   /** Toucher en coordonnées de scène : vrai si un objet a été attrapé. */
@@ -117,8 +110,8 @@ export interface ComptineScene {
   dispose(): void;
 }
 
-export function createComptineScene(c: Comptine, timing: ComptineTiming, style: FilmStyle = styleForComptine(c)): ComptineScene {
-  const mat = MATERIALS[style]();
+export function createComptineScene(c: Comptine, timing: ComptineTiming, style: StyleId = styleForComptine(c)): ComptineScene {
+  const mat = materialFor(style);
   const rand = seeded(c.id);
   const ninoLeft = rand(3) > 0.5;
   const ninoX = ninoLeft ? 322 : 495;

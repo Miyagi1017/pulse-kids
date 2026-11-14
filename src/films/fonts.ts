@@ -5,3 +5,10 @@ import '@fontsource/im-fell-english-sc/latin-400.css';
 import '@fontsource/architects-daughter/latin-400.css';
 import '@fontsource/cormorant-garamond/latin-600.css';
 import '@fontsource/cormorant-garamond/latin-600-italic.css';
+// Polices des 59 autres styles (src/kits/styles.ts), toutes en OFL.
+import '@fontsource/press-start-2p/latin-400.css';
+import '@fontsource/bungee/latin-400.css';
+import '@fontsource/poiret-one/latin-400.css';
+import '@fontsource/fredericka-the-great/latin-400.css';
+import '@fontsource/cinzel/latin-700.css';
+import '@fontsource/limelight/latin-400.css';

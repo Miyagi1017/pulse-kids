@@ -47,7 +47,7 @@ const fig = (shapes: Shape[], seed: number, layer: Figure['layer'] = 'front'): F
 
 /* ───────────── Objets (taille de base ≈ 64 px, centrés sur 0) ───────────── */
 
-function cloudShape(cx: number, cy: number, s: number, color = K.white): Pt[] {
+export function cloudShape(cx: number, cy: number, s: number, color = K.white): Pt[] {
   const pts: Pt[] = [];
   for (let i = 0; i <= 48; i++) {
     const a = (i / 48) * Math.PI * 2;
@@ -155,11 +155,11 @@ export function objet(name: Objet, t = 0, seed = 1): Figure {
 
 const W = 960;
 
-function tree(x: number, y: number, s: number, leaf = '#7FC47A'): Shape[] {
+export function tree(x: number, y: number, s: number, leaf = '#7FC47A'): Shape[] {
   return [body(rrect(x - 10 * s, y - 90 * s, 20 * s, 90 * s, 6 * s), '#A0714A'), body(ellipse(x, y - 120 * s, 60 * s, 52 * s), leaf), part(ellipse(x - 30 * s, y - 100 * s, 30 * s, 26 * s), leaf), part(ellipse(x + 32 * s, y - 104 * s, 30 * s, 28 * s), leaf)];
 }
 
-function pine(x: number, y: number, s: number, snow = false): Shape[] {
+export function pine(x: number, y: number, s: number, snow = false): Shape[] {
   const out: Shape[] = [body(rrect(x - 8 * s, y - 30 * s, 16 * s, 30 * s, 4 * s), '#8A5A3A')];
   for (let i = 0; i < 3; i++) {
     const w = (70 - i * 16) * s,
@@ -170,7 +170,7 @@ function pine(x: number, y: number, s: number, snow = false): Shape[] {
   return out;
 }
 
-function house(x: number, y: number, w: number, h: number, wall: string, roof: string, lit: boolean): Shape[] {
+export function house(x: number, y: number, w: number, h: number, wall: string, roof: string, lit: boolean): Shape[] {
   return [
     body([[x, y], [x + w, y], [x + w, y - h], [x, y - h]], wall),
     body([[x - 14, y - h], [x + w / 2, y - h - w * 0.45], [x + w + 14, y - h]], roof),
@@ -179,7 +179,7 @@ function house(x: number, y: number, w: number, h: number, wall: string, roof: s
   ];
 }
 
-function flowerAt(x: number, y: number, color: string, s = 1): Shape[] {
+export function flowerAt(x: number, y: number, color: string, s = 1): Shape[] {
   const out: Shape[] = [line([[x, y], [x, y - 26 * s]], '#5EA05A', 3 * s)];
   for (let i = 0; i < 5; i++) out.push(part(rotate(ellipse(x, y - 34 * s, 5 * s, 8 * s), (i * Math.PI * 2) / 5, x, y - 26 * s), color));
   out.push(dot(circle(x, y - 26 * s, 4 * s, 8), K.sun));

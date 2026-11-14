@@ -9,7 +9,7 @@ import { mediaFor, paletteFor, type Chanson } from '../data/chansons';
 import type { Theme } from '../lib/theme';
 import { ComptineStage } from '../comptines/ComptineStage';
 import { styleForComptine } from '../kits/comptineScene';
-import { STYLE_LABEL } from '../kits/materials';
+import { styleLabel } from '../kits/styles';
 
 /**
  * Le lecteur de chanson : une vidéo courte (ou une comptine dessinée en direct sur sa bande-son)
@@ -115,7 +115,7 @@ export function ChansonPlayer({
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 pb-8 flex flex-col gap-3">
         {anim && (
           <p className="flex flex-wrap items-center justify-between gap-2 text-sm font-semibold text-doux">
-            <span>🎨 {STYLE_LABEL[styleForComptine(anim.spec)]}</span>
+            <span>{styleLabel(styleForComptine(anim.spec))}</span>
             <span>{caught > 0 ? `⭐ ${caught} attrapé${caught > 1 ? 's' : ''} !` : '👆 Touche les objets pour les attraper'}</span>
           </p>
         )}

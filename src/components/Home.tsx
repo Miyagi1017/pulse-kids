@@ -1,26 +1,22 @@
-import { useEffect, type MouseEvent } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Pencil, Play, WifiOff } from 'lucide-react';
+import { BookA, BookOpen, Film, Footprints, Lightbulb, Moon, Music, Palette, Pencil, Play, Puzzle, WifiOff, Zap, type LucideIcon } from 'lucide-react';
 import type { Profile } from '../lib/profile';
 import type { Today } from '../../shared/schemas';
 import type { SportTip } from '../data/sport';
 import type { Playable } from '../lib/playlist';
 import { sceneFor, ThemeScene, type SceneTheme } from './ThemeScene';
-import { Mascot as AnimalMascot } from './Mascot';
-import { mascotForScene } from '../lib/mascots';
 import { nextTheme, THEME_INFO, type Theme } from '../lib/theme';
 import { AGE_INFO, otherAge, type AgeBand } from '../lib/age';
-import { KawaiiFace } from './Backdrop';
 import { Habitudes } from './Habitudes';
-import { personalize } from '../data/format';
-import { SECTION_STYLE, type Section } from './ui';
 import { soundEffects } from '../utils/soundEffects';
 import { burst, Mascot, pointOf, sayHello } from './fx';
-import { jump, LIFT, PRESS, wiggle as wiggleMove } from '../lib/motion';
-import { ExplainAnim } from './ExplainAnim';
-import { explicationOfTheDay } from '../data/explications';
-import { ALL_CHANSONS, mediaFor, paletteFor, type Chanson } from '../data/chansons';
-import { ComptineStage } from '../comptines/ComptineStage';
+import { LIFT, PRESS } from '../lib/motion';
+import { ALL_CHANSONS, type Chanson } from '../data/chansons';
+import type { Section } from './ui';
+import { VideoStage } from './VideoStage';
+import { Vignette } from './Vignette';
+import { tilePainter, type TileId } from '../kits/tiles';
 
 interface HomeProps {
   profile: Profile;
@@ -72,29 +68,10 @@ const tile = {
   hover: LIFT
 };
 
-/** L'emoji de la tuile se tortille (amorti) et grossit un peu quand on la survole. */
-const wiggle = { hover: { ...wiggleMove(16, 0.8), scale: 1.15 } };
 const TAP = PRESS;
-const sportHop = jump(26, 0.8);
-
-/** Résumé d'une vidéo : les scènes du milieu (sans le bonjour ni l'au revoir), une phrase chacune. */
-function journalSummary(today: Pick<Today, 'scenes'>, name: string): { emoji: string; text: string }[] {
-  const middle = today.scenes.length > 2 ? today.scenes.slice(1, -1) : today.scenes;
-  return middle.slice(0, 3).map((s) => {
-    const parts = personalize(s.text, name).split(/(?<=[.!?])\s/);
-    const first = parts[0].length < 20 && parts[1] ? `${parts[0]} ${parts[1]}` : parts[0];
-    return { emoji: s.emoji, text: first.length > 90 ? `${first.slice(0, 87)}…` : first };
-  });
-}
 
 export function Home({ profile, today, counts, offline, onOpen, onEditProfile, sport, sportDone, onSport, onSportHub, onLire, lireCount, featured, onFeatured, theme, onTheme, age, onAge, onExplications, explicationsCount, chanson, onChanson, onComptines, chansonDone, onFilms, filmsCount }: HomeProps) {
   const kawaii = theme !== 'aquarelle';
-  const open = (s: Section, e: MouseEvent<HTMLButtonElement>, emojis: string[]) => {
-    soundEffects.playPop();
-    const p = pointOf(e);
-    burst(p.x, p.y, emojis, 9);
-    onOpen(s);
-  };
   const isEvening = greeting() === 'Bonsoir';
 
   // La voix dit le prénom en arrivant (une fois par visite ; muet si le navigateur bloque l'audio avant un geste).
@@ -103,13 +80,35 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
     return () => clearTimeout(t);
   }, [profile.name]);
   const small: ('soir' | 'contes' | 'activites')[] = isEvening ? ['soir', 'contes', 'activites'] : ['contes', 'activites', 'soir'];
-  const question = explicationOfTheDay(today.date);
+
+  const featuredScene = (featured.category as SceneTheme | undefined) ?? sceneFor(featured.title, 'journal');
+  const go = (fn: () => void) => () => {
+    soundEffects.playPop();
+    fn();
+  };
+  const count = (c: { total: number; done: number }) => (c.done > 0 ? `${c.done} / ${c.total} ✓` : `${c.total} à découvrir`);
+  const tiles: TileProps[] = [
+    { id: 'sport', title: sport.title, sub: sportDone ? 'Défi réussi ✓' : 'Ton défi du jour', icon: Zap, color: 'bg-soleil text-encre', onClick: go(onSport) },
+    { id: 'comptines', title: 'Comptines', sub: `${ALL_CHANSONS.length} chansons à chanter${chansonDone ? ' ✓' : ''}`, icon: Music, color: 'bg-rose text-white', onClick: go(onComptines) },
+    { id: 'films', title: 'Petits films', sub: count(filmsCount), icon: Film, color: 'bg-lavande text-white', onClick: go(onFilms) },
+    { id: 'explications', title: 'Pourquoi ?', sub: count(explicationsCount), icon: Lightbulb, color: 'bg-ciel text-white', onClick: go(onExplications) },
+    { id: 'contes', title: TILE_LABEL.contes, sub: count(counts.contes), icon: BookOpen, color: 'bg-menthe text-white', onClick: go(() => onOpen('contes')) },
+    { id: 'activites', title: TILE_LABEL.activites, sub: count(counts.activites), icon: Puzzle, color: 'bg-corail text-white', onClick: go(() => onOpen('activites')) },
+    { id: 'soir', title: TILE_LABEL.soir, sub: count(counts.soir), icon: Moon, color: 'bg-nuit text-white', onClick: go(() => onOpen('soir')) },
+    { id: 'lire', title: 'Lire', sub: count(lireCount), icon: BookA, color: 'bg-ciel text-white', onClick: go(onLire) },
+    { id: 'video', title: 'Vidéos', sub: 'Le journal et 50 dessins animés', icon: Play, color: 'bg-corail text-white', onClick: go(() => onOpen('video')) },
+    { id: 'bouger', title: 'Bouger', sub: 'Défis et mini-défis', icon: Footprints, color: 'bg-menthe text-white', onClick: go(onSportHub) }
+  ];
+  // Le soir, les contes du soir passent en premier.
+  if (isEvening) tiles.unshift(...tiles.splice(6, 1));
+  void small;
+  void kawaii;
 
   return (
     <main className="min-h-dvh max-w-3xl mx-auto px-4 sm:px-6 pb-10" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top))' }}>
-      {/* Accueil personnalisé */}
-      <header className="flex items-center gap-4 mb-6">
-        <div className="text-6xl">
+      {/* Bonjour + prénom (touche-le pour l'entendre) */}
+      <header className="flex items-center gap-2 sm:gap-4 mb-5">
+        <div className="text-5xl sm:text-6xl shrink-0">
           <Mascot avatar={profile.avatar} name={profile.name} />
         </div>
         <div className="flex-1 min-w-0">
@@ -120,7 +119,7 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
               whileTap={{ scale: 0.92 }}
               onClick={(e) => {
                 const p = pointOf(e);
-                burst(p.x, p.y, ['💛', '✨', '⭐'], 8);
+                burst(p.x, p.y, ['✨', '⭐'], 8);
                 sayHello(greeting(), profile.name);
               }}
               className="max-w-full truncate text-left"
@@ -130,54 +129,38 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
             </motion.button>
           </h1>
         </div>
-        {/* Choix du thème : 🌸 kawaii ↔ 🍃 aquarelle */}
-        <motion.button
-          whileTap={PRESS}
-          onClick={(e) => {
+        <button
+          onClick={() => {
             soundEffects.playSparkle();
-            const p = pointOf(e);
-            burst(p.x, p.y, kawaii ? ['🍃', '☁️', '🌿'] : ['🌸', '💮', '✨'], 8);
+            onAge();
+          }}
+          className="press shrink-0 h-11 sm:h-12 px-2.5 sm:px-3 rounded-2xl bg-white shadow-bonbon font-bold text-doux text-sm sm:text-base"
+          aria-label={`Âge : ${AGE_INFO[age].label}. Passer à ${AGE_INFO[otherAge(age)].label}`}
+        >
+          {AGE_INFO[age].label}
+        </button>
+        <button
+          onClick={() => {
+            soundEffects.playSparkle();
             onTheme(nextTheme(theme));
           }}
-          className="h-11 px-3 rounded-2xl bg-white shadow-bonbon flex items-center gap-1.5 font-semibold text-doux"
-          aria-label={`Thème ${THEME_INFO[theme].label}. Passer au thème ${THEME_INFO[nextTheme(theme)].label}`}
+          className="press shrink-0 hidden sm:flex w-12 h-12 rounded-2xl bg-white shadow-bonbon items-center justify-center text-doux"
+          aria-label={`Couleurs ${THEME_INFO[theme].label}. Passer à ${THEME_INFO[nextTheme(theme)].label}`}
         >
-          <span className="text-xl" aria-hidden>
-            {THEME_INFO[theme].emoji}
-          </span>
-          <span className="hidden sm:inline">{THEME_INFO[theme].label}</span>
-        </motion.button>
-        <button onClick={onEditProfile} className="press w-11 h-11 rounded-2xl bg-white shadow-bonbon flex items-center justify-center text-doux" aria-label="Changer de prénom">
-          <Pencil className="w-5 h-5" />
+          <Palette className="w-6 h-6" />
+        </button>
+        <button onClick={onEditProfile} className="press shrink-0 w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-white shadow-bonbon flex items-center justify-center text-doux" aria-label="Changer de prénom">
+          <Pencil className="w-6 h-6" />
         </button>
       </header>
 
-      {/* Le contenu est adapté à l'âge : 5–6 ans ou 7–8 ans, changeable à tout moment */}
-      <div className="flex items-center justify-between gap-2 -mt-2 mb-4">
-        <span className="text-sm font-semibold text-doux">
-          Contenu adapté : {AGE_INFO[age].emoji} {AGE_INFO[age].label}
-        </span>
-        <button
-          onClick={(e) => {
-            soundEffects.playSparkle();
-            const p = pointOf(e);
-            burst(p.x, p.y, [AGE_INFO[otherAge(age)].emoji, '✨'], 7);
-            onAge();
-          }}
-          className="press text-sm font-bold text-ciel underline underline-offset-4 decoration-2 px-2 py-1"
-          aria-label={`Changer d’âge : passer à ${AGE_INFO[otherAge(age)].label}`}
-        >
-          Changer d’âge
-        </button>
-      </div>
-
       {offline && (
         <p role="status" className="mb-4 flex items-center gap-2 rounded-2xl bg-ciel-clair text-ciel px-4 py-2 font-medium">
-          <WifiOff className="w-5 h-5" /> Pas d’internet ? Pas de souci, tout marche quand même !
+          <WifiOff className="w-5 h-5" /> Pas d’internet ? Tout marche quand même !
         </p>
       )}
 
-      {/* Le sport du jour : en premier plan */}
+      {/* La vidéo du jour : un grand dessin animé qui bouge déjà, et un énorme bouton ▶ */}
       <motion.button
         custom={0}
         variants={tile}
@@ -188,240 +171,40 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
         onClick={(e) => {
           soundEffects.playPop();
           const p = pointOf(e);
-          burst(p.x, p.y, [sport.emoji, '💪', '⭐', '✨'], 9);
-          onSport();
-        }}
-        className="sticker w-full rounded-[2rem] bg-soleil text-encre p-5 sm:p-6 text-left relative overflow-hidden mb-4 flex items-center gap-4"
-      >
-        <motion.span
-          className="text-7xl sm:text-8xl leading-none shrink-0"
-          style={{ originY: 1 }}
-          animate={{ y: sportHop.y, scaleY: sportHop.scaleY, scaleX: sportHop.scaleX }}
-          transition={{ ...sportHop.transition, delay: 0.6, repeat: 2, repeatDelay: 1.4 }}
-          aria-hidden
-        >
-          {sport.emoji}
-        </motion.span>
-        <span className="flex-1 min-w-0">
-          <span className="inline-block bg-white/60 rounded-full px-3 py-1 text-sm font-semibold mb-2">🎲 Ton défi sport {sportDone ? '✓' : ''}</span>
-          <span className="block text-2xl sm:text-3xl font-bold leading-tight">{sport.title}</span>
-          <span className="block mt-1 font-medium opacity-80 line-clamp-2">💡 {sport.tip}</span>
-        </span>
-        <span className="hidden sm:inline-flex shrink-0 items-center gap-2 bg-corail text-white rounded-full px-5 py-2 text-lg font-bold">C’est parti ➜</span>
-      </motion.button>
-      <div className="flex justify-end -mt-2 mb-4">
-        <button onClick={() => (soundEffects.playPop(), onSportHub())} className="text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1">
-          🌱 Tous les défis, mini-défis et essentiels ➜
-        </button>
-      </div>
-
-      {/* Vidéo du jour : la grande tuile */}
-      <motion.button
-        custom={1}
-        variants={tile}
-        initial="hidden"
-        animate="show"
-        whileHover="hover"
-        whileTap={TAP}
-        onClick={(e) => {
-          soundEffects.playPop();
-          const p = pointOf(e);
-          burst(p.x, p.y, [featured.emoji, '🎬', '⭐', '✨'], 9);
+          burst(p.x, p.y, ['⭐', '✨'], 9);
           onFeatured();
         }}
-        className="sticker w-full rounded-[2rem] bg-corail text-white p-6 sm:p-8 text-left relative overflow-hidden mb-1"
+        className="sticker w-full rounded-[2rem] bg-corail text-white text-left relative overflow-hidden mb-5 block"
+        aria-label={`Regarder : ${featured.title}`}
       >
-        {/* Décor animé du thème de la vidéo */}
-        <ThemeScene theme={(featured.category as SceneTheme | undefined) ?? sceneFor(featured.title, 'journal')} />
-        <motion.span variants={wiggle} className="absolute right-2 bottom-2" aria-hidden>
-          <AnimalMascot animal={mascotForScene((featured.category as SceneTheme | undefined) ?? sceneFor(featured.title, 'journal'))} size={88} />
-        </motion.span>
-        <span className="relative inline-block bg-white/25 rounded-full px-3 py-1 text-sm font-semibold mb-3">🎬 {featured.title === today.title ? 'Le journal du jour' : 'Ta vidéo surprise'}</span>
-        <span className="relative block text-2xl sm:text-3xl font-bold leading-tight max-w-[85%]">{featured.title}</span>
-        {/* Aperçu : ce que raconte le journal aujourd'hui */}
-        <span className="mt-3 grid gap-1.5 max-w-[92%]">
-          {journalSummary(featured, profile.name).map((s, i) => (
-            <span key={i} className="flex items-start gap-2 bg-white/15 rounded-2xl px-3 py-1.5">
-              <span className="text-xl leading-tight shrink-0" aria-hidden>
-                {s.emoji}
-              </span>
-              <span className="text-sm sm:text-base font-medium leading-snug">{s.text}</span>
-            </span>
-          ))}
-        </span>
-        <span className="mt-4 inline-flex items-center gap-2 bg-white text-corail rounded-full px-5 py-2 text-lg font-bold">▶ Regarder</span>
-        <span className="relative block mt-2 text-sm font-semibold opacity-90">Puis les autres vidéos s’enchaînent</span>
-      </motion.button>
-      <div className="flex justify-end mb-4">
-        <button onClick={(e) => open('video', e, ['🎬', '⭐'])} className="text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1">
-          🎬 Toutes les vidéos et le journal ➜
-        </button>
-      </div>
-
-      {/* La chanson animée du jour : un épisode court, fabriqué en local */}
-      <motion.button
-        custom={2}
-        variants={tile}
-        initial="hidden"
-        animate="show"
-        whileHover="hover"
-        whileTap={TAP}
-        onClick={(e) => {
-          soundEffects.playPop();
-          const p = pointOf(e);
-          burst(p.x, p.y, ['🎵', '🎶', '⭐', '✨'], 9);
-          onChanson();
-        }}
-        className="sticker w-full rounded-[2rem] bg-white p-3 mb-4 flex items-center gap-4 text-left"
-      >
-        <span className="relative shrink-0 w-32 sm:w-44 aspect-video rounded-2xl overflow-hidden bg-nuit">
-          {chanson.comptine ? (
-            <ComptineStage comptine={chanson.comptine.spec} timing={chanson.comptine.timing} palette={paletteFor(theme)} className="w-full h-full" />
+        <span className="relative block">
+          {featured.mini ? (
+            <VideoStage video={featured.mini} scene={1} playing />
           ) : (
-            <img src={mediaFor(chanson, theme)?.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
+            <span className="relative block aspect-video overflow-hidden">
+              <ThemeScene theme={featuredScene} />
+            </span>
           )}
-          <span className="absolute inset-0 bg-encre/25 flex items-center justify-center text-white">
-            <Play className="w-8 h-8" fill="currentColor" />
+          <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/90 text-corail shadow-xl flex items-center justify-center">
+              <Play className="w-12 h-12 sm:w-14 sm:h-14 ml-1.5" fill="currentColor" />
+            </span>
           </span>
         </span>
-        <span className="flex-1 min-w-0">
-          <span className="block text-sm font-bold text-corail">🎵 Une comptine au hasard</span>
-          <span className="block text-xl sm:text-2xl font-bold leading-tight">
-            {chanson.emoji} {chanson.title}
-          </span>
-          <span className="block text-sm text-doux mt-0.5">
-            {Math.round(chanson.duration)} s · à chanter avec les gestes {chansonDone ? '· ✓' : ''}
+        <span className="flex items-center gap-3 px-5 py-4">
+          <span className="flex-1 min-w-0">
+            <span className="block text-sm font-semibold opacity-90">{featured.title === today.title ? 'Le journal du jour' : 'Ta vidéo du jour'}</span>
+            <span className="block text-2xl sm:text-3xl font-bold leading-tight truncate">{featured.title}</span>
           </span>
         </span>
       </motion.button>
 
-      <div className="flex justify-end -mt-2 mb-4">
-        <button
-          onClick={() => {
-            soundEffects.playPop();
-            onComptines();
-          }}
-          className="text-sm font-semibold text-doux underline underline-offset-4 decoration-2 px-2 py-1"
-        >
-          🎵 Les {ALL_CHANSONS.length} comptines ➜
-        </button>
+      {/* Les rubriques : de grandes images dessinées, chacune dans son style, un seul pictogramme */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        {tiles.map((t, i) => (
+          <Tile key={t.id} {...t} i={i + 1} />
+        ))}
       </div>
-
-      {/* Les explications animées : « pourquoi ? comment ? » en 3 étapes dessinées */}
-      <motion.button
-        custom={2}
-        variants={tile}
-        initial="hidden"
-        animate="show"
-        whileHover="hover"
-        whileTap={TAP}
-        onClick={(e) => {
-          soundEffects.playPop();
-          const p = pointOf(e);
-          burst(p.x, p.y, ['💡', '✨', '🌈', '⭐'], 9);
-          onExplications();
-        }}
-        className="sticker w-full rounded-[2rem] bg-ciel text-white p-4 sm:p-5 text-left mb-4 flex items-center gap-4 relative overflow-hidden"
-      >
-        <motion.span variants={wiggle} className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-white/25 overflow-hidden" aria-hidden>
-          <ExplainAnim anim={question.anim} className="w-full h-full" />
-        </motion.span>
-        <span className="flex-1 min-w-0">
-          <span className="inline-block bg-white/25 rounded-full px-3 py-1 text-sm font-semibold mb-1">💡 Les explications animées</span>
-          <span className="block text-xl sm:text-2xl font-bold leading-tight">Pourquoi ? Comment ?</span>
-          <span className="block opacity-90 font-medium mt-1">
-            {explicationsCount.done > 0 ? `${explicationsCount.done} / ${explicationsCount.total} comprises · ` : ''}3 étapes animées et un petit quiz
-          </span>
-        </span>
-      </motion.button>
-
-      {/* Les petits films dessinés */}
-      <motion.button
-        custom={4}
-        variants={tile}
-        initial="hidden"
-        animate="show"
-        whileHover="hover"
-        whileTap={TAP}
-        onClick={(e) => {
-          soundEffects.playPop();
-          const p = pointOf(e);
-          burst(p.x, p.y, ['🎞️', '🖍️', '🧦', '🏰'], 8);
-          onFilms();
-        }}
-        className="sticker w-full rounded-[2rem] bg-gradient-to-r from-amber-300 via-rose-300 to-sky-300 text-encre p-5 mb-4 text-left flex items-center gap-4"
-      >
-        <motion.span variants={wiggle} className="text-6xl leading-none" aria-hidden>
-          🎞️
-        </motion.span>
-        <span className="flex-1">
-          <span className="block text-2xl font-bold leading-tight">Les petits films</span>
-          <span className="block opacity-80 font-medium">
-            {filmsCount.total} films dessinés, un style chacun · touche l’écran pour aider les héros {filmsCount.done > 0 ? `· ${filmsCount.done} ✓` : ''}
-          </span>
-        </span>
-        <span className="hidden sm:inline-flex bg-white text-encre rounded-full px-4 py-2 font-bold">Regarder ➜</span>
-      </motion.button>
-
-      {/* Les 3 bibliothèques */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {small.map((s, i) => {
-          const st = SECTION_STYLE[s];
-          const c = counts[s];
-          return (
-            <motion.button
-              key={s}
-              custom={i + 2}
-              variants={tile}
-              initial="hidden"
-              animate="show"
-              whileHover="hover"
-              whileTap={TAP}
-              onClick={(e) => open(s, e, [st.emoji, '✨', '⭐'])}
-              className={`sticker relative rounded-[2rem] ${st.strong} ${s === 'soir' || s === 'activites' ? 'text-white' : 'text-encre'} p-5 text-left flex sm:flex-col items-center sm:items-start gap-4`}
-            >
-              <motion.span variants={wiggle} className="relative text-5xl sm:text-6xl inline-block" aria-hidden>
-                {st.emoji}
-                {kawaii && <KawaiiFace className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10" color={s === 'contes' ? '#47386b' : '#ffffff'} />}
-              </motion.span>
-              <span className="flex-1">
-                <span className="block text-xl font-bold">{TILE_LABEL[s]}</span>
-                <span className="block opacity-80 font-medium">
-                  {c.done > 0 ? `${c.done} / ${c.total} ✓` : `${c.total} à découvrir`}
-                </span>
-              </span>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* Apprendre à lire : 200 textes et poèmes */}
-      <motion.button
-        custom={5}
-        variants={tile}
-        initial="hidden"
-        animate="show"
-        whileHover="hover"
-        whileTap={TAP}
-        onClick={(e) => {
-          soundEffects.playPop();
-          const p = pointOf(e);
-          burst(p.x, p.y, ['📚', '🔤', '⭐'], 8);
-          onLire();
-        }}
-        className="sticker w-full rounded-[2rem] bg-ciel text-white p-5 mt-4 text-left flex items-center gap-4"
-      >
-        <motion.span variants={wiggle} className="text-6xl leading-none" aria-hidden>
-          📚
-        </motion.span>
-        <span className="flex-1">
-          <span className="block text-2xl font-bold leading-tight">Apprendre à lire</span>
-          <span className="block opacity-90 font-medium">
-            {lireCount.total} textes et poèmes à lire ou à écouter {lireCount.done > 0 ? `· ${lireCount.done} ✓` : ''}
-          </span>
-        </span>
-        <span className="hidden sm:inline-flex bg-white text-ciel rounded-full px-4 py-2 font-bold">Lire ➜</span>
-      </motion.button>
 
       {/* Les bonnes habitudes, en première page */}
       <div className="mt-6">
@@ -430,5 +213,33 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
 
       <footer className="text-center text-sm text-doux mt-10">Pulse Kids • sans publicité • ton prénom reste sur cet appareil</footer>
     </main>
+  );
+}
+
+interface TileProps {
+  id: TileId;
+  title: string;
+  sub: string;
+  icon: LucideIcon;
+  color: string;
+  onClick: () => void;
+  i?: number;
+}
+
+/** Grande tuile d'accueil : la vignette dessinée occupe presque tout, le titre est gros, un seul pictogramme. */
+function Tile({ id, title, sub, icon: Icon, color, onClick, i = 0 }: TileProps) {
+  return (
+    <motion.button custom={i} variants={tile} initial="hidden" animate="show" whileHover="hover" whileTap={TAP} onClick={onClick} className={`sticker rounded-[1.75rem] ${color} text-left overflow-hidden flex flex-col`} aria-label={`${title} — ${sub}`}>
+      <Vignette id={`tile-${id}`} paint={tilePainter(id)} ratio="4 / 3" className="w-full" />
+      <span className="flex items-center gap-2 px-2.5 sm:px-4 py-2.5 sm:py-3">
+        <span className="shrink-0 w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-white/25 flex items-center justify-center" aria-hidden>
+          <Icon className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="block text-base sm:text-2xl font-bold leading-tight line-clamp-2">{title}</span>
+          <span className="block text-xs sm:text-sm font-semibold opacity-85 truncate">{sub}</span>
+        </span>
+      </span>
+    </motion.button>
   );
 }
