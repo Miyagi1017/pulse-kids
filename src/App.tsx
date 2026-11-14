@@ -3,6 +3,8 @@ import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { Onboarding } from './components/Onboarding';
 import { Home } from './components/Home';
 import { videoPoster } from './components/VideoStage';
+import { Vignette } from './components/Vignette';
+import { itemPainter } from './kits/tiles';
 import { Library } from './components/Library';
 import { TaleReader } from './components/TaleReader';
 import { ActivityPlayer } from './components/ActivityPlayer';
@@ -35,7 +37,6 @@ import { FILMS, filmOf, nextFilm } from './films';
 import { AVENTURES } from './data/aventures';
 import { buildPlaylist, TODAY_ID } from './lib/playlist';
 import { FACTS } from '../shared/dailyContent';
-import { sceneFor, ThemeScene } from './components/ThemeScene';
 import { VIDEO_THEMES } from './data/videos';
 import type { Section } from './components/ui';
 import { CONTES as CONTES_PULSE } from './data/contes';
@@ -273,15 +274,10 @@ export default function App() {
                     onClick={() => setView(pick.adv ? { name: 'aventure', id: pick.id } : { name: 'activity', id: pick.id })}
                     className="press sticker relative overflow-hidden w-full mb-4 rounded-[2rem] bg-gradient-to-r from-violet-300 to-pink-300 text-encre p-4 sm:p-5 flex items-center gap-4 text-left"
                   >
-                    <ThemeScene theme={sceneFor(pick.text, 'fete')} />
-                    <span className="relative text-6xl" aria-hidden>
-                      🎲
-                    </span>
+                    <Vignette id={`lib-${pick.id}`} paint={itemPainter(pick.id, pick.text)} ratio="4 / 3" className="w-28 sm:w-36 shrink-0 rounded-2xl" />
                     <span className="relative flex-1">
                       <span className="block text-sm font-bold opacity-80">Le jeu surprise</span>
-                      <span className="block text-2xl font-bold leading-tight">
-                        {pick.emoji} {pick.title}
-                      </span>
+                      <span className="block text-2xl font-bold leading-tight">{pick.title}</span>
                       <span className="block font-medium opacity-80">{pick.adv ? 'Une aventure à explorer' : 'Un jeu à jouer'} · touche pour jouer !</span>
                     </span>
                   </button>
@@ -291,9 +287,7 @@ export default function App() {
                 onClick={() => setView({ name: 'aventures' })}
                 className="press sticker w-full mb-5 rounded-[2rem] bg-gradient-to-r from-emerald-300 to-sky-300 text-encre p-4 sm:p-5 flex items-center gap-4 text-left"
               >
-                <span className="text-6xl" aria-hidden>
-                  🗺️
-                </span>
+                <Vignette id="tile-aventures" paint={itemPainter('aventures-carte', 'château forêt')} ratio="4 / 3" className="w-28 sm:w-36 shrink-0 rounded-2xl" />
                 <span className="flex-1">
                   <span className="block text-2xl font-bold leading-tight">Les aventures à explorer</span>
                   <span className="block font-medium opacity-80">

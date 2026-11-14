@@ -4,6 +4,7 @@ import { Shuffle } from 'lucide-react';
 import { SECTION_STYLE, TopBar, type Section } from './ui';
 import { soundEffects } from '../utils/soundEffects';
 import { Vignette, type Paint } from './Vignette';
+import { itemPainter } from '../kits/tiles';
 
 export interface LibraryItem {
   id: string;
@@ -62,7 +63,7 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
           <div className="flex gap-2 overflow-x-auto pb-3 mb-2 -mx-4 px-4" role="tablist" aria-label="Thèmes">
             {[null, ...present].map((c) => {
               const active = filter === c;
-              const info = c ? categories[c] : { label: 'Tout mélangé', emoji: '🎲' };
+              const info = c ? categories[c] : { label: 'Tout', emoji: '' };
               return (
                 <button
                   key={c ?? 'all'}
@@ -74,7 +75,7 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
                   }}
                   className={`press shrink-0 rounded-full px-4 py-2 font-semibold whitespace-nowrap ${active ? `${st.strong} text-white shadow-bonbon` : 'bg-white text-encre'}`}
                 >
-                  {info.emoji} {info.label}
+                  {info.label}
                 </button>
               );
             })}
@@ -94,16 +95,13 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
                       ✓
                     </span>
                   )}
-                  {item.paint ? (
-                    <Vignette id={`lib-${item.id}`} paint={item.paint} className="w-full rounded-2xl" ratio="4 / 3" />
-                  ) : item.image ? (
+                  {item.image && !item.paint ? (
                     <img src={item.image} alt="" loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover rounded-2xl" />
                   ) : (
-                    <span className={`w-16 h-16 rounded-2xl ${dark ? 'bg-white/10' : st.soft} flex items-center justify-center text-4xl`} aria-hidden>
-                      {item.emoji}
-                    </span>
+                    // Vignette dessinée en code (plus d'emoji) : un style par contenu, parmi les 66.
+                    <Vignette id={`lib-${item.id}`} paint={item.paint ?? itemPainter(item.id, item.title, dark)} className="w-full rounded-2xl" ratio="4 / 3" />
                   )}
-                  <span className="font-semibold leading-snug">{item.title}</span>
+                  <span className="text-lg font-bold leading-snug">{item.title}</span>
                 </button>
               </motion.li>
             );

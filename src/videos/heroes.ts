@@ -339,7 +339,7 @@ export function hero(name: HeroName, t = 0, act = 0): Figure {
       break;
     case 'livres':
       S.push(body(rrect(-200, -170, 400, 230, 14), '#7a5236'), part(rrect(-186, -156, 372, 202, 8), '#2f5a46'));
-      S.push(line([[-150, -110], [-120, -60], [-90, -110]], K.white, 5), line([[-124, -80], [-106, -80]], K.white, 4), line(arc(-40, -84, 22, -Math.PI * 0.8, Math.PI * 0.8, 10), K.white, 5), line([[40, -110], [40, -60], [70, -60]], K.white, 5));
+      S.push(line([[-150, -60], [-120, -112], [-90, -60]], K.white, 5), line([[-136, -80], [-104, -80]], K.white, 4), line(arc(-40, -86, 24, Math.PI * 0.25, Math.PI * 1.75, 12), K.white, 5), line([[40, -110], [40, -60], [70, -60]], K.white, 5));
       ['#e4372b', '#4a90d9', '#f2b441', '#57b894'].forEach((c, i) => S.push(body(rrect(-140 + i * 6, 60 + i * -22 + 20, 180 - i * 12, 24, 4), c)));
       S.push(...objet('pomme', t).shapes.map((s) => ({ ...s, pts: move(s.pts.map(([x, y]) => [x * 1.4, y * 1.4] as Pt), 110, 54) })));
       break;
