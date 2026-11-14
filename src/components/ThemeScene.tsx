@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createThemeBackdrop, type ThemeBackdrop, W as SW, H as SH } from '../kits/themeScene';
+import type { StyleId } from '../kits/styles';
 import { memo } from 'react';
 import { motion } from 'motion/react';
 import { KawaiiFace } from './Backdrop';
@@ -339,7 +340,7 @@ export function sceneFor(text: string, fallback: SceneTheme = 'nature'): SceneTh
  * (src/kits/themeScene.ts). Il bouge doucement à 12 images/s, s'arrête quand il n'est pas visible,
  * et reste figé si l'appareil demande moins d'animations. Sans canvas, on garde l'ancien décor animé.
  */
-export const ThemeScene = memo(function ThemeScene({ theme }: { theme: SceneTheme }) {
+export const ThemeScene = memo(function ThemeScene({ theme, style }: { theme: SceneTheme; style?: StyleId }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [fallback, setFallback] = useState(false);
   useEffect(() => {
@@ -347,7 +348,7 @@ export const ThemeScene = memo(function ThemeScene({ theme }: { theme: SceneThem
     if (!cv) return;
     let backdrop: ThemeBackdrop;
     try {
-      backdrop = createThemeBackdrop(theme);
+      backdrop = createThemeBackdrop(theme, style);
     } catch {
       setFallback(true);
       return;

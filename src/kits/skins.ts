@@ -12,9 +12,10 @@
  */
 import type { CSSProperties } from 'react';
 import type { FilmStyle } from '../films/engine';
+import { SPECS, isSpecStyle, swatch, type StyleId } from './styles';
 
 export interface Skin {
-  style: FilmStyle;
+  style: StyleId;
   /** Carte de jeu au repos (choix, carte mémoire, objet à trouver). i : rang, pour varier. */
   card: (i: number) => CSSProperties;
   /** Dos d'une carte mémoire. */
@@ -109,3 +110,63 @@ export const SKINS: Record<FilmStyle, Skin> = {
     chip: { background: '#1c0b06', color: '#f3e3c3', fontFamily: FONT.serif, boxShadow: '0 0 0 1.5px #c9a14a' }
   }
 };
+
+const CSS_FONT: Record<string, string> = {
+  hand: FONT.hand,
+  board: FONT.board,
+  serif: FONT.serif,
+  period: FONT.period,
+  round: FONT.round
+};
+
+/** Police CSS d'une fiche de style (la fiche donne la police du canvas). */
+function cssFont(font: string): CSSProperties {
+  const fam = font.replace(/^(italic )?(\d00 )?\{s\}px /, '');
+  const out: CSSProperties = { fontFamily: fam };
+  if (font.startsWith('italic')) out.fontStyle = 'italic';
+  const w = /(\d00) /.exec(font);
+  if (w) out.fontWeight = Number(w[1]);
+  void CSS_FONT;
+  return out;
+}
+
+/**
+ * Peau d'un des 66 styles. Les 7 styles faits main gardent leur peau dessinée ci-dessus ;
+ * les 59 autres la tirent de leur fiche : papier, encre, police, ombre portée, trame, coins carrés en pixel.
+ */
+export function skinFor(id: StyleId): Skin {
+  if (!isSpecStyle(id)) return SKINS[id as FilmStyle];
+  const s = SPECS[id] as import('./styles').StyleSpec;
+  const sw = swatch(id);
+  const a = sw.accents;
+  const paper = sw.dark ? '#fbf6ec' : s.paper;
+  const ink = sw.dark ? '#1d1a17' : s.text;
+  const radius = s.pixel ? '0px' : s.fill === 'facet' ? '6px' : s.box === 'band' ? '12px' : '22px';
+  const border = s.outline > 0 ? `${Math.min(5, Math.max(2, Math.round(s.outline)))}px ${s.dash ? 'dashed' : 'solid'} ${s.ink}` : '0';
+  const shadow = s.fill === 'glow' ? `0 0 0 2px ${a[0]}, 0 0 18px ${a[0]}` : s.shadow ? `${s.shadow[0]}px ${s.shadow[1]}px 0 ${s.shadow[2]}` : '0 6px 16px rgba(0,0,0,0.16)';
+  const texture =
+    s.fill === 'dots' || s.fill === 'riso'
+      ? `radial-gradient(${a[0]}33 1.4px, transparent 1.6px) 0 0 / 9px 9px, `
+      : s.fill === 'hatch'
+        ? `repeating-linear-gradient(45deg, ${s.ink}14 0 1.5px, transparent 1.5px 6px), `
+        : s.bg === 'grid'
+          ? `linear-gradient(${a[0]}18 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, ${a[0]}18 1px, transparent 1px) 0 0 / 24px 24px, `
+          : '';
+  const font = cssFont(s.font);
+  const card = (i: number): CSSProperties => ({
+    background: `${texture}${paper}`,
+    border,
+    borderRadius: radius,
+    boxShadow: shadow,
+    rotate: s.wobble && s.wobble > 0.7 ? `${((i % 3) - 1) * 1.2}deg` : undefined
+  });
+  return {
+    style: id,
+    card,
+    back: (i) => ({ background: `repeating-linear-gradient(${s.pixel ? 0 : 45}deg, ${a[i % a.length]} 0 10px, ${a[(i + 1) % a.length]} 10px 20px)`, border, borderRadius: radius, boxShadow: shadow }),
+    panel: card(0),
+    word: { ...font, color: ink, fontSize: s.pixel ? '0.7em' : '1.1em', lineHeight: 1.2 },
+    question: { ...font, color: sw.dark ? '#fff8ea' : s.text, fontSize: s.pixel ? '0.6em' : undefined, lineHeight: 1.25, textShadow: sw.dark ? `0 0 6px ${s.paper}, 0 0 14px ${s.paper}` : `0 0 4px ${s.paper}, 0 0 10px ${s.paper}, 0 0 18px ${s.paper}` },
+    chip: { ...font, background: s.box === 'band' ? (s.boxBg ?? s.ink) : paper, color: s.box === 'band' ? (s.boxInk ?? '#fff') : ink, border: s.box === 'band' ? undefined : border, fontSize: s.pixel ? '0.65em' : undefined }
+  };
+}

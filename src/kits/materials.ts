@@ -22,7 +22,8 @@ export interface DrawOpts {
 }
 
 export interface Material {
-  id: FilmStyle;
+  /** Identifiant du style (un des 66, voir styles.ts). */
+  id: string;
   label: string;
   /** Images par seconde du dessin (12 = « sur les deux »), 0 = continu. */
   fps: number;
@@ -64,7 +65,7 @@ function centerOf(fig: Figure) {
   return { x: (b.x0 + b.x1) / 2, y: (b.y0 + b.y1) / 2, r: Math.hypot(b.x1 - b.x0, b.y1 - b.y0) / 2 };
 }
 
-function revealClip(g: CanvasRenderingContext2D, fig: Figure, u: number, wavy = 0) {
+export function revealClip(g: CanvasRenderingContext2D, fig: Figure, u: number, wavy = 0) {
   if (u >= 1) return;
   const c = centerOf(fig);
   const r = c.r * u + 0.5;

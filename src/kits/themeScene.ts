@@ -4,30 +4,30 @@
  * on reconnaît l'univers d'une page à son style, comme pour les comptines et les petits films.
  */
 import type { Decor, Objet } from '../data/comptines';
-import type { FilmStyle } from '../films/engine';
 import { H, W } from '../films/engine';
 import { place } from './geom';
 import { decor, objet } from './library';
-import { MATERIALS, type Material } from './materials';
+import type { Material } from './materials';
+import { materialFor, type StyleId } from './styles';
 
 export type SceneTheme = 'animaux' | 'nature' | 'espace' | 'metiers' | 'corps' | 'monde' | 'journal' | 'mer' | 'neige' | 'pluie' | 'fete' | 'nuit' | 'kawaii' | 'kawaiiFille' | 'kawaiiGarcon';
 
-export const SCENE_STYLE: Record<SceneTheme, { style: FilmStyle; decor: Decor; objets: Objet[] }> = {
-  animaux: { style: 'paper-popup', decor: 'jardin', objets: ['papillon', 'oiseau', 'fleur'] },
-  nature: { style: 'watercolor', decor: 'foret', objets: ['feuille', 'papillon', 'fleur'] },
-  espace: { style: 'crayon', decor: 'nuit', objets: ['fusee', 'etoile', 'lune'] },
+export const SCENE_STYLE: Record<SceneTheme, { style: StyleId; decor: Decor; objets: Objet[] }> = {
+  animaux: { style: 'claymation', decor: 'jardin', objets: ['papillon', 'oiseau', 'fleur'] },
+  nature: { style: 'urban-sketch', decor: 'foret', objets: ['feuille', 'papillon', 'fleur'] },
+  espace: { style: 'scifi-toon', decor: 'nuit', objets: ['fusee', 'etoile', 'lune'] },
   metiers: { style: 'brick-toy', decor: 'ville', objets: ['cube', 'voiture', 'etoile'] },
   corps: { style: 'rubber-hose', decor: 'chambre', objets: ['balle', 'ballon', 'etoile'] },
-  monde: { style: 'paper-popup', decor: 'ville', objets: ['bateau', 'oiseau', 'nuage'] },
-  journal: { style: 'whiteboard', decor: 'ville', objets: ['soleil', 'nuage', 'note'] },
-  mer: { style: 'watercolor', decor: 'plage', objets: ['poisson', 'bateau', 'bulle'] },
-  neige: { style: 'crayon', decor: 'neige', objets: ['flocon', 'etoile', 'flocon'] },
-  pluie: { style: 'whiteboard', decor: 'jardin', objets: ['goutte', 'nuage', 'goutte'] },
-  fete: { style: 'paper-popup', decor: 'chambre', objets: ['ballon', 'gateau', 'etoile'] },
-  nuit: { style: 'crayon', decor: 'nuit', objets: ['etoile', 'lune', 'etoile'] },
-  kawaii: { style: 'paper-popup', decor: 'chambre', objets: ['coeur', 'bulle', 'etoile'] },
-  kawaiiFille: { style: 'watercolor', decor: 'jardin', objets: ['coeur', 'papillon', 'fleur'] },
-  kawaiiGarcon: { style: 'brick-toy', decor: 'chambre', objets: ['fusee', 'voiture', 'etoile'] }
+  monde: { style: 'sea-adventure', decor: 'ville', objets: ['bateau', 'oiseau', 'nuage'] },
+  journal: { style: 'newsprint', decor: 'ville', objets: ['soleil', 'nuage', 'note'] },
+  mer: { style: 'ukiyoe', decor: 'plage', objets: ['poisson', 'bateau', 'bulle'] },
+  neige: { style: 'blue-white', decor: 'neige', objets: ['flocon', 'etoile', 'flocon'] },
+  pluie: { style: 'risograph', decor: 'jardin', objets: ['goutte', 'nuage', 'goutte'] },
+  fete: { style: 'comic-pop', decor: 'chambre', objets: ['ballon', 'gateau', 'etoile'] },
+  nuit: { style: 'paper-lantern', decor: 'nuit', objets: ['etoile', 'lune', 'etoile'] },
+  kawaii: { style: 'felt', decor: 'chambre', objets: ['coeur', 'bulle', 'etoile'] },
+  kawaiiFille: { style: 'origami', decor: 'jardin', objets: ['coeur', 'papillon', 'fleur'] },
+  kawaiiGarcon: { style: 'pixel-8bit', decor: 'chambre', objets: ['fusee', 'voiture', 'etoile'] }
 };
 
 /** Places des objets flottants : dans le ciel, loin du centre où se pose le contenu de la page. */
@@ -40,17 +40,18 @@ const SPOTS: [number, number, number][] = [
 ];
 
 export interface ThemeBackdrop {
-  style: FilmStyle;
+  style: StyleId;
   render(ctx: CanvasRenderingContext2D, t: number, still?: boolean): void;
   dispose(): void;
 }
 
-export function createThemeBackdrop(theme: SceneTheme): ThemeBackdrop {
+/** Décor d'un thème ; `style` force un autre des 66 styles (un jeu, une page, un contenu précis). */
+export function createThemeBackdrop(theme: SceneTheme, style?: StyleId): ThemeBackdrop {
   const spec = SCENE_STYLE[theme];
-  const mat: Material = MATERIALS[spec.style]();
+  const mat: Material = materialFor(style ?? spec.style);
   let lastStep = -1;
   return {
-    style: spec.style,
+    style: style ?? spec.style,
     render(ctx, tReal, still) {
       // Un fond se dessine lentement : 12 images/s suffisent (et laissent la place au contenu de la page).
       const fps = mat.fps || 12;

@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { COMPTINES, COMPTINE_THEMES, type Decor, type Objet } from '../data/comptines';
-import { THEME_STYLE } from './comptineScene';
+import { COMPTINES, type Decor, type Objet } from '../data/comptines';
+import { styleForComptine } from './comptineScene';
+import { SPECS, STYLE_IDS, colorMapper, isStyle } from './styles';
 import { cat, decor, kid, objet } from './library';
 import type { Figure } from './geom';
 
@@ -10,10 +11,24 @@ const finite = (f: Figure, what: string) => {
   for (const s of f.shapes) for (const [x, y] of s.pts) assert.ok(Number.isFinite(x) && Number.isFinite(y), `${what} : coordonnées valides`);
 };
 
-test('chaque thème de comptine a son style', () => {
-  for (const th of Object.keys(COMPTINE_THEMES)) assert.ok(THEME_STYLE[th as keyof typeof THEME_STYLE], th);
-  // Au moins 6 styles différents : on reconnaît la famille d'une comptine à son style.
-  assert.ok(new Set(Object.values(THEME_STYLE)).size >= 6);
+test('66 styles, tous différents et reconnus', () => {
+  assert.equal(STYLE_IDS.length, 66);
+  assert.equal(new Set(STYLE_IDS).size, 66);
+  for (const id of STYLE_IDS) assert.ok(isStyle(id), id);
+  assert.equal(Object.keys(SPECS).length, 59);
+});
+
+test('les fiches transforment toutes les couleurs en couleurs valides', () => {
+  for (const [id, spec] of Object.entries(SPECS)) {
+    const map = colorMapper(spec);
+    for (const c of ['#FFE0C4', '#4A7BB7', '#3E3355', '#FFFFFF', '#A8D98A']) assert.match(map(c), /^#[0-9a-f]{6}$/, id);
+  }
+});
+
+test('deux comptines voisines n’ont jamais le même style', () => {
+  const styles = COMPTINES.map(styleForComptine);
+  for (let i = 1; i < styles.length; i++) assert.notEqual(styles[i], styles[i - 1]);
+  assert.ok(new Set(styles).size >= Math.min(30, COMPTINES.length));
 });
 
 test('tous les décors, objets et personnages des comptines se construisent', () => {
@@ -25,12 +40,11 @@ test('tous les décors, objets et personnages des comptines se construisent', ()
   finite(cat({ t: 1, tail: 4, tilt: 3 }), 'Mila');
 });
 
-test('chaque style de décor a sa peau de jeu', async () => {
-  const { SCENE_STYLE } = await import('./themeScene');
-  const { SKINS } = await import('./skins');
-  for (const [scene, spec] of Object.entries(SCENE_STYLE)) {
-    const skin = SKINS[spec.style];
-    assert.ok(skin, scene);
-    assert.ok(skin.card(0).background && skin.back(1).background, `${scene} : cartes et dos`);
+test('chacun des 66 styles a sa peau de jeu', async () => {
+  const { skinFor } = await import('./skins');
+  for (const id of STYLE_IDS) {
+    const skin = skinFor(id);
+    assert.ok(skin, id);
+    assert.ok(skin.card(0).background && skin.back(1).background && skin.question.fontFamily, `${id} : cartes, dos et police`);
   }
 });
