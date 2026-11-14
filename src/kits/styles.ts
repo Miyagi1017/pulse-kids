@@ -1,9 +1,9 @@
 /**
  * Les 66 styles de Pulse Kids.
  * 7 matières faites à la main (materials.ts) + 59 styles décrits par une fiche (StyleSpec) et rendus
- * par une matière générique. Les fiches reprennent les 91 styles de claude-video / Lemo-Opuscar (MIT) :
- * on en garde les 66 qui parlent aux enfants (pas de tableaux de bord, de captures d'écran ni de pubs).
- * Les palettes viennent des fiches STYLE.md ; chaque style garde sa façon de remplir, de cerner,
+ * par une matière générique.
+ * La liste suit le catalogue des 66 titres et styles de Pulse Kids ; les fiches et palettes viennent de
+ * lemomo-ai/lemo-opuscar et zhgarylu/claude-video (MIT). Chaque style garde sa façon de remplir, de cerner,
  * son fond, son grain et sa police, appliqués à n'importe quelle figure des kits (geom.ts).
  */
 import { H, W, clamp, hash } from '../films/engine';
@@ -12,8 +12,8 @@ import { RES, canvas, ctx2d, wrap } from '../films/crayon';
 import { bbox, pathPts, shade, type Figure, type Pt } from './geom';
 import { MATERIALS, STYLE_LABEL, revealClip, type Material } from './materials';
 
-type Fill = 'flat' | 'shade' | 'cel' | 'hatch' | 'dots' | 'stipple' | 'glow' | 'line' | 'facet' | 'gradient' | 'wash' | 'felt' | 'brush' | 'riso';
-type Bg = 'plain' | 'grid' | 'lines' | 'dots' | 'waves' | 'stars' | 'rays' | 'cloth' | 'felt' | 'staff' | 'lead' | 'lightbox' | 'diag';
+type Fill = 'points' | 'glass' | 'flat' | 'shade' | 'cel' | 'hatch' | 'dots' | 'stipple' | 'glow' | 'line' | 'facet' | 'gradient' | 'wash' | 'felt' | 'brush' | 'riso';
+type Bg = 'circuit' | 'window' | 'memphis' | 'plain' | 'grid' | 'lines' | 'dots' | 'waves' | 'stars' | 'rays' | 'cloth' | 'felt' | 'staff' | 'lead' | 'lightbox' | 'diag';
 type Post = 'grain' | 'vignette' | 'flicker' | 'scan' | 'tilt' | 'spot' | 'scratch' | 'fibers' | 'strobe' | 'gate' | 'warm';
 type Box = 'halo' | 'band' | 'card';
 
@@ -71,64 +71,64 @@ const F = {
 
 export const SPECS = {
   'art-deco': { label: 'Art déco doré', paper: '#0d0b09', paper2: '#10231f', bg: 'rays', bgInk: 'rgba(201,162,75,0.16)', palette: ['#0d0b09', '#10231f', '#6F5220', '#C9A24B', '#F3D98B', '#1f3a5c', '#8a2f2a', '#f4ead2', '#2f6b5a'], ink: '#C9A24B', outline: 2.4, fill: 'gradient', post: ['vignette'], font: F.lime, text: '#F3D98B', box: 'band', boxBg: '#0d0b09', boxInk: '#F3D98B', fps: 24 },
-  'art-nouveau': { label: 'Art nouveau', paper: '#EBDFC1', bg: 'plain', palette: ['#EBDFC1', '#C99B3C', '#9BAF84', '#5F6E42', '#D9A59C', '#A7A0CE', '#716AA9', '#3d2f22', '#c8664a'], ink: '#5F4A2A', outline: 2.6, fill: 'flat', post: ['fibers'], font: F.deco, fontScale: 1.1, text: '#4a3820', box: 'card', fps: 24 },
-  'blue-white': { label: 'Porcelaine bleue', paper: '#F6F4EE', bg: 'waves', bgInk: 'rgba(29,63,143,0.10)', ramp: ['#06103A', '#1d3f8f', '#6f93cf', '#D4E3F5', '#F6F4EE'], ink: '#06103A', outline: 1.6, fill: 'wash', post: ['grain'], font: F.serif, text: '#06103A', box: 'halo', fps: 0 },
   blueprint: { label: 'Plan d’architecte', paper: '#18336B', paper2: '#2A58A6', bg: 'grid', bgInk: 'rgba(231,240,249,0.16)', ramp: ['#18336B', '#2A58A6', '#5d8fd6', '#9cc0ea'], ink: '#E7F0F9', outline: 2, wobble: 0.5, fill: 'line', post: ['grain'], font: F.board, text: '#E7F0F9', box: 'halo', fps: 12 },
-  cardboard: { label: 'Carton découpé', paper: '#d9b27a', bg: 'lines', bgInk: 'rgba(140,106,67,0.16)', palette: ['#8c6a43', '#b39468', '#d9b27a', '#e6d6a8', '#c19a5f', '#2c5a4b', '#5a3f2b', '#c2492f', '#e8e0c8', '#3d6b8f', '#e0b23a'], ink: '#5a3f2b', outline: 2, wobble: 0.8, fill: 'flat', shadow: [5, 6, 'rgba(60,40,20,0.35)'], post: ['grain'], font: F.hand, text: '#3b2a1c', box: 'card', fps: 12 },
   'cel-anime-80s': { label: 'Dessin animé des années 80', paper: '#f9e9c8', sat: 1.25, ink: '#5a2e2e', inkFromColor: true, outline: 2.2, fill: 'cel', post: ['grain', 'vignette'], font: F.round, text: '#5a2e2e', box: 'band', boxBg: 'rgba(30,14,40,0.78)', boxInk: '#fff0a0', fps: 12 },
-  charcoal: { label: 'Fusain', paper: '#E2DAC8', ramp: ['#18171A', '#42454C', '#8a8a86', '#c9c2b2', '#E2DAC8'], ink: '#18171A', outline: 2.4, wobble: 1.6, fill: 'stipple', post: ['grain', 'fibers'], font: F.hand, text: '#18171A', box: 'halo', fps: 12 },
-  claymation: { label: 'Pâte à modeler', paper: '#ecd3a0', palette: ['#ecd3a0', '#b9674b', '#3f7480', '#e0a62a', '#e58c86', '#93b08a', '#2b2420', '#f4ebdd', '#6b8fc4', '#c94a3a'], ink: '#2b2420', outline: 0, wobble: 0.9, fill: 'shade', shadow: [6, 8, 'rgba(43,36,32,0.3)'], post: ['vignette', 'grain'], font: F.round, text: '#2b2420', box: 'card', fps: 12 },
-  clockwork: { label: 'Horlogerie en laiton', paper: '#3f332c', paper2: '#241c17', bg: 'dots', bgInk: 'rgba(242,200,114,0.10)', ramp: ['#1e1712', '#5a4330', '#8a6232', '#d09a48', '#f2c872', '#fff1c8'], ink: '#1e1712', outline: 2, fill: 'gradient', post: ['vignette', 'grain'], font: F.roman, text: '#f2c872', box: 'band', boxBg: '#1e1712', boxInk: '#f2c872', fps: 12 },
-  'comic-pop': { label: 'Bande dessinée pop', paper: '#fffaf0', bg: 'dots', bgInk: 'rgba(26,143,216,0.14)', palette: ['#e4372b', '#ffd21f', '#1a8fd8', '#5cb8ee', '#16110f', '#fffaf0', '#f3ead3', '#3fae4b', '#f28fb2', '#f39a3a'], ink: '#16110f', outline: 4, fill: 'dots', shadow: [5, 5, '#16110f'], font: F.bungee, text: '#16110f', box: 'card', fps: 12 },
-  constructivist: { label: 'Affiche constructiviste', paper: '#e8dcc0', bg: 'diag', bgInk: 'rgba(224,58,31,0.85)', palette: ['#e8dcc0', '#e03a1f', '#17130f', '#dba22c', '#8a8270'], ink: '#17130f', outline: 0, fill: 'flat', post: ['grain'], font: F.bungee, text: '#17130f', box: 'band', boxBg: '#17130f', boxInk: '#e8dcc0', fps: 12 },
-  cyanotype: { label: 'Cyanotype', paper: '#0a2250', paper2: '#2062a0', ramp: ['#f4f0e2', '#cfe6ee', '#b2d7e4', '#5d97c4'], backFade: 0.25, ink: '#f4f0e2', outline: 0, fill: 'flat', post: ['grain', 'fibers'], font: F.serif, text: '#f4f0e2', box: 'halo', fps: 0 },
-  'doodle-science': { label: 'Carnet de sciences', paper: '#f4efe4', bg: 'grid', bgInk: 'rgba(116,184,232,0.28)', palette: ['#2b2622', '#74b8e8', '#a9cb8c', '#f6c545', '#ee8a3a', '#58aaa3', '#f4efe4', '#e86a6a', '#b58ad8'], ink: '#2b2622', outline: 2.4, wobble: 1.2, fill: 'wash', font: F.board, text: '#2b2622', box: 'halo', fps: 12 },
-  dunhuang: { label: 'Fresque de Dunhuang', paper: '#d9b98a', palette: ['#efe0c2', '#c98a4b', '#3f8f7b', '#3a5f9e', '#b5402a', '#3a2a20', '#e7c46a', '#8a5a3a'], ink: '#3a2a20', outline: 1.8, wobble: 0.5, fill: 'flat', post: ['grain', 'fibers', 'vignette'], font: F.roman, text: '#3a2a20', box: 'card', fps: 12 },
-  embroidery: { label: 'Broderie', paper: '#F1DFB4', bg: 'cloth', bgInk: 'rgba(120,90,50,0.10)', palette: ['#B0372B', '#D8A52F', '#5F8236', '#2C4B82', '#F1DFB4', '#2C2A2F', '#3E6E7C', '#e9a3a0', '#f4f0e4'], ink: '#2C2A2F', inkFromColor: true, outline: 2.6, dash: [5, 3], fill: 'hatch', post: ['grain'], font: F.hand, text: '#2C2A2F', box: 'card', fps: 12 },
-  engraving: { label: 'Gravure ancienne', paper: '#f1e8d2', ramp: ['#1c1510', '#2b1e14', '#6b4a2a', '#9a6a34', '#e8ddc2', '#f4eddb'], ink: '#1c1510', outline: 1.6, fill: 'hatch', post: ['fibers', 'vignette'], font: F.period, text: '#1c1510', box: 'halo', fps: 12 },
-  'era-scroll': { label: 'Rouleau d’histoire', paper: '#e8dbb0', palette: ['#3c2416', '#a56e42', '#a63a22', '#d9ab6e', '#2c2750', '#f3cf94', '#e8dbb0', '#5f7a4a', '#4f7fa0'], ink: '#3c2416', outline: 1.8, fill: 'wash', post: ['fibers', 'vignette'], font: F.serif, text: '#3c2416', box: 'halo', fps: 12 },
-  felt: { label: 'Feutrine', paper: '#D6CAB4', bg: 'felt', bgInk: 'rgba(90,70,50,0.10)', palette: ['#7F95A8', '#C4694A', '#D3A64A', '#86966A', '#D5A199', '#f4ecdc', '#4b4038', '#a56f9a', '#5f8fbf'], ink: '#4b4038', inkFromColor: true, outline: 2, dash: [4, 4], wobble: 0.8, fill: 'felt', shadow: [3, 4, 'rgba(60,45,30,0.3)'], post: ['grain'], font: F.hand, text: '#4b4038', box: 'card', fps: 12 },
+  constructivist: { label: 'Montage constructiviste', paper: '#e8dcc0', bg: 'diag', bgInk: 'rgba(224,58,31,0.85)', palette: ['#e8dcc0', '#e03a1f', '#17130f', '#dba22c', '#8a8270'], ink: '#17130f', outline: 0, fill: 'flat', post: ['grain'], font: F.bungee, text: '#17130f', box: 'band', boxBg: '#17130f', boxInk: '#e8dcc0', fps: 12 },
+  engraving: { label: 'Gravure au burin', paper: '#f1e8d2', ramp: ['#1c1510', '#2b1e14', '#6b4a2a', '#9a6a34', '#e8ddc2', '#f4eddb'], ink: '#1c1510', outline: 1.6, fill: 'hatch', post: ['fibers', 'vignette'], font: F.period, text: '#1c1510', box: 'halo', fps: 12 },
   'game-show': { label: 'Plateau de jeu télé', paper: '#2a1a4a', paper2: '#1B1B1B', bg: 'rays', bgInk: 'rgba(255,210,63,0.12)', palette: ['#FFFFFF', '#FFF6E5', '#FFD23F', '#FF8C42', '#FF5A5F', '#FF8FB1', '#4cc9f0', '#7b61ff', '#1B1B1B', '#57cc99'], ink: '#1B1B1B', outline: 3.5, fill: 'gradient', shadow: [0, 6, 'rgba(0,0,0,0.45)'], post: ['vignette'], font: F.bungee, text: '#FFD23F', box: 'band', boxBg: '#1B1B1B', boxInk: '#FFD23F', fps: 24 },
   'hd-2d': { label: 'Diorama pixel HD', paper: '#2c4262', paper2: '#101d3e', sat: 1.1, ink: '#101d3e', outline: 0, fill: 'shade', pixel: 3, post: ['tilt', 'vignette'], font: F.pixel, fontScale: 0.55, text: '#fff6d8', box: 'band', boxBg: 'rgba(5,8,24,0.82)', boxInk: '#fff6d8', fps: 12 },
   'hologram-hud': { label: 'Hologramme', paper: '#05141f', paper2: '#0b2a3a', bg: 'grid', bgInk: 'rgba(82,224,224,0.12)', ramp: ['#0b3a48', '#147a8c', '#2fb7c9', '#9ff6ff'], ink: '#9ff6ff', outline: 2, fill: 'glow', post: ['scan', 'vignette'], font: F.round, text: '#9ff6ff', box: 'halo', fps: 24 },
   impasto: { label: 'Peinture épaisse', paper: '#f7dca0', palette: ['#34507e', '#d99a78', '#f7dca0', '#dca064', '#c98d7e', '#3f7a6c', '#b8342a', '#f4f0e6', '#2b2a3a', '#e8c34a'], ink: '#2b2a3a', outline: 0, wobble: 1, fill: 'brush', post: ['grain'], font: F.serif, text: '#2b2a3a', box: 'card', fps: 12 },
   'ink-wash': { label: 'Lavis à l’encre', paper: '#F2ECDE', ramp: ['#1a1814', '#4a463e', '#8c867a', '#c9c2b2', '#F2ECDE'], ink: '#1a1814', outline: 1.4, wobble: 0.6, fill: 'wash', post: ['fibers'], font: F.serif, text: '#1a1814', box: 'halo', fps: 0 },
   'iso-infographic': { label: 'Maquette en relief', paper: '#efe6cf', palette: ['#A9B27C', '#D9C27A', '#B07A45', '#6A3B22', '#CF5140', '#B3352B', '#f4efe2', '#4f7d8c', '#7fa3c8', '#e8b04a'], ink: '#3a2a1e', outline: 1.6, fill: 'gradient', shadow: [8, 6, 'rgba(60,40,20,0.25)'], font: F.round, text: '#3a2a1e', box: 'card', fps: 12 },
-  'lacquer-gold': { label: 'Laque et or', paper: '#0c0807', paper2: '#2a0d08', palette: ['#0c0807', '#b3261a', '#c4952f', '#7b5513', '#fff1b8', '#b98650', '#5a1a12'], ink: '#c4952f', outline: 2, fill: 'gradient', post: ['vignette'], font: F.roman, text: '#fff1b8', box: 'band', boxBg: '#0c0807', boxInk: '#c4952f', fps: 12 },
   'lowpoly-island': { label: 'Île en facettes', paper: '#9fd3e8', paper2: '#f3dfab', palette: ['#f3dfab', '#e2c68e', '#93c96c', '#7fbd62', '#c99c6e', '#b4b8bd', '#8f949c', '#4a9ad1', '#e86a5a', '#ffffff', '#2e3a4a', '#f2b441', '#b98ad4'], ink: '#2e3a4a', outline: 0, fill: 'facet', font: F.round, text: '#2e3a4a', box: 'card', fps: 24 },
-  'manga-panel': { label: 'Case de manga', paper: '#fbfaf5', bg: 'rays', bgInk: 'rgba(14,13,16,0.05)', ramp: ['#0e0d10', '#1b1a1f', '#7d7b80', '#d8d6d0', '#fbfaf5'], ink: '#0e0d10', outline: 3, fill: 'dots', font: F.bungee, text: '#0e0d10', box: 'card', fps: 12 },
   microgame: { label: 'Mini-jeu vidéo', paper: '#2a0f5c', paper2: '#1a1030', palette: ['#1a1030', '#3d168f', '#ff2e88', '#ffc928', '#e08a00', '#1fd1d1', '#ffffff', '#7cf06a', '#ff7a3c'], ink: '#1a1030', outline: 3, fill: 'flat', shadow: [0, 6, '#1a1030'], font: F.bungee, text: '#ffc928', box: 'band', boxBg: '#1a1030', boxInk: '#ffc928', fps: 12 },
   'midcentury-toon': { label: 'Cartoon des années 50', paper: '#F4EAD5', paper2: '#E6D8BC', palette: ['#F4EAD5', '#E6D8BC', '#D4C29F', '#2B2420', '#E4613F', '#B8452B', '#E8B43A', '#4f8a8b', '#7fa36b', '#9fc6d0'], ink: '#2B2420', outline: 2, wobble: 0.6, misreg: 4, fill: 'flat', post: ['grain'], font: F.shrik, text: '#2B2420', box: 'halo', fps: 12 },
-  'natural-history': { label: 'Planche de naturaliste', paper: '#f4e8cc', sat: 0.6, ink: '#2b1d12', outline: 1.4, fill: 'hatch', post: ['fibers', 'vignette'], font: F.period, text: '#2b1d12', box: 'card', fps: 12 },
-  'neon-sign': { label: 'Enseigne au néon', paper: '#0b0b1a', paper2: '#1a0f2a', bg: 'lines', bgInk: 'rgba(255,255,255,0.03)', palette: ['#ff3fa4', '#2ef2ff', '#ffe14a', '#5cff7a', '#b06bff', '#ff7a3c'], ink: '#ff3fa4', outline: 3, fill: 'glow', post: ['vignette', 'flicker'], font: F.lime, text: '#ffb3e0', box: 'halo', fps: 24 },
-  newsprint: { label: 'Vieux journal', paper: '#d7cfb5', ramp: ['#1b1814', '#292826', '#7a7466', '#bdb59d', '#d7cfb5'], ink: '#1b1814', outline: 1.8, fill: 'dots', post: ['grain', 'fibers'], font: F.period, text: '#1b1814', box: 'card', fps: 12 },
-  nianhua: { label: 'Image du Nouvel An', paper: '#f6ecd6', palette: ['#d8282b', '#1f9a5a', '#f5c218', '#f27aa0', '#2e5fb4', '#1a1a1a', '#f6ecd6', '#f08a2a'], sat: 1.3, ink: '#1a1a1a', outline: 2.6, fill: 'flat', post: ['fibers'], font: F.shrik, text: '#b81f22', box: 'card', fps: 12 },
   'one-line': { label: 'Un seul trait', paper: '#F4EFE4', ramp: ['#d8cfbf', '#e6dccb', '#efe7d8'], ink: '#1D1A17', outline: 2.6, wobble: 0.8, fill: 'line', font: F.hand, text: '#1D1A17', box: 'halo', fps: 12 },
-  'opera-cel': { label: 'Opéra en dessin animé', paper: '#2a1a3a', paper2: '#5a2a4a', bg: 'rays', bgInk: 'rgba(246,199,90,0.08)', palette: ['#f2e6d0', '#c8a24b', '#b0263a', '#3d6fa8', '#2a1a3a', '#e88aa0', '#5fa070', '#f6c75a'], ink: '#1a0f22', inkFromColor: true, outline: 2.4, fill: 'cel', post: ['vignette'], font: F.roman, text: '#f6e7c8', box: 'band', boxBg: 'rgba(26,15,34,0.85)', boxInk: '#f6c75a', fps: 12 },
-  origami: { label: 'Origami', paper: '#ece6da', palette: ['#8ea6d4', '#ecaa88', '#d0cbbf', '#1c2748', '#e86a6a', '#f2c46a', '#7fb98a', '#f4f1ea', '#b98ad4'], ink: '#1c2748', outline: 0, fill: 'facet', shadow: [6, 8, 'rgba(28,39,72,0.22)'], font: F.round, text: '#1c2748', box: 'card', fps: 12 },
-  'paper-annotation': { label: 'Cahier annoté', paper: '#f7f4ea', bg: 'lines', bgInk: 'rgba(58,123,213,0.22)', palette: ['#14161a', '#23262b', '#ffe14d', '#e5484d', '#3a7bd5', '#2fa36b', '#f7f4ea', '#f2a03d', '#b58ad8'], ink: '#23262b', outline: 2.2, wobble: 1, fill: 'wash', font: F.hand, text: '#14161a', box: 'halo', fps: 12 },
-  'paper-lantern': { label: 'Lanternes de papier', paper: '#0a1330', paper2: '#2e4478', palette: ['#fffaf0', '#fff0cf', '#f7dca4', '#f2a65a', '#e0603a', '#43598a', '#172a58', '#c94a4a', '#8fbf9a'], backFade: 0.2, ink: '#172a58', outline: 0, fill: 'shade', post: ['vignette'], font: F.serif, text: '#fff0cf', box: 'halo', fps: 0 },
+  'paper-lantern': { label: 'Papier découpé rétroéclairé', paper: '#0a1330', paper2: '#2e4478', palette: ['#fffaf0', '#fff0cf', '#f7dca4', '#f2a65a', '#e0603a', '#43598a', '#172a58', '#c94a4a', '#8fbf9a'], backFade: 0.2, ink: '#172a58', outline: 0, fill: 'shade', post: ['vignette'], font: F.serif, text: '#fff0cf', box: 'halo', fps: 0 },
   'papercut-red': { label: 'Papier découpé rouge', paper: '#f2e8d0', ramp: ['#8a0c20', '#b00f26', '#d2201f', '#de3b30', '#f2e8d0'], backFade: 0.82, ink: '#8a0c20', outline: 0, fill: 'flat', shadow: [3, 4, 'rgba(80,10,20,0.25)'], post: ['fibers'], font: F.shrik, text: '#b00f26', box: 'halo', fps: 12 },
   'pictogram-motion': { label: 'Pictogrammes', paper: '#fbf6ec', palette: ['#c21d15', '#e83220', '#f07a45', '#231a6e', '#fbf6ec', '#2f7f6f', '#f2c23a'], ink: '#231a6e', outline: 0, fill: 'flat', font: F.bungee, text: '#231a6e', box: 'band', boxBg: '#231a6e', boxInk: '#fbf6ec', fps: 24 },
-  'pixel-8bit': { label: 'Jeu vidéo 8 bits', paper: '#5c94fc', palette: ['#000000', '#fcfcfc', '#f83800', '#fcb800', '#00b800', '#0078f8', '#6844fc', '#bcbcbc', '#ac7c00', '#f8b8f8', '#5c94fc', '#7c3f00', '#b8f818', '#58d854', '#00a800', '#3cbcfc', '#a4e4fc', '#fce0a8', '#f87858', '#b8f8b8', '#a8d888'], ink: '#000000', outline: 2, fill: 'flat', pixel: 6, post: ['scan'], font: F.pixel, fontScale: 0.55, text: '#fcfcfc', box: 'band', boxBg: '#000000', boxInk: '#fcfcfc', fps: 12 },
   'pixel-rpg': { label: 'Aventure en pixels', paper: '#3e8948', paper2: '#265c42', palette: ['#be4a2f', '#d77643', '#ead4aa', '#e4a672', '#b86f50', '#733e39', '#3e2731', '#63c74d', '#3e8948', '#0099db', '#f7e26b', '#ffffff', '#b55088'], ink: '#3e2731', outline: 1.8, fill: 'cel', pixel: 4, font: F.pixel, fontScale: 0.5, text: '#ead4aa', box: 'band', boxBg: '#3e2731', boxInk: '#ead4aa', fps: 12 },
   risograph: { label: 'Impression risographie', paper: '#F6F1E6', palette: ['#0078BF', '#FFE800', '#FF48B0', '#F6F1E6', '#2a2a6a'], ink: '#0078BF', outline: 0, misreg: 3, fill: 'riso', post: ['grain'], font: F.bungee, text: '#0078BF', box: 'halo', fps: 12 },
-  'sand-animation': { label: 'Dessin dans le sable', paper: '#f3dfae', paper2: '#e0b46a', bg: 'lightbox', ramp: ['#3e2a14', '#6b4a26', '#a07a48', '#d8bc84', '#f3dfae'], ink: '#3e2a14', outline: 0, wobble: 1.4, fill: 'stipple', post: ['vignette'], font: F.serif, text: '#3e2a14', box: 'halo', fps: 12 },
-  'scifi-toon': { label: 'Dessin animé de l’espace', paper: '#1b1422', paper2: '#3a2a50', bg: 'stars', bgInk: 'rgba(255,255,255,0.7)', palette: ['#a7c3b1', '#ff4f9a', '#ff9bcb', '#b8f03c', '#52e0e0', '#ff7a2f', '#f4f0ff', '#7a5cff', '#1b1422', '#ffd23f'], ink: '#1b1422', inkFromColor: true, outline: 2.6, fill: 'cel', post: ['vignette'], font: F.bungee, text: '#b8f03c', box: 'band', boxBg: '#1b1422', boxInk: '#b8f03c', fps: 12 },
-  'sea-adventure': { label: 'Aventure en mer', paper: '#f4e6c4', palette: ['#f4e6c4', '#1d1612', '#16a6a3', '#0d7f94', '#ffc531', '#f0503e', '#3fb04a', '#ffffff', '#f39ab0', '#8a5a3a', '#98a3ad'], ink: '#1d1612', outline: 3, wobble: 0.7, fill: 'flat', post: ['grain'], font: F.shrik, text: '#1d1612', box: 'card', fps: 12 },
-  'sheet-music': { label: 'Partition illustrée', paper: '#efe3c6', bg: 'staff', bgInk: 'rgba(42,33,24,0.22)', palette: ['#2a2118', '#c8432a', '#256a8c', '#8a7418', '#8d4423', '#efe3c6', '#e8b84a', '#6a9a5a'], ink: '#2a2118', outline: 1.8, fill: 'wash', post: ['fibers'], font: F.period, text: '#2a2118', box: 'halo', fps: 12 },
+  'scifi-toon': { label: 'Dessin animé de science-fiction', paper: '#1b1422', paper2: '#3a2a50', bg: 'stars', bgInk: 'rgba(255,255,255,0.7)', palette: ['#a7c3b1', '#ff4f9a', '#ff9bcb', '#b8f03c', '#52e0e0', '#ff7a2f', '#f4f0ff', '#7a5cff', '#1b1422', '#ffd23f'], ink: '#1b1422', inkFromColor: true, outline: 2.6, fill: 'cel', post: ['vignette'], font: F.bungee, text: '#b8f03c', box: 'band', boxBg: '#1b1422', boxInk: '#b8f03c', fps: 12 },
   'silent-film': { label: 'Film muet', paper: '#bdb8ad', ramp: ['#121212', '#3a3a3a', '#7d7b77', '#c9c5bb', '#efece4'], ink: '#121212', outline: 2, fill: 'shade', post: ['vignette', 'flicker', 'scratch', 'grain'], font: F.period, text: '#efece4', box: 'band', boxBg: '#121212', boxInk: '#efece4', fps: 16 },
   'silkscreen-poster': { label: 'Affiche sérigraphiée', paper: '#FBE6B4', palette: ['#F6CD98', '#EE9A73', '#9A7FA8', '#3E7079', '#1E3B3F', '#FBE6B4', '#E4EEDC', '#c9504a'], ink: '#1E3B3F', outline: 0, misreg: 3, fill: 'flat', post: ['grain'], font: F.bungee, text: '#1E3B3F', box: 'halo', fps: 12 },
-  'stage-light': { label: 'Spectacle sous les projecteurs', paper: '#2a1a40', paper2: '#120c20', sat: 1.15, ink: '#120c20', outline: 2, fill: 'shade', post: ['spot', 'vignette'], font: F.lime, text: '#ffac34', box: 'band', boxBg: 'rgba(18,12,32,0.85)', boxInk: '#ffac34', fps: 24 },
   'stained-glass': { label: 'Vitrail', paper: '#142a70', bg: 'lead', bgInk: '#14100e', palette: ['#1d3a9c', '#142a70', '#a8101c', '#dc9a22', '#2f7f36', '#6b7a22', '#632a63', '#f3e6b0', '#3f9ad1'], ink: '#14100e', outline: 6, fill: 'facet', post: ['vignette'], font: F.roman, text: '#f3e6b0', box: 'band', boxBg: '#14100e', boxInk: '#f3e6b0', fps: 12 },
-  super8: { label: 'Film Super 8', paper: '#cfe0e0', sat: 1.1, light: 0.02, ink: '#2a2018', outline: 0, fill: 'shade', post: ['warm', 'grain', 'flicker', 'gate'], font: F.hand, text: '#3a2a20', box: 'halo', fps: 18 },
   'tilt-shift': { label: 'Monde miniature', paper: '#a9d58a', sat: 1.35, ink: '#0f3e2a', outline: 0, fill: 'shade', shadow: [4, 6, 'rgba(0,0,0,0.22)'], post: ['tilt'], font: F.round, text: '#0f3e2a', box: 'card', fps: 12 },
   'transit-map': { label: 'Plan de métro', paper: '#F4F0E8', bg: 'grid', bgInk: 'rgba(29,36,51,0.05)', palette: ['#e3342f', '#f6993f', '#ffcd3c', '#38c172', '#3490dc', '#9561e2', '#1D2433', '#F4F0E8', '#5A6170', '#f07ab0'], ink: '#1D2433', outline: 3, fill: 'flat', font: F.round, text: '#1D2433', box: 'card', fps: 24 },
   ukiyoe: { label: 'Estampe japonaise', paper: '#eee2c6', paper2: '#c9b690', bg: 'waves', bgInk: 'rgba(29,58,102,0.13)', palette: ['#1d3a66', '#13284a', '#4d6f98', '#c7b893', '#fbf6e9', '#c94a3a', '#3f6b4a', '#e8a35a', '#2a2420', '#e8d9b0'], ink: '#2a2420', outline: 1.8, fill: 'gradient', post: ['fibers', 'grain'], font: F.serif, text: '#13284a', box: 'card', fps: 12 },
   'urban-sketch': { label: 'Croquis sur le vif', paper: '#f5eede', palette: ['#2b2520', '#d6d56f', '#aabf57', '#7fa04a', '#56793c', '#3f5d36', '#d98a5a', '#7aa8c8', '#e8c45a', '#c46a6a', '#f5eede', '#b49ad0'], ink: '#2b2520', outline: 1.6, wobble: 1.4, fill: 'wash', font: F.hand, text: '#2b2520', box: 'halo', fps: 12 },
   woodcut: { label: 'Gravure sur bois', paper: '#EFE8D8', ramp: ['#111111', '#111111', '#C8502A', '#D8C29C', '#EFE8D8'], ink: '#111111', outline: 3, wobble: 0.5, fill: 'hatch', post: ['fibers'], font: F.period, text: '#111111', box: 'card', fps: 12 },
-  'y2k-vaporwave': { label: 'Rêve pastel des années 2000', paper: '#24114f', paper2: '#ff4fc3', bg: 'grid', bgInk: 'rgba(63,232,255,0.32)', palette: ['#ff4fc3', '#3fe8ff', '#7a4dff', '#24114f', '#d4cdf4', '#ffe14a', '#ffffff'], ink: '#24114f', outline: 2, fill: 'gradient', post: ['scan'], font: F.bungee, text: '#d4cdf4', box: 'halo', fps: 24 },
-  zoetrope: { label: 'Zootrope', paper: '#efe2bf', ramp: ['#241509', '#2a190d', '#6f4a2a', '#b98a3a', '#efe2bf'], ink: '#241509', outline: 2, fill: 'flat', post: ['strobe', 'vignette', 'grain'], font: F.period, text: '#241509', box: 'card', fps: 12 }
+  'caption-news': { label: 'Journal des enfants', paper: '#F7F5EF', palette: ['#0E0E0C', '#F7F5EF', '#FFC21A', '#FF4A3D', '#8D8B83', '#2f7fd8', '#57b894', '#f2a0c0'], ink: '#0E0E0C', outline: 2.5, fill: 'flat', shadow: [4, 4, '#0E0E0C'], font: F.bungee, text: '#0E0E0C', box: 'band', boxBg: '#FFC21A', boxInk: '#0E0E0C', fps: 24 },
+  newsreel: { label: 'Actualités des années 20', paper: '#bcb6aa', ramp: ['#151310', '#3d3730', '#807667', '#cfc4ae', '#efe6d0'], ink: '#151310', outline: 1.8, fill: 'shade', post: ['vignette', 'flicker', 'scratch', 'grain', 'gate'], font: F.period, text: '#efe6d0', box: 'band', boxBg: '#151310', boxInk: '#efe6d0', fps: 16 },
+  countdown: { label: 'Compte à rebours', paper: '#0B0E11', paper2: '#06080A', bg: 'grid', bgInk: 'rgba(242,245,247,0.06)', palette: ['#FF5B1F', '#FF3B30', '#F2F5F7', '#7C878D', '#ffc21a', '#3fd8ff', '#57e0a0', '#2a3036'], ink: '#F2F5F7', outline: 2, fill: 'gradient', post: ['vignette'], font: F.bungee, text: '#FF5B1F', box: 'halo', fps: 24 },
+  'city-symphony': { label: 'Symphonie du temps', paper: '#EDE8DF', palette: ['#EDE8DF', '#B0AAA0', '#D9772F', '#3a3a3a', '#6f6a62', '#f2c14e', '#7aa8c8', '#8fb07a'], ink: '#3a3a3a', outline: 1.4, fill: 'gradient', post: ['grain'], font: F.deco, fontScale: 1.1, text: '#3a3a3a', box: 'halo', fps: 12 },
+  'visual-investigation': { label: 'Tableau d’enquête', paper: '#141619', paper2: '#0B0C0E', bg: 'grid', bgInk: 'rgba(228,224,212,0.05)', palette: ['#E4E0D4', '#FF4A2E', '#8a8f98', '#f2c14e', '#3fa0ff', '#2a2e34', '#57b894'], ink: '#E4E0D4', outline: 2, fill: 'flat', shadow: [5, 6, 'rgba(0,0,0,0.5)'], post: ['vignette'], font: F.board, text: '#E4E0D4', box: 'card', fps: 12 },
+  telestrator: { label: 'Analyse au feutre', paper: '#3a7a4a', paper2: '#2a5a38', bg: 'lines', bgInk: 'rgba(255,255,255,0.22)', sat: 1.1, ink: '#FFD400', outline: 3, fill: 'shade', post: ['vignette'], font: F.bungee, text: '#FFD400', box: 'band', boxBg: '#0C1411', boxInk: '#FFD400', fps: 24 },
+  'news-package': { label: 'Reportage télé', paper: '#1B1E23', paper2: '#121417', bg: 'rays', bgInk: 'rgba(242,207,29,0.05)', palette: ['#F2CF1D', '#F8DE4A', '#D8B30C', '#D4B064', '#F4F1E8', '#22262C', '#e2574c', '#3f8fd8', '#57b894'], ink: '#121417', outline: 2, fill: 'gradient', post: ['vignette'], font: F.bungee, text: '#F8DE4A', box: 'band', boxBg: '#F2CF1D', boxInk: '#121417', fps: 24 },
+  'satellite-briefing': { label: 'Vue satellite', paper: '#070B0E', paper2: '#1A3B6B', bg: 'stars', bgInk: 'rgba(242,245,246,0.6)', palette: ['#1F3F6B', '#8CB5DB', '#ECE2CB', '#FFBE55', '#F2F5F6', '#A1A7A9', '#4f8a5a', '#2f6a3a', '#c94a3a'], ink: '#F2F5F6', outline: 1.2, fill: 'shade', post: ['scan', 'vignette'], font: F.round, text: '#F2F5F6', box: 'halo', fps: 24 },
+  'briefing-board': { label: 'Tableau d’ingénieur', paper: '#F3F1EB', bg: 'grid', bgInk: 'rgba(31,79,200,0.10)', palette: ['#F3F1EB', '#8F8B83', '#23272E', '#1F4FC8', '#D33A21', '#5F86DA', '#6C727B', '#f2c14e', '#57b894'], ink: '#23272E', outline: 2, wobble: 0.8, fill: 'wash', font: F.board, text: '#23272E', box: 'card', fps: 12 },
+  'lidar-survey': { label: 'Scan en points lumineux', paper: '#05080A', paper2: '#0b1512', palette: ['#5C9A7A', '#E2F3DC', '#C8B38C', '#D4FFF0', '#FFB347', '#7ad0ff', '#ff7ab0'], ink: '#D4FFF0', outline: 0, fill: 'points', post: ['vignette'], font: F.round, text: '#D4FFF0', box: 'halo', fps: 24 },
+  'white-model': { label: 'Maquette blanche éclairée', paper: '#F3F3F1', paper2: '#dcdcd8', sat: 0.35, light: 0.12, ink: '#17181A', outline: 1, fill: 'shade', shadow: [6, 8, 'rgba(23,24,26,0.18)'], font: F.round, text: '#17181A', box: 'card', fps: 12 },
+  'data-physical': { label: 'Données en volume', paper: '#EFE4CF', paper2: '#C4BEB4', palette: ['#C8CCD1', '#9FD3D6', '#D2B07A', '#FFF1DC', '#B9D2FF', '#C6DBFF', '#e8a07a', '#7aa86a', '#3a3a3a', '#d87a8a'], ink: '#3a3a3a', outline: 0, fill: 'gradient', shadow: [8, 6, 'rgba(60,50,40,0.2)'], font: F.round, text: '#3a3a3a', box: 'card', fps: 12 },
+  teardown: { label: 'Vue éclatée', paper: '#f1efe9', bg: 'grid', bgInk: 'rgba(13,14,16,0.05)', palette: ['#34363a', '#0d0e10', '#f1efe9', '#ff6b3d', '#d9d4c9', '#686c73', '#4a90d9', '#f2c14e', '#57b894'], ink: '#0d0e10', outline: 1.4, fill: 'gradient', shadow: [10, 10, 'rgba(13,14,16,0.15)'], font: F.round, text: '#0d0e10', box: 'halo', fps: 24 },
+  microscope: { label: 'Au microscope', paper: '#181B1F', paper2: '#0B0D0F', palette: ['#6fd0ff', '#b48aff', '#3f6fd8', '#e0f6ff', '#ff8ad8', '#57e0a0', '#ffd36e'], ink: '#F4F1EC', outline: 1.2, fill: 'glow', post: ['vignette'], font: F.round, text: '#F4F1EC', box: 'halo', fps: 24 },
+  'archive-lighttable': { label: 'Table lumineuse d’archives', paper: '#F7F9FB', bg: 'lightbox', ramp: ['#15171A', '#4a3f33', '#9a8a72', '#e8dcc4', '#F7F9FB'], ink: '#0E0F11', outline: 1.2, fill: 'shade', shadow: [4, 6, 'rgba(0,0,0,0.25)'], post: ['vignette', 'grain'], font: F.period, text: '#0E0F11', box: 'card', fps: 12 },
+  chalkboard: { label: 'Tableau à la craie', paper: '#183026', paper2: '#0f1c15', palette: ['#f4f1e4', '#f6d36a', '#f39ab0', '#8fd0f5', '#a8e08a', '#f0a060'], backFade: 0.35, ink: '#f4f1e4', outline: 2.2, wobble: 1.2, fill: 'line', post: ['grain'], font: F.chalk, text: '#f4f1e4', box: 'halo', fps: 12 },
+  'halftone-dossier': { label: 'Dossier en trame', paper: '#F4ECDD', bg: 'dots', bgInk: 'rgba(46,85,214,0.10)', palette: ['#1D2340', '#2E55D6', '#FF5A87', '#FFC628', '#F58A34', '#D9621E', '#FFF4E2', '#57b894'], ink: '#1D2340', outline: 3, fill: 'dots', shadow: [5, 5, '#1D2340'], font: F.bungee, text: '#1D2340', box: 'card', fps: 12 },
+  'printed-long-take': { label: 'Carte à gratter', paper: '#16171b', ramp: ['#16171b', '#2a2a2e', '#c4332b', '#dfa443', '#ede5cd'], ink: '#ede5cd', outline: 1.6, fill: 'hatch', post: ['grain'], font: F.period, text: '#ede5cd', box: 'halo', fps: 12 },
+  'swiss-motion': { label: 'Graphisme suisse', paper: '#EAE9E5', bg: 'grid', bgInk: 'rgba(17,17,17,0.06)', palette: ['#111111', '#E30613', '#FFFFFF', '#CFCEC9', '#EAE9E5', '#2a5cd8', '#f2c14e'], ink: '#111111', outline: 0, fill: 'flat', font: '700 {s}px "Helvetica Neue", Arial, sans-serif', text: '#111111', box: 'band', boxBg: '#E30613', boxInk: '#ffffff', fps: 24 },
+  'spy-titles': { label: 'Générique d’espion années 60', paper: '#efe4c9', palette: ['#1b1714', '#d23a22', '#e2a52a', '#9a2a18', '#b07e1c', '#3a322b', '#efe4c9', '#3f7a8a'], ink: '#1b1714', outline: 0, misreg: 3, fill: 'flat', post: ['grain'], font: F.lime, text: '#1b1714', box: 'halo', fps: 12 },
+  'ascii-crt': { label: 'Terminal rétro', paper: '#090604', palette: ['#FF6605', '#FFB000', '#FFEBB8', '#BFE4FF', '#B8E0FF', '#7a4a10'], ink: '#FFB000', outline: 1.6, fill: 'glow', pixel: 3, post: ['scan', 'vignette'], font: F.pixel, fontScale: 0.5, text: '#FFB000', box: 'halo', fps: 12 },
+  dataviz: { label: 'Histoire en graphiques', paper: '#F6F3EC', bg: 'grid', bgInk: 'rgba(43,39,35,0.06)', palette: ['#2B2723', '#DDD6C9', '#BDB4A5', '#6E665C', '#2166AC', '#4393C3', '#d6604d', '#f4a582', '#92c5de', '#E4DDCF', '#5aae61'], ink: '#2B2723', outline: 0, fill: 'flat', font: F.round, text: '#2B2723', box: 'halo', fps: 24 },
+  'dark-keynote': { label: 'Présentation de nuit', paper: '#151822', paper2: '#0A0B0F', palette: ['#3B4CCA', '#E8EAF0', '#8A90A0', '#222734', '#5b8cff', '#ffb347', '#57e0a0', '#ff7ab0'], ink: '#E8EAF0', outline: 0, fill: 'gradient', shadow: [0, 8, 'rgba(0,0,0,0.5)'], post: ['vignette'], font: F.round, text: '#E8EAF0', box: 'halo', fps: 24 },
+  'living-screencast': { label: 'Écran animé', paper: '#EEEAE2', bg: 'window', bgInk: '#2A2622', palette: ['#1F1E1C', '#D97757', '#BD5D3A', '#EEEAE2', '#E08565', '#2A2622', '#F2C14E', '#7aa8c8', '#8fbf7a'], ink: '#2A2622', outline: 1.6, fill: 'flat', shadow: [0, 4, 'rgba(0,0,0,0.12)'], font: F.round, text: '#2A2622', box: 'card', fps: 24 },
+  'isometric-picture-book': { label: 'Livre d’images en relief', paper: '#f6efe0', sat: 1.1, ink: '#3e3355', outline: 1.8, fill: 'gradient', shadow: [10, 8, 'rgba(62,51,85,0.18)'], font: F.round, text: '#3e3355', box: 'card', fps: 12 },
+  'circuit-board': { label: 'Circuit imprimé', paper: '#0b2a1a', paper2: '#05190F', bg: 'circuit', bgInk: 'rgba(74,169,119,0.35)', palette: ['#1C6A44', '#4AA977', '#D9B25B', '#C9784A', '#F2EEE1', '#0b2a1a'], ink: '#D9B25B', outline: 1.6, fill: 'flat', post: ['vignette'], font: F.bungee, text: '#D9B25B', box: 'halo', fps: 12 },
+  backrooms: { label: 'Couloir lumineux', paper: '#d5bd66', paper2: '#8c763c', bg: 'lines', bgInk: 'rgba(77,61,38,0.12)', palette: ['#d5bd66', '#4d3d26', '#8c763c', '#d9d3b8', '#e6e1cf', '#fbfaf0', '#ff2a1a', '#7aa8c8'], ink: '#4d3d26', outline: 1.2, fill: 'shade', post: ['grain', 'vignette', 'scan'], font: F.round, text: '#4d3d26', box: 'halo', fps: 18 },
+  'glass-product': { label: 'Verre et reflets', paper: '#f3f8fb', paper2: '#e2e9ef', ink: '#34383d', outline: 0, fill: 'glass', shadow: [0, 14, 'rgba(21,24,27,0.10)'], font: F.round, text: '#15181b', box: 'halo', fps: 24 },
+  'memphis-diorama': { label: 'Diorama Memphis', paper: '#FFFCF6', bg: 'memphis', palette: ['#25214A', '#FFD36E', '#9DE8A6', '#6FD889', '#D6E68E', '#A6E3FB', '#ff7aa8', '#FFFCF6', '#ff8a4a', '#a8aab8'], ink: '#25214A', outline: 2.4, fill: 'flat', shadow: [6, 6, '#25214A'], font: F.bungee, text: '#25214A', box: 'card', fps: 12 },
+  'desktop-flythrough': { label: 'Bureau d’ordinateur', paper: '#e2e8f5', paper2: '#c4cde3', bg: 'window', bgInk: '#171c2e', ink: '#171c2e', outline: 1.4, fill: 'flat', shadow: [0, 8, 'rgba(23,28,46,0.15)'], font: F.round, text: '#171c2e', box: 'card', fps: 24 }
 } satisfies Record<string, StyleSpec>;
 
 export type SpecStyle = keyof typeof SPECS;
@@ -139,12 +139,12 @@ export type StyleId = FilmStyle | SpecStyle;
  * de contenus (les 50 vidéos du jour, les comptines…) change d'univers à chaque fois.
  */
 export const STYLE_IDS: StyleId[] = [
-  'paper-popup', 'neon-sign', 'watercolor', 'pixel-8bit', 'claymation', 'ukiyoe', 'comic-pop', 'cyanotype', 'crayon', 'stained-glass', 'felt',
-  'art-deco', 'risograph', 'origami', 'silent-film', 'sea-adventure', 'lowpoly-island', 'woodcut', 'scifi-toon', 'embroidery', 'brick-toy', 'paper-lantern',
-  'cel-anime-80s', 'engraving', 'transit-map', 'hologram-hud', 'impasto', 'manga-panel', 'rubber-hose', 'blue-white', 'game-show', 'sand-animation', 'midcentury-toon',
-  'blueprint', 'nianhua', 'tilt-shift', 'lacquer-gold', 'urban-sketch', 'pixel-rpg', 'shadow-puppet', 'doodle-science', 'super8', 'papercut-red', 'clockwork',
-  'cardboard', 'opera-cel', 'charcoal', 'y2k-vaporwave', 'dunhuang', 'whiteboard', 'microgame', 'art-nouveau', 'stage-light', 'iso-infographic', 'ink-wash',
-  'natural-history', 'pictogram-motion', 'silkscreen-poster', 'hd-2d', 'one-line', 'era-scroll', 'constructivist', 'sheet-music', 'paper-annotation', 'newsprint', 'zoetrope'
+  'paper-popup', 'countdown', 'watercolor', 'ascii-crt', 'brick-toy', 'ukiyoe', 'news-package', 'crayon', 'stained-glass', 'halftone-dossier', 'lidar-survey',
+  'art-deco', 'risograph', 'microscope', 'silent-film', 'memphis-diorama', 'lowpoly-island', 'woodcut', 'scifi-toon', 'archive-lighttable', 'whiteboard', 'paper-lantern',
+  'cel-anime-80s', 'engraving', 'transit-map', 'hologram-hud', 'impasto', 'caption-news', 'rubber-hose', 'chalkboard', 'game-show', 'white-model', 'midcentury-toon',
+  'blueprint', 'printed-long-take', 'tilt-shift', 'dark-keynote', 'urban-sketch', 'pixel-rpg', 'shadow-puppet', 'briefing-board', 'newsreel', 'papercut-red', 'circuit-board',
+  'teardown', 'satellite-briefing', 'glass-product', 'spy-titles', 'data-physical', 'visual-investigation', 'microgame', 'city-symphony', 'telestrator', 'iso-infographic', 'ink-wash',
+  'isometric-picture-book', 'pictogram-motion', 'silkscreen-poster', 'hd-2d', 'one-line', 'backrooms', 'constructivist', 'living-screencast', 'swiss-motion', 'dataviz', 'desktop-flythrough'
 ];
 
 export const isSpecStyle = (id: string): id is SpecStyle => id in SPECS;
@@ -370,6 +370,75 @@ function paintBackground(g: CanvasRenderingContext2D, spec: StyleSpec, id: strin
           g.lineWidth = 6;
           g.strokeRect(x, y, 120, 90);
         }
+      break;
+    }
+    case 'circuit': {
+      // Pistes de circuit imprimé : segments à angle droit et pastilles.
+      g.lineWidth = 3;
+      for (let i = 0; i < 26; i++) {
+        let x = hash(seed, i, 1) * W,
+          y = hash(seed, i, 2) * H;
+        g.beginPath();
+        g.moveTo(x, y);
+        for (let k = 0; k < 4; k++) {
+          if ((i + k) % 2) x += (hash(seed, i, k, 3) - 0.5) * 260;
+          else y += (hash(seed, i, k, 4) - 0.5) * 200;
+          g.lineTo(x, y);
+        }
+        g.stroke();
+        g.beginPath();
+        g.arc(x, y, 6, 0, Math.PI * 2);
+        g.fill();
+      }
+      break;
+    }
+    case 'window': {
+      // Fenêtres d'application : barre de titre, trois pastilles, cadre.
+      for (const [x, y, w, h] of [[40, 30, 420, 260], [520, 60, 400, 200], [300, 300, 360, 220]]) {
+        g.fillStyle = 'rgba(255,255,255,0.55)';
+        g.fillRect(x, y, w, h);
+        g.fillStyle = 'rgba(0,0,0,0.07)';
+        g.fillRect(x, y, w, 22);
+        ['#ff5f57', '#febc2e', '#28c840'].forEach((c, k) => {
+          g.fillStyle = c;
+          g.beginPath();
+          g.arc(x + 14 + k * 16, y + 11, 4.5, 0, Math.PI * 2);
+          g.fill();
+        });
+        g.strokeStyle = 'rgba(0,0,0,0.12)';
+        g.lineWidth = 1.5;
+        g.strokeRect(x, y, w, h);
+      }
+      break;
+    }
+    case 'memphis': {
+      // Confettis Memphis : triangles, zigzags, ronds, en couleurs franches.
+      const cols = ['#FFD36E', '#9DE8A6', '#A6E3FB', '#ff7aa8', '#25214A'];
+      for (let i = 0; i < 40; i++) {
+        const x = hash(seed, i, 1) * W,
+          y = hash(seed, i, 2) * H * 0.75,
+          k = Math.floor(hash(seed, i, 3) * 3);
+        g.fillStyle = g.strokeStyle = cols[i % cols.length];
+        g.globalAlpha = 0.55;
+        g.lineWidth = 3;
+        if (k === 0) {
+          g.beginPath();
+          g.moveTo(x, y - 8);
+          g.lineTo(x + 9, y + 7);
+          g.lineTo(x - 9, y + 7);
+          g.closePath();
+          g.fill();
+        } else if (k === 1) {
+          g.beginPath();
+          for (let z = 0; z < 5; z++) g.lineTo(x + z * 7, y + (z % 2 ? -6 : 6));
+          g.stroke();
+        } else {
+          g.beginPath();
+          g.arc(x, y, 5, 0, Math.PI * 2);
+          g.fill();
+        }
+      }
+      g.globalAlpha = 1;
       break;
     }
     case 'lightbox': {
@@ -643,6 +712,43 @@ export function specMaterial(id: SpecStyle, spec: StyleSpec): Material {
           pathPts(g, pts, true);
           g.strokeStyle = shade(col, -0.28);
           g.lineWidth = back ? 0.8 : 1.4;
+          g.stroke();
+        }
+        break;
+      }
+      case 'points': {
+        // Nuage de points (scan LiDAR) : la forme n'existe que par ses points lumineux.
+        g.save();
+        pathPts(g, pts, true);
+        g.clip();
+        g.fillStyle = col;
+        const stepP = role === 'sky' ? 14 : back ? 8 : 6;
+        const off = (boil * 2) % stepP;
+        for (let y = Math.floor(bx.y0 / stepP) * stepP + off; y <= bx.y1; y += stepP)
+          for (let x = Math.floor(bx.x0 / stepP) * stepP + ((y / stepP) % 2) * (stepP / 2); x <= bx.x1; x += stepP) {
+            const r = (role === 'sky' ? 1.3 : 2.4) * (0.6 + hash(s, x, y) * 0.6);
+            g.globalAlpha = role === 'sky' ? 0.45 : back ? 0.75 : 1;
+            g.fillRect(x - r / 2, y - r / 2, r, r);
+          }
+        g.restore();
+        break;
+      }
+      case 'glass': {
+        // Verre : teinte transparente, reflet blanc en haut à gauche, liseré clair.
+        pathPts(g, pts, true);
+        g.globalAlpha = role === 'sky' ? 0.5 : 0.42;
+        g.fillStyle = col;
+        g.fill();
+        g.globalAlpha = 1;
+        if (role !== 'sky') {
+          const grd = g.createLinearGradient(bx.x0, bx.y0, bx.x0 + bx.w * 0.6, bx.y0 + bx.h * 0.6);
+          grd.addColorStop(0, 'rgba(255,255,255,0.75)');
+          grd.addColorStop(0.35, 'rgba(255,255,255,0.08)');
+          grd.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = grd;
+          g.fill();
+          g.strokeStyle = shade(col, -0.15);
+          g.lineWidth = back ? 0.8 : 1.6;
           g.stroke();
         }
         break;

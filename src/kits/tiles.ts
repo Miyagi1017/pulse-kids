@@ -21,12 +21,12 @@ interface TileArt {
 }
 
 export const TILE_ART: Record<TileId, TileArt> = {
-  sport: { style: 'comic-pop', decor: 'jardin', kids: 'jump', objets: [['ballon', 760, 170, 1.2], ['etoile', 200, 130, 1], ['balle', 640, 430, 1]] },
-  bouger: { style: 'claymation', decor: 'savane', hero: ['girafe', 640, 300, 0.95], kids: 'girl', objets: [['soleil', 180, 110, 1.1]] },
+  sport: { style: 'halftone-dossier', decor: 'jardin', kids: 'jump', objets: [['ballon', 760, 170, 1.2], ['etoile', 200, 130, 1], ['balle', 640, 430, 1]] },
+  bouger: { style: 'isometric-picture-book', decor: 'savane', hero: ['girafe', 640, 300, 0.95], kids: 'girl', objets: [['soleil', 180, 110, 1.1]] },
   video: { style: 'scifi-toon', decor: 'espace', hero: ['fusee', 600, 270, 0.9], kids: 'boy', objets: [['etoile', 820, 110, 0.9], ['lune', 160, 120, 1]] },
-  comptines: { style: 'felt', decor: 'chambre', kids: 'both', objets: [['note', 260, 150, 1.3], ['note', 700, 120, 1.1], ['etoile', 480, 90, 0.9]] },
+  comptines: { style: 'memphis-diorama', decor: 'chambre', kids: 'both', objets: [['note', 260, 150, 1.3], ['note', 700, 120, 1.1], ['etoile', 480, 90, 0.9]] },
   films: { style: 'paper-popup', decor: 'ciel', hero: ['chateau', 480, 300, 0.85], objets: [['oiseau', 200, 130, 1], ['nuage', 780, 110, 1]] },
-  explications: { style: 'doodle-science', decor: 'ecole', hero: ['microscope', 640, 320, 0.9], kids: 'girl', objets: [['bulle', 820, 150, 1], ['etoile', 200, 120, 0.8]] },
+  explications: { style: 'briefing-board', decor: 'ecole', hero: ['microscope', 640, 320, 0.9], kids: 'girl', objets: [['bulle', 820, 150, 1], ['etoile', 200, 120, 0.8]] },
   contes: { style: 'watercolor', decor: 'foret', kids: 'both', cat: true, objets: [['papillon', 480, 150, 1.2], ['fleur', 820, 420, 1]] },
   activites: { style: 'brick-toy', decor: 'chambre', kids: 'boy', objets: [['cube', 640, 400, 1.3], ['cube', 720, 400, 1.3], ['cube', 680, 340, 1.3], ['balle', 220, 420, 1]] },
   soir: { style: 'paper-lantern', decor: 'nuit', hero: ['chouette', 700, 300, 0.75], objets: [['lune', 220, 120, 1.4], ['etoile', 480, 80, 0.8], ['etoile', 880, 200, 0.7]] },
