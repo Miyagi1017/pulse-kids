@@ -173,7 +173,7 @@ export default function App() {
           section="video"
           items={videos.map((v) => ({ id: v.id, emoji: v.emoji, title: v.title, image: v.thumb, paint: v.mini ? videoPoster(v.mini) : undefined, category: v.category }))}
           done={done}
-          categories={VIDEO_THEMES}
+          categories={{ ...VIDEO_THEMES, catalogue: { label: 'Les 66 dessins animés', emoji: '' } }}
           onBack={home}
           onPick={(id) => setView({ name: 'player', index: playlist.findIndex((p) => p.id === id) })}
           action={{ label: '▶ Tout regarder', onClick: () => setView({ name: 'player', index: 0 }) }}

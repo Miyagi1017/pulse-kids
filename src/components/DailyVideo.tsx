@@ -78,7 +78,7 @@ export function VideoPlayer({
   const nextVideo = playlist[videoIndex + 1];
   const quiz = quizFor(video.id);
   const quizPhase = finished && !!quiz && !quizSolved;
-  const paper = videoPaper(video.id);
+  const paper = videoPaper(video.mini ?? video);
 
   const next = useCallback(() => setIndex((i) => i + 1), []);
 
