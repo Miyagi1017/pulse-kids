@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { MiniVideo } from '../data/videos';
-import { createVideoScene } from '../videos/videoScene';
+import { createVideoScene, type CodedVideo } from '../videos/videoScene';
 import { swatch } from '../kits/styles';
 import { styleForVideo } from '../videos/videoScene';
 import type { Paint } from './Vignette';
@@ -9,7 +8,7 @@ import type { Paint } from './Vignette';
  * Le dessin animé d'une vidéo du jour (rendu en code, dans le style de la vidéo).
  * Le temps repart de zéro à chaque scène ; en pause, l'image s'arrête.
  */
-export function VideoStage({ video, scene, playing, className = '' }: { video: MiniVideo; scene: number; playing: boolean; className?: string }) {
+export function VideoStage({ video, scene, playing, className = '' }: { video: CodedVideo; scene: number; playing: boolean; className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const playingRef = useRef(playing);
   playingRef.current = playing;
@@ -50,13 +49,13 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: M
 }
 
 /** Couleur de papier du style de la vidéo (fond autour de l'image, sous le texte). */
-export function videoPaper(id: string) {
-  return swatch(styleForVideo(id));
+export function videoPaper(video: CodedVideo) {
+  return swatch(video.style ?? styleForVideo(video.id));
 }
 
 /** Vignette d'une vidéo : la scène de présentation, figée. */
 const posters = new Map<string, Paint>();
-export function videoPoster(video: MiniVideo): Paint {
+export function videoPoster(video: CodedVideo): Paint {
   const hit = posters.get(video.id);
   if (hit) return hit;
   const p: Paint = (ctx) => {

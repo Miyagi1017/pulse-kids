@@ -6,7 +6,7 @@
  * Les décors propres aux vidéos (savane, espace, fond marin, désert…) sont en bas du fichier.
  */
 import { arc, body, circle, cubic, dot, ellipse, line, move, part, quad, ribbon, rotate, rrect, sky, star, type Figure, type Pt, type Shape } from '../kits/geom';
-import { GROUND, K, cloudShape, decor as libDecor, flowerAt, objet, pine, tree } from '../kits/library';
+import { GROUND, K, cat, cloudShape, decor as libDecor, flowerAt, objet, pine, tree } from '../kits/library';
 import type { Decor } from '../data/comptines';
 
 const INK = K.ink;
@@ -25,7 +25,8 @@ export type HeroName =
   | 'lune' | 'soleil' | 'planete' | 'fusee' | 'astronaute' | 'etoile' | 'terre' | 'aurore'
   | 'camion' | 'docteur' | 'tracteur' | 'pain' | 'livres' | 'bus' | 'microscope'
   | 'dent' | 'coeur' | 'fruits' | 'dodo' | 'bouger'
-  | 'eiffel' | 'chameau' | 'palmier' | 'ours' | 'chateau';
+  | 'eiffel' | 'chameau' | 'palmier' | 'ours' | 'chateau'
+  | 'tourblocs' | 'robot' | 'train' | 'phare' | 'avion' | 'bulle' | 'chat' | 'cloche';
 
 export function hero(name: HeroName, t = 0, act = 0): Figure {
   const S: Shape[] = [];
@@ -391,6 +392,73 @@ export function hero(name: HeroName, t = 0, act = 0): Figure {
         S.push(line([[x - s, y - s], [x + s, y - s], [x - s, y + s], [x + s, y + s]], '#6b8fc4', 4));
       }
       break;
+    /* ───────── Héros des 66 dessins animés du catalogue ───────── */
+    case 'tourblocs': {
+      // Tour de cubes : les cubes arrivent un à un pendant l'action.
+      const cols = ['#e4372b', '#4a90d9', '#f2c14e', '#57b894', '#b78cf2', '#f39a3a'];
+      const n = act > 0 ? 2 + Math.floor(Math.min(1, act) * 4) : 6;
+      for (let i = 0; i < n; i++) {
+        const y = 60 - i * 46,
+          x = Math.sin(i * 1.7) * 8;
+        S.push(body(rrect(x - 50, y, 100, 46, 6), cols[i % cols.length]), part(rrect(x - 30, y - 8, 20, 10, 3), cols[i % cols.length]), part(rrect(x + 10, y - 8, 20, 10, 3), cols[i % cols.length]));
+      }
+      break;
+    }
+    case 'robot': {
+      const wave = Math.sin(t * 4) * 0.5;
+      S.push(line([[0, -150], [0, -120]], '#4a4f5a', 4), dot(circle(0, -156, 9, 10), Math.floor(t * 2) % 2 ? '#e4372b' : '#f2c14e'));
+      S.push(body(rrect(-60, -120, 120, 90, 18), '#9fb4c8'), part(rrect(-44, -100, 88, 50, 12), '#2d3a4e'));
+      S.push(...(b ? [line([[-28, -76], [-12, -76]], '#6fe0ff', 3), line([[12, -76], [28, -76]], '#6fe0ff', 3)] : [dot(circle(-20, -78, 8, 10), '#6fe0ff'), dot(circle(20, -78, 8, 10), '#6fe0ff')]), line(arc(0, -70, 14, 0.4, Math.PI - 0.4, 6), '#6fe0ff', 3));
+      S.push(body(rrect(-70, -24, 140, 110, 16), '#b8c8d8'), part(circle(0, 20, 18), '#f2c14e'), part(rrect(-40, 52, 80, 14, 6), '#8ea2b6'));
+      S.push(body(rotate(rrect(-104, -20, 26, 80, 12), -0.2, -90, -16), '#9fb4c8'), body(rotate(rrect(78, -20, 26, 80, 12), 2.6 + wave, 90, -16), '#9fb4c8'));
+      S.push(body(circle(-34, 100, 20), '#4a4f5a'), body(circle(34, 100, 20), '#4a4f5a'));
+      break;
+    }
+    case 'train': {
+      const bump = Math.abs(Math.sin(t * 8)) * 2;
+      for (let w = 0; w < 2; w++) {
+        const x = -220 + w * 130;
+        S.push(body(rrect(x, -40 - bump, 110, 80, 10), ['#4a90d9', '#57b894'][w]), part(rrect(x + 14, -26 - bump, 34, 30, 6), '#fff4c2'), part(rrect(x + 60, -26 - bump, 34, 30, 6), '#fff4c2'));
+        S.push(body(circle(x + 26, 50, 18), '#2b2622'), body(circle(x + 84, 50, 18), '#2b2622'));
+      }
+      S.push(body(rrect(40, -40 - bump, 150, 80, 10), '#e4372b'), body(rrect(130, -110 - bump, 60, 74, 8), '#e4372b'), part(rrect(142, -98 - bump, 36, 30, 6), '#fff4c2'), body(rrect(60, -86 - bump, 24, 50, 4), '#2b2622'));
+      for (let i = 0; i < 3; i++) S.push(part(circle(72 + i * 14, -110 - ((t * 50 + i * 30) % 90), 10 + i * 4), '#d8dde4'));
+      S.push(body(circle(80, 50, 24), '#2b2622'), body(circle(160, 50, 24), '#2b2622'), part([[190, 10], [218, 40], [190, 40]], '#f2c14e'));
+      break;
+    }
+    case 'phare': {
+      const beam = act > 0.2 ? Math.min(1, act * 1.5) : 0.3 + 0.2 * Math.sin(t * 2);
+      const a = Math.sin(t * 0.8) * 0.5;
+      S.push(part([[0, -170], [Math.cos(a - 0.15) * 420, -170 + Math.sin(a - 0.15) * 420 - 60], [Math.cos(a + 0.15) * 420, -170 + Math.sin(a + 0.15) * 420 + 60]].map(([x, y]) => [x, y] as Pt), beam > 0.5 ? '#fff4c2' : '#e8e0b0'));
+      S.push(body([[-60, 110], [-36, -130], [36, -130], [60, 110]], '#f4f0e8'), part([[-52, 60], [52, 60], [46, 20], [-46, 20]], '#e4372b'), part([[-42, -20], [42, -20], [38, -60], [-38, -60]], '#e4372b'));
+      S.push(body(rrect(-34, -190, 68, 60, 8), '#2b2622'), part(rrect(-24, -182, 48, 44, 6), beam > 0.5 ? '#ffd36e' : '#c9a24b'), body([[-44, -190], [0, -230], [44, -190]], '#e4372b'));
+      break;
+    }
+    case 'avion': {
+      const fly = act > 0.2 ? Math.min(1, act) : 0;
+      const A: Shape[] = [body([[-140, 0], [140, -30], [-60, 40]], '#f4f4f4'), part([[-140, 0], [140, -30], [-40, 10]], '#d8dde4'), part([[-60, 40], [140, -30], [-30, 60]], '#c9ced6')];
+      for (const sh of A) S.push({ ...sh, pts: move(rotate(sh.pts, -0.1 - fly * 0.3 + Math.sin(t * 2) * 0.05), fly * 160, Math.sin(t * 2) * 8 - fly * 120) });
+      for (let i = 1; i < 6; i++) S.push(dot(circle(-150 - i * 30 + fly * 160, 10 + i * 6 - fly * 100, 3, 6), '#8e96a3'));
+      break;
+    }
+    case 'bulle': {
+      const s = 1 + Math.sin(t * 2) * 0.04;
+      S.push(body(circle(0, -20 + Math.sin(t) * 10, 130 * s), '#cfe9ff'), part(ellipse(-50, -80, 40, 22, -0.6), '#ffffff'));
+      ['#ff7ab0', '#f2c14e', '#57e0a0', '#6fb7ff'].forEach((c, i) => S.push(part(ribbon(arc(0, -20, 100 * s - i * 10, Math.PI * 0.15, Math.PI * 0.55, 10), 5), c)));
+      break;
+    }
+    case 'chat': {
+      const c = cat({ t }, 9);
+      for (const sh of c.shapes) S.push({ ...sh, pts: sh.pts.map(([x, y]) => [x * 2.2, y * 2.2 + 100] as Pt), width: sh.width ? sh.width * 2 : undefined });
+      break;
+    }
+    case 'cloche': {
+      const sw = Math.sin(t * (act > 0.2 ? 6 : 2)) * (act > 0.2 ? 0.35 : 0.1);
+      const C: Shape[] = [line([[0, -170], [0, -130]], '#7a5236', 6), body([...quad([-30, -130], [-34, -40], [-100, 60], 10), [100, 60], ...quad([100, 60], [34, -40], [30, -130], 10).slice(1)], '#e0b040'), part(rrect(-104, 50, 208, 20, 8), '#c99a2a'), body(circle(0, 82, 16), '#8a6a1a')];
+      for (const sh of C) S.push({ ...sh, pts: rotate(sh.pts, sw, 0, -170) });
+      if (act > 0.2) for (let i = 0; i < 3; i++) S.push(line(arc(0, -40, 150 + i * 30, -0.5, 0.5, 8).map(([x, y]) => [x, y] as Pt), '#e0b040', 3));
+      break;
+    }
     case 'bouger':
       break;
 

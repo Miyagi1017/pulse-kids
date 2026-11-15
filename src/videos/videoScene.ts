@@ -10,7 +10,7 @@
  * L'image est une fonction du temps : render(scène, temps dans la scène) donne toujours la même image.
  */
 import type { Objet } from '../data/comptines';
-import { VIDEOS, type MiniVideo } from '../data/videos';
+import { VIDEOS } from '../data/videos';
 import { clamp, easeInOut, easeOut } from '../films/engine';
 import { place, type Figure } from '../kits/geom';
 import { kid, objet } from '../kits/library';
@@ -108,6 +108,14 @@ export function styleForVideo(id: string): StyleId {
   return styleAt(Math.max(0, i), 11);
 }
 
+/** Ce qu'il faut pour rendre un dessin animé codé : une mini-vidéo du jour ou un des 66 du catalogue. */
+export interface CodedVideo {
+  id: string;
+  title: string;
+  style?: StyleId;
+  board?: Board;
+}
+
 export interface VideoScene {
   style: StyleId;
   /** scene : 0 (titre) → 4 (la question) ; t : secondes depuis le début de la scène. */
@@ -121,8 +129,8 @@ const SPOTS: [number, number][] = [
   [640, 90]
 ];
 
-export function createVideoScene(video: MiniVideo, style: StyleId = styleForVideo(video.id)): VideoScene {
-  const board = boardFor(video.id) ?? B('etoile', 'ciel', ['etoile', 'nuage', 'etoile']);
+export function createVideoScene(video: CodedVideo, style: StyleId = video.style ?? styleForVideo(video.id)): VideoScene {
+  const board = video.board ?? boardFor(video.id) ?? B('etoile', 'ciel', ['etoile', 'nuage', 'etoile']);
   const mat: Material = materialFor(style);
   const s0 = board.s ?? 1,
     y0 = board.y ?? 310;
