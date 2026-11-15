@@ -315,7 +315,8 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
           curG.save();
           const grd = curG.createRadialGradient(sx, sy, r * 0.6, sx, sy, r);
           grd.addColorStop(0, 'rgba(5,4,12,0)');
-          grd.addColorStop(1, 'rgba(5,4,12,0.82)');
+          // Pas trop sombre : sur les styles déjà noirs, le projecteur ne doit jamais donner un écran noir.
+          grd.addColorStop(1, 'rgba(5,4,12,0.55)');
           curG.fillStyle = grd;
           curG.fillRect(0, 0, W0, H0);
           curG.restore();
@@ -366,7 +367,12 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
       // Transition (une demi-seconde au début du plan), sinon l'image du plan telle quelle.
       const p = hadPrev ? clamp(tReal / TRANS) : 1;
       if (p >= 1) {
-        ctx.drawImage(cur, 0, 0, W0, H0);
+        // Respiration de caméra (Video-Making : rien de figé plus de 0,75 s) : une très lente avancée sur tout le plan,
+        // un peu plus marquée pendant l'arrêt sur image, pour que les styles à paliers (briques, pixels) bougent aussi.
+        const inFreeze = scene === 2 && !still && tReal > FREEZE_AT && tReal < FREEZE_AT + FREEZE;
+        const b = still ? 1 : 1 + 0.02 * clamp(tReal / L) + (inFreeze ? 0.03 * easeInOut(clamp((tReal - FREEZE_AT) / FREEZE)) : 0);
+        const fy = Math.min(y0, 400);
+        ctx.drawImage(cur, 480 - 480 * b, fy - fy * b, W0 * b, H0 * b);
         return;
       }
       const kind = TRANSITIONS[(vHash + scene) % TRANSITIONS.length];

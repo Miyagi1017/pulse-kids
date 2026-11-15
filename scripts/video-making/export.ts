@@ -40,7 +40,9 @@ for (const v of all) {
   const dir = join(dest, v.id);
   mkdirSync(join(dir, 'assets'), { recursive: true });
   for (const f of ['page.js', 'page.css']) if (existsSync(join(bundle, f))) copyFileSync(join(bundle, f), join(dir, 'assets', f));
-  const texts = [`${v.title} !`, ...v.scenes].map(noName);
+  // Apostrophe droite : l'aligneur de Video-Making garde alors « l'histoire » en un seul mot (avec ’ il le coupe en deux,
+  // et le petit « l » s'allume trop peu de temps pour le contrôle des sous-titres).
+  const texts = [`${v.title} !`, ...v.scenes].map((s) => noName(s).replaceAll('’', "'"));
   const L = texts.map((_, s) => shotLength(v.id, s));
   const at = L.map((_, i) => L.slice(0, i).reduce((a, b) => a + b, 0));
   // Sons sur les actions (Video-Making : jamais sur une grille) : un souffle à chaque changement de plan,

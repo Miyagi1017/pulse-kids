@@ -21,6 +21,8 @@ export function sceneTiming(id: string, scene: number): SceneTiming | undefined 
 
 /** Respiration après la dernière syllabe, avant de couper (Video-Making : on coupe juste après la phrase). */
 export const TAIL = 0.45;
+/** Silence en plus après la question posée à l'enfant (dernier plan). */
+export const QUESTION_PAUSE = 0.4;
 /** Durée minimale de chaque plan : le temps que la mise en scène se lise (titre, présentation, gros plan, plan large, question). */
 export const MIN_SHOT = [2.4, 2.6, 3.4, 2.6, 2.8];
 /** Plan sans prise enregistrée (voix du navigateur) : durée par défaut. */
@@ -30,7 +32,8 @@ const DEFAULT_SHOT = [2.6, 3.2, 3.8, 3.2, 3.2];
 export function shotLength(id: string, scene: number): number {
   const t = sceneTiming(id, scene);
   const min = MIN_SHOT[Math.min(scene, MIN_SHOT.length - 1)];
-  return t ? Math.max(min, t.d + TAIL) : DEFAULT_SHOT[Math.min(scene, DEFAULT_SHOT.length - 1)];
+  // Après la question finale, un peu plus de silence : l'enfant a le temps de répondre.
+  return t ? Math.max(min, t.d + TAIL + (scene === 4 ? QUESTION_PAUSE : 0)) : DEFAULT_SHOT[Math.min(scene, DEFAULT_SHOT.length - 1)];
 }
 
 /** Lettres d'un mot sans accents ni ponctuation, pour comparer le texte affiché au texte dit. */
