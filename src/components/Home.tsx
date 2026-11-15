@@ -211,7 +211,17 @@ export function Home({ profile, today, counts, offline, onOpen, onEditProfile, s
         <Habitudes day={today.date} />
       </div>
 
-      <footer className="text-center text-sm text-doux mt-10">Pulse Kids • sans publicité • ton prénom reste sur cet appareil</footer>
+      <footer className="text-center text-sm text-doux mt-10">
+        <p>Pulse Kids • sans publicité • ton prénom reste sur cet appareil</p>
+        {/* Crédits (pour les grands) : styles, voix et outils libres utilisés. */}
+        <details className="mt-2 text-xs opacity-80">
+          <summary className="cursor-pointer">Crédits</summary>
+          <p className="mt-1 leading-relaxed">
+            Dessins animés rendus en code d’après Lemo-Opuscar et claude-video (MIT). Voix : Christine (ElevenLabs) ; timbre prolongé avec OpenVoice V2 de MyShell (MIT) sur la voix
+            française Piper « siwis » (jeu de données SIWIS, Université d’Édimbourg, CC BY 4.0).
+          </p>
+        </details>
+      </footer>
     </main>
   );
 }
