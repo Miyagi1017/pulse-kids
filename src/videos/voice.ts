@@ -44,6 +44,12 @@ export function sayScene(id: string, scene: number, text: string, opts: { rate: 
     .catch(() => end(false));
 }
 
+/** Avancement de la prise en cours (0 → 1), ou null si aucune prise ne joue (voix du navigateur). */
+export function voiceProgress(): number | null {
+  if (!current || !isFinite(current.duration) || current.duration <= 0) return null;
+  return Math.min(1, current.currentTime / current.duration);
+}
+
 export function stopVoice() {
   if (current) {
     current.onended = null;
