@@ -50,6 +50,12 @@ export function voiceProgress(): number | null {
   return Math.min(1, current.currentTime / current.duration);
 }
 
+/** Instant de la prise en cours, en secondes (pour allumer les mots au moment où Christine les dit), ou null. */
+export function voiceTime(): number | null {
+  if (!current || current.paused && current.currentTime === 0) return null;
+  return current.currentTime;
+}
+
 export function stopVoice() {
   if (current) {
     current.onended = null;

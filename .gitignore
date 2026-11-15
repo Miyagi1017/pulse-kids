@@ -43,3 +43,6 @@ song/
 hive/
 roster.json
 roster-backups/
+
+# MP4 rendus par Video-Making (scripts/video-making/render_all.sh)
+video/out-video-making/

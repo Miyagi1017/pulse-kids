@@ -17,6 +17,7 @@ import { kid, objet } from '../kits/library';
 import type { Material } from '../kits/materials';
 import { materialFor, strHash, styleAt, swatch, type StyleId } from '../kits/styles';
 import { hero, videoDecor, type HeroName, type VideoDecor } from './heroes';
+import { keyWordStart, shotLength } from './timing';
 
 export interface Board {
   hero: HeroName;
@@ -114,6 +115,27 @@ export interface CodedVideo {
   title: string;
   style?: StyleId;
   board?: Board;
+  /** Les 4 phrases narrées : le montage cale le gros plan sur le mot fort (src/videos/timing.ts). */
+  scenes?: readonly unknown[];
+}
+
+/** Le minutage d'un plan : sa durée, l'arrivée du coup de zoom et l'arrêt sur image (gros plan). */
+interface ShotPlan {
+  L: number;
+  land: number;
+  freezeAt: number | null;
+}
+
+function shotPlan(video: CodedVideo, scene: number): ShotPlan {
+  const L = shotLength(video.id, scene);
+  if (scene !== 2) return { L, land: 0.75, freezeAt: null };
+  // Video-Making : on coupe 0 à 0,15 s avant le mot fort ; ici, le zoom arrive juste avant lui.
+  const said = video.scenes?.[1];
+  const key = typeof said === 'string' ? keyWordStart(video.id, scene, said) : null;
+  const land = key === null ? 0.75 : clamp(key - 0.1, 0.45, Math.max(0.45, L - 2.2));
+  // Un seul arrêt sur image, au sommet de l'action, s'il reste le temps de le lire puis de repartir.
+  const freezeAt = Math.min(L - FREEZE - 0.35, land + 1.5);
+  return { L, land, freezeAt: freezeAt > land + 0.6 ? freezeAt : null };
 }
 
 export interface VideoScene {
@@ -127,7 +149,6 @@ const W0 = 960,
   H0 = 540;
 /** Durée des transitions entre plans, et l'arrêt sur image du gros plan (vocabulaire video-shotcraft). */
 const TRANS = 0.55,
-  FREEZE_AT = 2.6,
   FREEZE = 0.9;
 const TRANSITIONS = ['iris', 'whip', 'push', 'doors'] as const;
 /** Places des objets à la fin (« photo de groupe » autour du héros et des enfants). */
@@ -163,9 +184,12 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
   const vHash = strHash(video.id);
   // Ouverture : projecteur pour les styles sombres, sinon grue ou lente avancée selon la vidéo.
   const opening: 'spot' | 'crane' | 'push' = sw.dark ? 'spot' : vHash % 2 ? 'crane' : 'push';
+  const plans: ShotPlan[] = [0, 1, 2, 3, 4].map((i) => shotPlan(video, i));
   return {
     style,
     render(ctx, scene, tReal, still) {
+      const { L, land, freezeAt } = plans[Math.min(scene, 4)];
+      const FREEZE_AT = freezeAt ?? Infinity;
       // Le plan change : on garde la dernière image du plan précédent pour la transition.
       if (scene !== curScene) {
         if (curScene >= 0 && !still) prevG.drawImage(cur, 0, 0);
@@ -189,31 +213,32 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
           cy = 270,
           drive = 0, // glissement latéral pour la parallaxe (profondeur)
           shake = 0;
+        // Chaque mouvement de caméra occupe tout le plan (Video-Making : pas de temps mort, rien de figé > 0,75 s).
         if (scene === 0) {
           if (opening === 'crane') {
             // Grue : on part au ras du sol, tout près, puis on s'élève et on recule.
-            const e = easeOut(clamp(t / 2));
+            const e = easeOut(clamp(t / Math.min(2, L - 0.4)));
             k = 1.3 - 0.3 * e;
             cy = 400 - 130 * e;
           } else if (opening === 'push') {
-            const e = easeInOut(clamp(t / 2.4));
+            const e = easeInOut(clamp(t / L));
             k = 0.9 + 0.1 * e;
           }
         } else if (scene === 1) {
           // Glissière à plusieurs plans : le décor glisse lentement, les objets proches vite.
-          drive = 150 * (1 - easeOut(clamp(t / 2.4)));
+          drive = 150 * (1 - easeOut(clamp(t / (L * 0.85))));
         } else if (scene === 2) {
-          // Coup de zoom : plan large tenu, puis on fonce sur le héros, léger rebond.
-          const z = clamp((t - 0.5) / 0.25);
+          // Coup de zoom : plan large tenu, puis on fonce sur le héros juste avant le mot fort, léger rebond.
+          const z = clamp((t - (land - 0.25)) / 0.25);
           const zin = z * z * z;
-          const back = clamp((t - 0.75) / 0.22);
+          const back = clamp((t - land) / 0.22);
           k = 1 + 0.52 * zin - 0.06 * easeOut(back);
           cx = 480;
           cy = 270 + (heroY - 20 - 270) * zin;
-          shake = t > 0.75 && t < 1.05 ? Math.sin(t * 90) * 6 * (1 - (t - 0.75) / 0.3) : 0;
+          shake = t > land && t < land + 0.3 ? Math.sin(t * 90) * 6 * (1 - (t - land) / 0.3) : 0;
         } else if (scene === 3) {
           // On recule doucement pour voir tout le monde.
-          const e = easeInOut(clamp(t / 3));
+          const e = easeInOut(clamp(t / L));
           k = 1.18 - 0.28 * e;
           cy = heroY - 30 + (280 - heroY + 30) * e;
           drive = Math.sin(t * 0.4) * 40;
@@ -252,13 +277,16 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
           hs = s0;
         if (scene === 3) hx = 480 + Math.sin(t * 0.5) * 70;
         if (scene === 4) {
-          hx = 480 + (310 - 480) * easeInOut(clamp(t / 1.4));
-          hs = s0 * (1 - 0.18 * easeInOut(clamp(t / 1.4)));
+          const aside = Math.min(1.4, L * 0.45);
+          hx = 480 + (310 - 480) * easeInOut(clamp(t / aside));
+          hs = s0 * (1 - 0.18 * easeInOut(clamp(t / aside)));
         }
         // Le héros « se soulève » à la fin de la glissière (il devient le sujet du plan).
-        if (scene === 1) hs *= 1 + 0.035 * easeOut(clamp((t - 2.2) / 0.5));
-        const act = scene === 2 ? clamp((t - 1.1) / 2.6) : 0;
-        const enter = scene === 0 ? easeOut(clamp(t / 1.6)) : 1;
+        if (scene === 1) hs *= 1 + 0.035 * easeOut(clamp((t - (L - 0.7)) / 0.5));
+        // L'action du gros plan démarre à l'arrivée du zoom et finit avec la phrase (temps du monde, hors arrêt sur image).
+        const actEnd = L - 0.3 - (freezeAt === null ? 0 : FREEZE);
+        const act = scene === 2 ? clamp((t - (land + 0.35)) / Math.max(0.8, actEnd - land - 0.35)) : 0;
+        const enter = scene === 0 ? easeOut(clamp(t / Math.min(1.6, L * 0.55))) : 1;
         const H = hero(board.hero, T, act);
         const fig = board.hero === 'bouger' ? kid(true, { armL: 150 + Math.sin(T * 6) * 20, armR: -150 - Math.sin(T * 6) * 20, t: T, mouth: 'open' }, 5) : H;
         const bob = board.hero === 'bouger' ? -Math.abs(Math.sin(T * 3)) * 60 : Math.sin(T * 1.3) * 3;
@@ -266,23 +294,24 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
 
         // La question : Nino et Nina arrivent en marchant et saluent.
         if (scene === 4) {
-          const walk = easeOut(clamp((t - 0.3) / 1.6));
+          const walk = easeOut(clamp((t - 0.3) / Math.min(1.6, L * 0.5)));
           const wave = Math.sin(T * 7) * 25;
           mat.draw(mid(place(kid(true, { armR: -140 + wave, walk: walk < 1 ? T * 4 : 0, t: T, mouth: 'smile' }, 3), { x: 640 + (1 - walk) * 380, y: 481, s: 0.62 })));
           mat.draw(mid(place(kid(false, { armL: 140 - wave, walk: walk < 1 ? T * 4 : 0, t: T, mouth: 'open' }, 4), { x: 780 + (1 - walk) * 380, y: 481, s: 0.62 })));
         }
         mat.end();
-        if (scene === 0) mat.title(video.title, clamp((t - 0.6) / 0.6));
+        if (scene === 0) mat.title(video.title, clamp((t - Math.min(0.6, L * 0.25)) / 0.6));
 
         // ── Composition de l'image : effets de plan, puis transition depuis le plan précédent ──
         curG.setTransform(cur.width / W0, 0, 0, cur.height / H0, 0, 0);
         mat.present(curG);
         // Projecteur (ouverture des styles sombres) : la nuit, un rond de lumière cherche puis trouve le héros.
         if (scene === 0 && opening === 'spot') {
-          const e = easeInOut(clamp(t / 2.2));
+          const find = Math.min(2.2, L * 0.6);
+          const e = easeInOut(clamp(t / find));
           const sx = 140 + (480 - 140) * e,
             sy = 200 + (y0 - 200) * e,
-            r = 130 + 900 * clamp((t - 2.2) / 0.8) ** 2;
+            r = 130 + 900 * clamp((t - find) / 0.8) ** 2;
           curG.save();
           const grd = curG.createRadialGradient(sx, sy, r * 0.6, sx, sy, r);
           grd.addColorStop(0, 'rgba(5,4,12,0)');
@@ -291,9 +320,9 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
           curG.fillRect(0, 0, W0, H0);
           curG.restore();
         }
-        // Coup de zoom : un éclair chaud à l'arrivée.
-        if (scene === 2 && t > 0.75 && t < 1.2) {
-          curG.fillStyle = `rgba(255,244,214,${0.55 * Math.exp(-(t - 0.75) * 9)})`;
+        // Coup de zoom : un éclair chaud à l'arrivée (léger : Video-Making interdit les flashs plein écran).
+        if (scene === 2 && t > land && t < land + 0.45) {
+          curG.fillStyle = `rgba(255,244,214,${0.3 * Math.exp(-(t - land) * 9)})`;
           curG.fillRect(0, 0, W0, H0);
         }
         // Arrêt sur image : coins de cadre, et un cercle dessiné à la main autour du héros.
@@ -327,7 +356,7 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
             curG.stroke();
           }
           if (tReal - FREEZE_AT < 0.1) {
-            curG.fillStyle = 'rgba(255,255,255,0.6)';
+            curG.fillStyle = 'rgba(255,255,255,0.25)';
             curG.fillRect(0, 0, W0, H0);
           }
           curG.restore();

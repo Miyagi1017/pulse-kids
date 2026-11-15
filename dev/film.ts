@@ -2,6 +2,7 @@
 import '../src/films/fonts';
 import { VIDEOS, createVideoScene } from '../src/videos/videoScene';
 import { CAPSULES } from '../src/videos/capsules';
+import { shotLength } from '../src/videos/timing';
 const id = new URLSearchParams(location.search).get('id') ?? 'video-animaux-01';
 const v = [...VIDEOS, ...CAPSULES].find((x) => x.id === id)!;
 await document.fonts.ready;
@@ -9,7 +10,9 @@ const vs = createVideoScene(v as never);
 const work = document.createElement('canvas');
 work.width = 960; work.height = 540;
 const wg = work.getContext('2d')!;
-const keep: [number, number[]][] = [[0, [0.4, 1.2, 2.4]], [1, [0.15, 0.3, 1, 2.8]], [2, [0.2, 0.6, 0.85, 1.6, 2.9, 3.8]], [3, [0.2, 0.4, 2.5]], [4, [0.25, 0.5, 1.3, 2.4]]];
+// Images clés en fraction de la durée réelle du plan (calée sur la voix de Christine, src/videos/timing.ts).
+const frac: [number, number[]][] = [[0, [0.15, 0.5, 0.95]], [1, [0.05, 0.12, 0.4, 0.95]], [2, [0.08, 0.2, 0.3, 0.5, 0.7, 0.97]], [3, [0.08, 0.15, 0.9]], [4, [0.1, 0.2, 0.5, 0.95]]];
+const keep = frac.map(([scene, f]): [number, number[]] => [scene, f.map((x) => Math.round(x * shotLength(v.id, scene) * 24) / 24)]);
 for (const [scene, marks] of keep) {
   // On rend toutes les images à 24 i/s (la transition a besoin du plan précédent), on garde les images clés.
   for (let t = 0; t <= Math.max(...marks) + 0.001; t += 1 / 24) {

@@ -18,6 +18,7 @@ import { VideoStage, videoPaper, videoPoster } from './VideoStage';
 import { sayScene, stopVoice, videoClip } from '../videos/voice';
 import { Vignette } from './Vignette';
 import { KaraokeText } from './KaraokeText';
+import { shotLength, TAIL } from '../videos/timing';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
 
 const cloud = float(12, 2.8);
@@ -99,10 +100,14 @@ export function VideoPlayer({
     if (!playing || finished) return;
     setImgOk(true);
     let advanced = false;
+    const startedAt = performance.now();
+    // Montage Video-Making : le plan dure la phrase + une respiration, et jamais moins que son action
+    // (le gros plan n'est plus coupé avant l'arrêt sur image).
+    const minMs = video.mini && videoClip(video.id, index) ? shotLength(video.id, index) * 1000 : 0;
     const advance = () => {
       if (advanced) return;
       advanced = true;
-      setTimeout(next, 700);
+      fallbackTimer.current = setTimeout(next, Math.max(minMs ? TAIL * 1000 : 700, minMs - (performance.now() - startedAt)));
     };
     // La voix de Christine (prise enregistrée) si la scène en a une, sinon la voix du navigateur.
     const recorded = !!videoClip(video.id, index);
@@ -268,7 +273,7 @@ export function VideoPlayer({
                     className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
                     aria-live="polite"
                   >
-                    <KaraokeText text={text} />
+                    <KaraokeText text={text} raw={scene.text} id={video.id} scene={index} />
                   </motion.p>
                   <button
                     onClick={replay}
