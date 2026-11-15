@@ -17,6 +17,7 @@ import { mascotForScene } from '../lib/mascots';
 import { VideoStage, videoPaper, videoPoster } from './VideoStage';
 import { sayScene, stopVoice, videoClip } from '../videos/voice';
 import { Vignette } from './Vignette';
+import { KaraokeText } from './KaraokeText';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
 
 const cloud = float(12, 2.8);
@@ -267,7 +268,7 @@ export function VideoPlayer({
                     className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
                     aria-live="polite"
                   >
-                    {text}
+                    <KaraokeText text={text} />
                   </motion.p>
                   <button
                     onClick={replay}

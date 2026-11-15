@@ -12,6 +12,13 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: C
   const ref = useRef<HTMLCanvasElement>(null);
   const playingRef = useRef(playing);
   playingRef.current = playing;
+  const sceneRef = useRef(scene);
+  sceneRef.current = scene;
+  const redraw = useRef<() => void>(() => undefined);
+  // Mouvements réduits : pas de boucle d'animation, on redessine seulement quand le plan change.
+  useEffect(() => {
+    redraw.current();
+  }, [scene]);
   useEffect(() => {
     const cv = ref.current;
     if (!cv) return;
@@ -20,10 +27,16 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: C
     let raf = 0,
       alive = true,
       t = reduced ? 3 : 0,
+      shown = sceneRef.current,
       last = performance.now();
     const frame = () => {
       if (!alive) return;
       const now = performance.now();
+      // Nouveau plan : le temps du plan repart de zéro (la scène garde l'image précédente pour la transition).
+      if (sceneRef.current !== shown) {
+        shown = sceneRef.current;
+        t = reduced ? 3 : 0;
+      }
       if (playingRef.current && !reduced) t += Math.min(0.1, (now - last) / 1000);
       last = now;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -35,8 +48,11 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: C
       }
       const g = cv.getContext('2d')!;
       g.setTransform(w / 960, 0, 0, h / 540, 0, 0);
-      vs.render(g, scene, t, !!reduced);
+      vs.render(g, shown, t, !!reduced);
       if (!reduced) raf = requestAnimationFrame(frame);
+    };
+    redraw.current = () => {
+      if (alive && reduced) frame();
     };
     void document.fonts.ready.then(() => alive && frame());
     return () => {
@@ -44,7 +60,7 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: C
       cancelAnimationFrame(raf);
       vs.dispose();
     };
-  }, [video, scene]);
+  }, [video]);
   return <canvas ref={ref} className={`block w-full ${className}`} style={{ aspectRatio: '16 / 9' }} role="img" aria-label={`${video.title}, dessin animé`} />;
 }
 
