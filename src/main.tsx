@@ -7,6 +7,10 @@ import '@fontsource/fredoka/latin-500.css';
 import '@fontsource/fredoka/latin-600.css';
 import '@fontsource/fredoka/latin-700.css';
 import './index.css';
+import { loadVoiceBank } from './voice/player';
+
+// La banque de voix de Christine (liste des phrases enregistrées) se charge tout de suite.
+void loadVoiceBank();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

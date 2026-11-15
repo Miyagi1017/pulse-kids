@@ -30,7 +30,7 @@ if not os.path.exists('/tmp/claude-0/ov/tgt_se.pt'):
     torch.save(tgt, '/tmp/claude-0/ov/tgt_se.pt'); torch.save(src, '/tmp/claude-0/ov/src_se.pt')
 tgt = torch.load('/tmp/claude-0/ov/tgt_se.pt'); src = torch.load('/tmp/claude-0/ov/src_se.pt')
 tau = float(os.environ.get('TAU', '0.3'))
-L = json.load(open('/tmp/claude-0/ov/gen/lines.json'))
+L = json.load(open(os.environ.get('LINES', '/tmp/claude-0/ov/gen/lines.json')))
 only = sys.argv[1:]
 n = 0
 for l in L:

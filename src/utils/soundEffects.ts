@@ -1,3 +1,4 @@
+import { bankParts, playBank, stopBank } from '../voice/player';
 /**
  * Web Audio API synthesized sound effects and Speech Synthesis utilities
  * 100% offline-compatible, no external audio assets required.
@@ -471,6 +472,7 @@ if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
 }
 
 export function stopSpeaking() {
+  stopBank();
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     activeUtterance = null;
@@ -482,7 +484,17 @@ export function isSpeaking(): boolean {
   return window.speechSynthesis.speaking;
 }
 
-export function speakFrenchText(text: string, options: SpeakOptions = {}) {
+export function speakFrenchText(text: string, options: SpeakOptions = {}, browserOnly = false) {
+  // La voix de Christine (banque de prises) si chaque phrase du texte est enregistrée ;
+  // si une prise ne se charge pas (hors ligne), la voix du navigateur reprend le texte.
+  if (typeof window !== 'undefined' && !browserOnly) {
+    const parts = bankParts(text);
+    if (parts) {
+      stopSpeaking();
+      playBank(parts, { ...options, onError: () => speakFrenchText(text, options, true) });
+      return;
+    }
+  }
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     if (options.onEnd) options.onEnd();
     return;
