@@ -183,7 +183,10 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
   const sw = swatch(style);
   const vHash = strHash(video.id);
   // Ouverture : projecteur pour les styles sombres, sinon grue ou lente avancée selon la vidéo.
-  const opening: 'spot' | 'crane' | 'push' = sw.dark ? 'spot' : vHash % 2 ? 'crane' : 'push';
+  // Sur un papier déjà presque noir (lidar, hologramme…), le projecteur donnerait un écran noir : on ouvre en grue.
+  const [pr, pg, pb] = (sw.paper.match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i)?.slice(1) ?? ['ff', 'ff', 'ff']).map((h) => parseInt(h, 16) / 255);
+  const veryDark = 0.2126 * pr + 0.7152 * pg + 0.0722 * pb < 0.12;
+  const opening: 'spot' | 'crane' | 'push' = sw.dark && !veryDark ? 'spot' : vHash % 2 || veryDark ? 'crane' : 'push';
   const plans: ShotPlan[] = [0, 1, 2, 3, 4].map((i) => shotPlan(video, i));
   return {
     style,
