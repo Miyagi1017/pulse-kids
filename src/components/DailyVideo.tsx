@@ -7,7 +7,7 @@ import { personalize } from '../data/format';
 import { quizFor } from '../data/videoQuiz';
 import type { Playable } from '../lib/playlist';
 import { AGE_INFO, narrationRate, type AgeBand } from '../lib/age';
-import { soundEffects, speakFrenchText, stopSpeaking } from '../utils/soundEffects';
+import { soundEffects } from '../utils/soundEffects';
 import { TopBar } from './ui';
 import { burst } from './fx';
 import { BigQuiz } from './Quiz';
@@ -15,6 +15,7 @@ import { ThemeScene, type SceneTheme } from './ThemeScene';
 import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
 import { VideoStage, videoPaper, videoPoster } from './VideoStage';
+import { sayScene, stopVoice, videoClip } from '../videos/voice';
 import { Vignette } from './Vignette';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
 
@@ -83,7 +84,7 @@ export function VideoPlayer({
   const next = useCallback(() => setIndex((i) => i + 1), []);
 
   const goToVideo = useCallback((vi: number) => {
-    stopSpeaking();
+    stopVoice();
     setCountdown(null);
     setQuizSolved(false);
     setVideoIndex(vi);
@@ -102,19 +103,21 @@ export function VideoPlayer({
       advanced = true;
       setTimeout(next, 700);
     };
-    speakFrenchText(text, {
+    // La voix de Christine (prise enregistrée) si la scène en a une, sinon la voix du navigateur.
+    const recorded = !!videoClip(video.id, index);
+    sayScene(video.id, index, text, {
       rate: narrationRate(age),
       pitch: AGE_INFO[age].pitch,
       onEnd: advance,
       onError: () => (fallbackTimer.current = setTimeout(advance, readingMs(text) * (age === 'petit' ? 1.3 : 1)))
     });
-    if (!('speechSynthesis' in window)) fallbackTimer.current = setTimeout(advance, readingMs(text) * (age === 'petit' ? 1.3 : 1));
+    if (!recorded && !('speechSynthesis' in window)) fallbackTimer.current = setTimeout(advance, readingMs(text) * (age === 'petit' ? 1.3 : 1));
     return () => {
       clearTimeout(fallbackTimer.current);
       advanced = true;
-      stopSpeaking();
+      stopVoice();
     };
-  }, [videoIndex, index, playing, finished, text, next, replayTick, age]);
+  }, [videoIndex, index, playing, finished, text, next, replayTick, age, video.id]);
 
   // Vidéo terminée : on la marque comme vue (sans couper la question qui suit).
   useEffect(() => {
@@ -142,7 +145,7 @@ export function VideoPlayer({
     return () => clearTimeout(t);
   }, [countdown, videoIndex, goToVideo]);
 
-  useEffect(() => () => stopSpeaking(), []);
+  useEffect(() => () => stopVoice(), []);
 
   const jump = useCallback(
     (delta: number) => {
