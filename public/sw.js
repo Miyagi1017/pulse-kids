@@ -3,7 +3,7 @@
  * - Assets (JS/CSS/polices/icônes) : cache d'abord (fichiers versionnés par Vite).
  * - /api : jamais mis en cache (données personnelles), sauf l'édition du jour.
  */
-const VERSION = 'pk-v7';
+const VERSION = 'pk-v8';
 const SHELL = ['/', '/index.html', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -29,6 +29,12 @@ self.addEventListener('fetch', (event) => {
 
   // Vidéos et bandes-son des comptines : le navigateur les lit par morceaux (requêtes partielles).
   if (url.pathname.startsWith('/videos/') || url.pathname.startsWith('/comptines/')) return;
+
+  // Liste des prises de la banque de voix : réseau d'abord (elle grandit à chaque mise en ligne).
+  if (url.pathname === '/banque/index.json') {
+    event.respondWith(networkFirst(req));
+    return;
+  }
 
   if (url.pathname.startsWith('/api/')) {
     // Seul le contenu public du jour est mis en cache (pour l'ouvrir hors ligne).
