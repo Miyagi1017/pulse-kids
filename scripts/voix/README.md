@@ -14,3 +14,7 @@ Les narrations des films, des 50 vidéos du jour et des 66 dessins animés sont 
 
 Une phrase sans prise est dite par la voix du navigateur. Pour remplacer une prise par une vraie prise ElevenLabs,
 il suffit d'écraser le mp3 correspondant.
+
+**Refaire des prises de la banque** (ex. les 335 phrases des mini-défis) : `redo_openvoice.py` dit chaque phrase avec la voix
+neuronale edge-tts « fr-FR-DeniseNeural », lui applique le timbre de Christine avec OpenVoice V2 et écrase le mp3 de `public/banque/`.
+`LINES=lignes.json REPO=<dépôt> python redo_openvoice.py` (réglages : `TAU`, `BASE_RATE`, `BASE_VOICE`).
