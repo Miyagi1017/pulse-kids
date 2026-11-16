@@ -18,3 +18,7 @@ il suffit d'écraser le mp3 correspondant.
 **Refaire des prises de la banque** (ex. les 335 phrases des mini-défis) : `redo_openvoice.py` dit chaque phrase avec la voix
 neuronale edge-tts « fr-FR-DeniseNeural », lui applique le timbre de Christine avec OpenVoice V2 et écrase le mp3 de `public/banque/`.
 `LINES=lignes.json REPO=<dépôt> python redo_openvoice.py` (réglages : `TAU`, `BASE_RATE`, `BASE_VOICE`).
+
+**Toutes les voix de l'app** (banque, films, vidéos ; sauf La Grosse Fraise Rouge, prise de référence) :
+`npx tsx scripts/voix/bank-lines.ts > bank.json && npx tsx scripts/voix/all-lines.ts bank.json > lines.json`, puis
+`LINES=lines.json REPO=<dépôt> python redo_openvoice.py` dans WSL (7 492 phrases ≈ 6 h 30 sur ce PC, reprend où il s'est arrêté).
