@@ -17,6 +17,8 @@ import { mascotForScene } from '../lib/mascots';
 import { VideoStage, videoPaper, videoPoster } from './VideoStage';
 import { sayScene, stopVoice, videoClip } from '../videos/voice';
 import { PACE } from '../videos/pacing';
+import { pickSource } from '../videos/source';
+import { FilmMp4 } from './FilmMp4';
 import { Vignette } from './Vignette';
 import { KaraokeText } from './KaraokeText';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
@@ -71,6 +73,9 @@ export function VideoPlayer({
   const [bigText, setBigText] = useState(age === 'petit');
   const [replayTick, setReplayTick] = useState(0);
   const [quizSolved, setQuizSolved] = useState(false);
+  // Le film MP4 Lemo-Opuscar s'il existe et si l'on est en ligne, sinon le dessin animé en code.
+  const online = () => typeof navigator === 'undefined' || navigator.onLine !== false;
+  const [mode, setMode] = useState<'mp4' | 'code'>(() => pickSource(playlist[Math.max(0, Math.min(startIndex, playlist.length - 1))].id, online()));
   const fallbackTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const video = playlist[videoIndex];
@@ -90,14 +95,16 @@ export function VideoPlayer({
     setCountdown(null);
     setQuizSolved(false);
     setVideoIndex(vi);
+    setMode(pickSource(playlist[vi].id, online()));
     setIndex(0);
     setPlaying(true);
-  }, []);
+  }, [playlist]);
 
   // Narration + avance automatique des scènes.
   useEffect(() => {
     clearTimeout(fallbackTimer.current);
-    if (!playing || finished) return;
+    // Le film MP4 porte sa propre voix : pas de narration par-dessus.
+    if (!playing || finished || mode === 'mp4') return;
     setImgOk(true);
     let advanced = false;
     let pause: ReturnType<typeof setTimeout> | undefined;
@@ -122,7 +129,7 @@ export function VideoPlayer({
       advanced = true;
       stopVoice();
     };
-  }, [videoIndex, index, playing, finished, text, next, replayTick, age, video.id]);
+  }, [videoIndex, index, playing, finished, text, next, replayTick, age, video.id, mode]);
 
   // Vidéo terminée : on la marque comme vue (sans couper la question qui suit).
   useEffect(() => {
@@ -258,7 +265,20 @@ export function VideoPlayer({
                   className="relative cursor-pointer"
                   onPointerDown={() => soundEffects.playSparkle()}
                 >
-                  <VideoStage video={video.mini} scene={index} playing={playing} />
+                  {mode === 'mp4' ? (
+                    <FilmMp4
+                      id={video.id}
+                      playing={playing}
+                      onScene={setIndex}
+                      onEnd={() => setIndex(scenes.length)}
+                      onFail={(i) => {
+                        setMode('code');
+                        setIndex(i);
+                      }}
+                    />
+                  ) : (
+                    <VideoStage video={video.mini} scene={index} playing={playing} />
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 p-4 sm:p-5 text-center">
                   <motion.p

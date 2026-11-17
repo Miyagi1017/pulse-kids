@@ -27,8 +27,9 @@ self.addEventListener('fetch', (event) => {
   // Ressources externes (photos NASA) : laissées au navigateur.
   if (url.origin !== self.location.origin) return;
 
-  // Vidéos et bandes-son des comptines : le navigateur les lit par morceaux (requêtes partielles).
-  if (url.pathname.startsWith('/videos/') || url.pathname.startsWith('/comptines/')) return;
+  // Vidéos, bandes-son des comptines et films MP4 : le navigateur les lit par morceaux (requêtes partielles),
+  // jamais mis en cache (trop lourds) ; hors ligne, le dessin animé en code les remplace.
+  if (url.pathname.startsWith('/videos/') || url.pathname.startsWith('/comptines/') || url.pathname.startsWith('/films-mp4/')) return;
 
   // Liste des prises de la banque de voix : réseau d'abord (elle grandit à chaque mise en ligne).
   if (url.pathname === '/banque/index.json') {
