@@ -1,0 +1,31 @@
+1
+00:00:00,881 --> 00:00:02,069
+La Lune !
+
+2
+00:00:05,141 --> 00:00:07,270
+Regarde là-haut : c'est la Lune !
+
+3
+00:00:10,080 --> 00:00:12,944
+La Lune tourne autour de la Terre, tout doucement.
+
+4
+00:00:15,585 --> 00:00:17,614
+Elle ne fait pas de lumière toute seule.
+
+5
+00:00:20,585 --> 00:00:23,695
+Elle renvoie celle du Soleil, comme un grand miroir.
+
+6
+00:00:26,540 --> 00:00:32,315
+Certains soirs, elle est toute ronde. D'autres soirs, c'est un fin croissant.
+
+7
+00:00:34,958 --> 00:00:37,927
+Un jour, des astronautes ont marché sur la Lune !
+
+8
+00:00:40,630 --> 00:00:44,386
+Et toi, ce soir, tu regarderas la forme de la Lune ?

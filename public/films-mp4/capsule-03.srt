@@ -1,0 +1,31 @@
+1
+00:00:00,840 --> 00:00:02,244
+Compte à Rebours Fusée !
+
+2
+00:00:05,100 --> 00:00:08,130
+Voici une petite fusée, toute prête à partir.
+
+3
+00:00:10,895 --> 00:00:12,903
+Elle rêve d'aller voir les étoiles.
+
+4
+00:00:15,935 --> 00:00:18,939
+Le moteur gronde doucement : vroum, vroum…
+
+5
+00:00:21,760 --> 00:00:24,688
+On compte avec elle : trois… deux… un…
+
+6
+00:00:27,371 --> 00:00:31,902
+Décollage ! La fusée monte, monte, très haut.
+
+7
+00:00:34,605 --> 00:00:37,780
+La voilà au milieu des étoiles, près de la Lune.
+
+8
+00:00:40,506 --> 00:00:42,790
+Et toi, où irais-tu avec une fusée ?

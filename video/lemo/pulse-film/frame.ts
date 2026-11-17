@@ -108,9 +108,9 @@ export function filmFrame(story: Story): { render: (ctx: CanvasRenderingContext2
       v.addColorStop(1, sw.dark ? 'rgba(0,0,0,0.45)' : 'rgba(60,40,20,0.22)');
       ctx.fillStyle = v;
       ctx.fillRect(0, 0, W, H);
-      // Ouverture depuis le papier, et carton de fin.
       const endAt = story.dur - FILM_PACE.end;
-      const fade = Math.max(1 - Math.min(1, t / 0.8), Math.min(1, Math.max(0, (t - endAt) / 0.9)));
+      // Ouverture : fondu court (0,3 s, jamais d'écran noir) ; fin : l'image reste visible et vivante sous un voile de papier.
+      const fade = Math.max(1 - Math.min(1, t / 0.3), 0.6 * Math.min(1, Math.max(0, (t - endAt) / 0.9)));
       if (fade > 0) {
         ctx.globalAlpha = fade;
         ctx.fillStyle = paper;
@@ -123,9 +123,10 @@ export function filmFrame(story: Story): { render: (ctx: CanvasRenderingContext2
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = '500 64px Fredoka';
-        ctx.fillText(story.title, W / 2, H / 2 - 30);
+        const bob = Math.sin((t - endAt) * 2.2) * 6;
+        ctx.fillText(story.title, W / 2, H / 2 - 30 + bob);
         ctx.font = '500 40px Fredoka';
-        ctx.fillText('Fin', W / 2, H / 2 + 50);
+        ctx.fillText('Fin', W / 2, H / 2 + 50 + bob);
         ctx.globalAlpha = 1;
       }
     }

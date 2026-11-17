@@ -30,14 +30,13 @@ for P in "$ROOT"/*/; do
     && "$PY" "$PACK/scripts/qc_final.py" --project "$P" >>"$LOG" 2>&1; then
     cp "$P/out/$id.mp4" "$OUT/$id.mp4"
     # Repères pour l'app (scènes, prénom) et liste des films disponibles.
-    "$PY" - "$P/project.json" "$OUT/$id.json" "$REPO/src/videos/mp4-index.json" "$id" <<'PYEOF'
+    "$PY" - "$P/project.json" "$OUT/$id.json" "$REPO/src/videos/mp4-index.json" "$id" >>"$LOG" 2>&1 <<'PYEOF'
 import json, sys
 pk = json.load(open(sys.argv[1]))["pulse"]
 json.dump({"scenes": pk["shots"], "names": pk["names"]}, open(sys.argv[2], "w"))
 idx = json.load(open(sys.argv[3]))
 if sys.argv[4] not in idx: idx.append(sys.argv[4])
-open(sys.argv[3], "w").write(json.dumps(sorted(idx), indent=1) + "
-")
+open(sys.argv[3], "w").write(json.dumps(sorted(idx), indent=1) + chr(10))
 PYEOF
     # Sous-titres pour YouTube : un bloc par phrase, minuté par l'alignement.
     "$PY" "$HERE/srt.py" --project "$P" --out "$OUT/$id.srt" >>"$LOG" 2>&1
