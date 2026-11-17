@@ -47,3 +47,15 @@ export function keyFile(key: string): string {
   }
   return (h >>> 0).toString(36).padStart(7, '0');
 }
+
+/** Phrase affichée : le gabarit {p} devient le prénom, ou disparaît proprement s'il n'y en a pas (« Et toi, tu… »). */
+export function cleanName(s: string, name?: string | null): string {
+  const n = name?.trim();
+  if (n) return s.split('{p}').join(n);
+  return s
+    .replace(/\s*\{p\}\s*([,.])/g, '$1')
+    .replace(/\s*\{p\}\s*([!?…:;])/g, ' $1')
+    .replace(/\{p\}/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
