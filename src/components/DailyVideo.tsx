@@ -260,7 +260,7 @@ export function VideoPlayer({
                 className="absolute inset-0 flex flex-col overflow-y-auto"
                 style={{ background: paper.dark ? '#14121c' : paper.paper, color: paper.dark ? '#fff8ea' : paper.text }}
               >
-                {/* Le dessin animé de la vidéo, rendu en code dans son style livre d'enfant (pacing.ts). */}
+                {/* Le dessin animé de la vidéo, rendu en code dans son style (un des 66, pacing.ts). */}
                 <div
                   className="relative cursor-pointer"
                   onPointerDown={() => soundEffects.playSparkle()}

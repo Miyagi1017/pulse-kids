@@ -9,7 +9,7 @@
  * attente où l'enfant doit toucher une zone. Le film dessine chaque image à partir de l'état ci-dessous.
  */
 import type { FilmAudio } from './audio';
-import { PACE } from '../videos/pacing';
+import { PACE } from '../videos/pace';
 
 /** Taille logique de la scène : tout est dessiné dans ce repère, puis mis à l'échelle de l'écran. */
 export const W = 960;

@@ -9,7 +9,7 @@ import { VIDEOS } from '../../src/data/videos';
 import { CAPSULES } from '../../src/videos/capsules';
 import { keyFile, sentenceKey } from '../../src/voice/bank';
 import { filmTimeline, type VoicePart } from '../../src/videos/filmTimeline';
-import { storybookStyleFor } from '../../src/videos/pacing';
+import { videoStyleFor } from '../../src/videos/pacing';
 
 const [id, dir] = process.argv.slice(2);
 const video = [...VIDEOS, ...CAPSULES].find((v) => v.id === id);
@@ -45,7 +45,7 @@ video.scenes.forEach((text, i) => {
 });
 
 const tl = filmTimeline(shots);
-const story = { id, title: video.title, style: storybookStyleFor(id), dur: tl.dur, scenes: tl.scenes, names: tl.names, voices: tl.voices.map((v) => ({ file: v.src, at: v.at })) };
+const story = { id, title: video.title, style: videoStyleFor(id), dur: tl.dur, scenes: tl.scenes, names: tl.names, voices: tl.voices.map((v) => ({ file: v.src, at: v.at })) };
 writeFileSync(path.join(dir, 'story.json'), JSON.stringify(story, null, 1));
 writeFileSync(path.join(dir, 'cues.json'), JSON.stringify({ scenes: tl.scenes.map((t) => +t.toFixed(3)), names: tl.names.map((t) => +t.toFixed(3)) }));
 console.log(`${id} : ${shots.length} plans, ${tl.dur.toFixed(1)} s, ${tl.names.length} prénom(s)`);

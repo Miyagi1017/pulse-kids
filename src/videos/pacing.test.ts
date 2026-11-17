@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { VIDEOS } from '../data/videos';
 import { CAPSULES } from './capsules';
-import { isStyle } from '../kits/styles';
-import { PACE, SLOW_TRANSITIONS, STORYBOOK_STYLES, nextIndex, shotFor, storybookStyleFor } from './pacing';
+import { STYLE_IDS } from '../kits/styles';
+import { PACE, SLOW_TRANSITIONS, nextIndex, shotFor, videoStyleFor } from './pacing';
 
 test('shotFor : titre, découverte, une seule action, question à la fin', () => {
   assert.equal(shotFor(0, 8), 'titre');
@@ -23,13 +23,11 @@ test('rythme lent : pas de whip, plans ≥ 3 s, pause de 0,8 à 1,2 s', () => {
   assert.ok(PACE.pauseAfterLine >= 0.8 && PACE.pauseAfterLine <= 1.2);
 });
 
-test('styles livre d’enfant : valides, et un style par famille de sujets', () => {
-  assert.equal(STORYBOOK_STYLES.length, 8);
-  for (const s of STORYBOOK_STYLES) assert.ok(isStyle(s), s);
-  for (const v of [...VIDEOS, ...CAPSULES]) assert.ok(STORYBOOK_STYLES.includes(storybookStyleFor(v.id)), v.id);
-  const byTheme = new Map<string, Set<string>>();
-  for (const v of VIDEOS) byTheme.set(v.theme, (byTheme.get(v.theme) ?? new Set()).add(storybookStyleFor(v.id)));
-  for (const [theme, styles] of byTheme) assert.equal(styles.size, 1, theme);
+test('un style différent par vidéo, parmi les 66 du catalogue', () => {
+  for (const v of [...VIDEOS, ...CAPSULES]) assert.ok(STYLE_IDS.includes(videoStyleFor(v.id)), v.id);
+  assert.equal(new Set(CAPSULES.map((c) => videoStyleFor(c.id))).size, CAPSULES.length, 'les 66 dessins animés');
+  assert.equal(new Set(VIDEOS.map((v) => videoStyleFor(v.id))).size, VIDEOS.length, 'les 50 vidéos du jour');
+  for (const c of CAPSULES) assert.equal(videoStyleFor(c.id), c.style, `${c.id} garde son style du catalogue`);
 });
 
 test('nextIndex : un appui pendant la pause avance d’une seule phrase', () => {

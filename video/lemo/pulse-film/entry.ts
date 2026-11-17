@@ -1,7 +1,7 @@
 /**
  * Gabarit de film Lemo-Opuscar pour Pulse Kids : une page que Lemo filme image par image (window.DUR,
  * window.render(t), window.READY ; voir lemo-opuscar/core/README.md).
- * L'image vient du moteur de dessins animés de l'app (src/videos/videoScene.ts, style livre d'enfant) ; le
+ * L'image vient du moteur de dessins animés de l'app (src/videos/videoScene.ts, style du catalogue) ; le
  * gabarit y ajoute la matière d'un film Lemo : grain du papier qui « respire » à 8 images/s, léger tremblé du
  * trait, vignettage, ouverture et carton de fin. Le rythme vient de story.json (src/videos/filmTimeline.ts).
  * Regroupé par esbuild en film.js + film.css (scripts/lemo/render.sh).
@@ -12,7 +12,7 @@ import { createVideoScene, type CodedVideo } from '../../../src/videos/videoScen
 import { VIDEOS } from '../../../src/data/videos';
 import { CAPSULES } from '../../../src/videos/capsules';
 import { swatch } from '../../../src/kits/styles';
-import { storybookStyleFor } from '../../../src/videos/pacing';
+import { videoStyleFor } from '../../../src/videos/pacing';
 import { FILM_PACE } from '../../../src/videos/filmTimeline';
 
 export interface Story {
@@ -68,7 +68,7 @@ function grains(dark: boolean): HTMLCanvasElement[] {
 export async function boot(canvas: HTMLCanvasElement, story: Story) {
   const video: CodedVideo | undefined = [...VIDEOS, ...CAPSULES].find((v) => v.id === story.id);
   if (!video) throw new Error(`vidéo inconnue : ${story.id}`);
-  const style = storybookStyleFor(story.id);
+  const style = videoStyleFor(story.id);
   const sw = swatch(style);
   await document.fonts.ready;
   const vs = createVideoScene(video, style);

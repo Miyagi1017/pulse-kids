@@ -12,7 +12,7 @@
 import type { Objet } from '../data/comptines';
 import { VIDEOS } from '../data/videos';
 import { back, clamp, easeInOut, easeOut } from '../films/engine';
-import { PACE, SLOW_TRANSITIONS, shotFor, storybookStyleFor, type Shot } from './pacing';
+import { PACE, SLOW_TRANSITIONS, shotFor, videoStyleFor, type Shot } from './pacing';
 import { place, type Figure } from '../kits/geom';
 import { kid, objet } from '../kits/library';
 import type { Material } from '../kits/materials';
@@ -147,7 +147,7 @@ const SPOTS: [number, number][] = [
   [640, 90]
 ];
 
-export function createVideoScene(video: CodedVideo, style: StyleId = storybookStyleFor(video.id)): VideoScene {
+export function createVideoScene(video: CodedVideo, style: StyleId = videoStyleFor(video.id)): VideoScene {
   const count = video.scenes?.length ?? 4;
   const board = video.board ?? boardFor(video.id) ?? B('etoile', 'ciel', ['etoile', 'nuage', 'etoile']);
   const mat: Material = materialFor(style);
