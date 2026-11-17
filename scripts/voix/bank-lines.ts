@@ -19,6 +19,7 @@ import * as jeux from '../../src/data/jeux';
 import * as jeuxI from '../../src/data/jeuxInteractifs';
 import * as dico from '../../src/data/dictionnaire';
 import { keyFile, sentenceKey, splitSentences, withoutName } from '../../src/voice/bank';
+import { splitAtName } from '../../src/voice/names';
 
 const SOURCES: [unknown, number][] = [
   [programmes, 1], [sport, 1], [mini, 1], [physiques, 1], [wushu, 1], [jeux, 1], [jeuxI, 1], [activites, 1], [quiz, 1],
@@ -35,6 +36,8 @@ const isText = (s: string) => /\p{L}{2,}/u.test(s) && !/^[a-z0-9]+(-[a-z0-9]+)+$
 const clean = (s: string) => s.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}]/gu, '').replace(/\s+/g, ' ').trim();
 function add(text: string, prio: number) {
   for (const sent of splitSentences(clean(text))) {
+    // Phrase avec prénom : on enregistre aussi les morceaux autour, pour que Christine dise le prénom (voice/names.ts).
+    if (sent.includes('{p}')) for (const seg of splitAtName(sent)) add(seg, prio);
     const t = withoutName(sent);
     const key = sentenceKey(t);
     if (!key || key.length < 1) continue;

@@ -30,6 +30,10 @@ chantier.
    papercut, shadow-puppet, rubber-hose, midcentury-toon, ink-wash (doux), urban-sketch. Un style par famille de
    sujets, pour qu'une suite de vidéos reste reconnaissable.
 4. **Voix** : toutes les nouvelles phrases dites par Christine via `scripts/voix/redo_openvoice.py`.
+   **La voix dit le prénom** (demande de l'utilisateur, 2026-11-17) : banque des ≈ 2 000 prénoms les plus donnés
+   en France (fichier public INSEE) dite par Christine ; une phrase avec `{p}` est enregistrée en morceaux autour du
+   prénom et jouée à la suite ; prénom absent de la banque → voix du navigateur pour le prénom seul ; dans les MP4,
+   un silence à la place du prénom, que le lecteur remplit au bon moment. Vaut partout où l'app dit `{p}`.
 5. **Deux versions de chaque vidéo** :
    - **B, en code dans l'app** (léger, hors ligne) : moteur `src/videos/videoScene.ts` refait au rythme lent ;
    - **A, film MP4 Lemo-Opuscar** : vrai film rendu sur le PC.

@@ -105,6 +105,19 @@ pour le montage du générique et le contrôle.
 - [ ] **Step 4 : Lancer** `npm test` → passe.
 - [ ] **Step 5 : Commit** `Voix de Christine pour les nouvelles histoires` ; PR.
 
+### Task 2b : Christine dit le prénom
+
+**Files :** Create `src/voice/names.ts` (`nameKey(name: string): string` — minuscules sans accents ;
+`splitAtName(text: string): string[]` — morceaux autour de `{p}`, vides retirés), `src/voice/names.test.ts`,
+`scripts/voix/names-lines.ts` (prénoms INSEE → `banque/prenom-<nameKey>`), lignes « morceaux » ajoutées à
+`bank-lines.ts` et `all-lines.ts` (clé de chaque morceau = `sentenceKey(morceau)`) ; Modify `src/videos/voice.ts`
+et `src/utils/soundEffects.ts` (jouer morceau, prénom, morceau ; prénom inconnu → `speakFrenchText(name)`).
+
+- [ ] Tests : `splitAtName('Et toi {p}, tu sais ?')` → `['Et toi', 'tu sais ?']` ; `nameKey('Léa-Rose ')` →
+  `'lea-rose'` ; `playlist(text, name, bankIndex)` renvoie `[clip('Et toi'), name('lea'), clip('tu sais')]` et,
+  pour un prénom absent, `{ tts: 'Zébulon' }` à la place du prénom.
+- [ ] Générer les ≈ 2 000 prénoms + tous les morceaux (fenêtre de suivi), tests verts, commit, PR.
+
 ### Task 3 : Le moteur lent (B)
 
 **Files :**

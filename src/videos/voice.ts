@@ -2,10 +2,11 @@
  * Voix des vidéos du jour et des 66 dessins animés.
  * Prises enregistrées dans src/assets/voix/<id>/<n° de scène>.mp3 : voix de Christine (ElevenLabs),
  * prolongée par clonage de timbre OpenVoice V2 (MIT) sur une voix française Piper (scripts/voix-openvoice.md).
- * Sans prise, la synthèse vocale du navigateur prend le relais.
- * Le prénom n'est pas enregistré : il reste affiché à l'écran.
+ * Sans prise, la synthèse vocale du navigateur prend le relais. Le prénom est dit par Christine
+ * (morceaux de la banque autour du prénom, voice/names.ts) quand sa prise existe.
  */
 import { speakFrenchText, stopSpeaking } from '../utils/soundEffects';
+import { nameParts, playBank } from '../voice/player';
 
 const CLIPS = import.meta.glob('../assets/voix/*/*.mp3', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 
@@ -18,6 +19,16 @@ let current: HTMLAudioElement | null = null;
 /** Dit la scène (prise enregistrée si elle existe) ; onEnd une seule fois ; onError si rien ne peut être dit. */
 export function sayScene(id: string, scene: number, text: string, opts: { rate: number; pitch?: number; onEnd: () => void; onError: () => void }) {
   stopVoice();
+  // Avec un prénom : Christine le dit (morceaux de la banque autour du prénom), si toutes les prises existent.
+  const withName = nameParts(text);
+  if (withName) {
+    playBank(withName, { onEnd: opts.onEnd, onError: () => playClip(id, scene, text, opts) });
+    return;
+  }
+  playClip(id, scene, text, opts);
+}
+
+function playClip(id: string, scene: number, text: string, opts: { rate: number; pitch?: number; onEnd: () => void; onError: () => void }) {
   const url = videoClip(id, scene);
   if (!url) {
     speakFrenchText(text, { rate: opts.rate, pitch: opts.pitch, onEnd: opts.onEnd, onError: opts.onError });

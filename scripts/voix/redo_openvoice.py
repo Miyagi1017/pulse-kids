@@ -99,4 +99,8 @@ for i, l in enumerate(L):
     if (i + 1) % 50 == 0:
         left = (time.time() - t0) / (i + 1) * (len(L) - i - 1) / 3600
         print(f"conv {i + 1} / {len(L)}  ({l['key']})  reste ≈ {left:.1f} h", flush=True)
+# La banque : index.json liste toutes les prises présentes (nouvelles comprises).
+if any(l['key'].startswith('banque/') for l in L):
+    d = f'{REPO}/public/banque'
+    json.dump(sorted(f[:-4] for f in os.listdir(d) if f.endswith('.mp3')), open(f'{d}/index.json', 'w'))
 print('ok', len(L))
