@@ -281,24 +281,29 @@ export function VideoPlayer({
                   )}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 p-4 sm:p-5 text-center">
-                  <motion.p
-                    key={index}
-                    initial={{ y: 12, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
-                    aria-live="polite"
-                  >
-                    <KaraokeText text={text} />
-                  </motion.p>
-                  <button
-                    onClick={replay}
-                    className="press rounded-full px-4 py-2 text-base font-semibold flex items-center gap-2"
-                    style={{ background: paper.dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.07)' }}
-                    aria-label="Réécouter cette scène"
-                  >
-                    <Volume2 className="w-5 h-5" /> Réécouter
-                  </button>
+                  {/* Le film MP4 porte son propre sous-titre karaoké : le texte n'est affiché que pour le dessin animé en code. */}
+                  {mode === 'code' && (
+                    <>
+                      <motion.p
+                        key={index}
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
+                        aria-live="polite"
+                      >
+                        <KaraokeText text={text} />
+                      </motion.p>
+                      <button
+                        onClick={replay}
+                        className="press rounded-full px-4 py-2 text-base font-semibold flex items-center gap-2"
+                        style={{ background: paper.dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.07)' }}
+                        aria-label="Réécouter cette scène"
+                      >
+                        <Volume2 className="w-5 h-5" /> Réécouter
+                      </button>
+                    </>
+                  )}
                 </div>
               </motion.section>
             ) : !finished ? (
