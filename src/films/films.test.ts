@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { FILMS, nextFilm } from './index';
-import { hash, mulberry, readingSeconds, type FrameState } from './engine';
+import { beatEnd, hash, mulberry, readingSeconds, type FrameState } from './engine';
 
 const state = (beat: number): FrameState => ({ t: 0, beat, bt: 0, waiting: true, sinceTap: null, end: null, caption: '' });
 
@@ -41,4 +41,11 @@ test('aléatoire reproductible et temps de lecture raisonnable', () => {
     b = mulberry(7);
   assert.equal(a(), b());
   assert.ok(readingSeconds('Une chaussette !') >= 1.8);
+});
+
+test('rythme lent : chaque plan dure au moins 3 s et laisse 1 s après la phrase', () => {
+  assert.equal(beatEnd({ text: 'Une chaussette !', min: 2.6, hold: 0.5 }, 10, 11), 13);
+  assert.equal(beatEnd({ text: 'Voici… la danse !', min: 4.2, hold: 0.4 }, 10, 14), 15);
+  assert.equal(beatEnd({ text: 'Long plan.', min: 6, hold: 1.5 }, 0, 2), 6);
+  assert.equal(beatEnd({ text: 'Long plan.', min: 6, hold: 1.5 }, 0, 5), 6.5);
 });

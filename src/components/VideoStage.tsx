@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { createVideoScene, type CodedVideo } from '../videos/videoScene';
 import { swatch } from '../kits/styles';
-import { styleForVideo } from '../videos/videoScene';
+import { storybookStyleFor } from '../videos/pacing';
 import type { Paint } from './Vignette';
 
 /**
@@ -65,8 +65,8 @@ export function VideoStage({ video, scene, playing, className = '' }: { video: C
 }
 
 /** Couleur de papier du style de la vidéo (fond autour de l'image, sous le texte). */
-export function videoPaper(video: CodedVideo) {
-  return swatch(video.style ?? styleForVideo(video.id));
+export function videoPaper(video: { id: string }) {
+  return swatch(storybookStyleFor(video.id));
 }
 
 /** Vignette d'une vidéo : la scène de présentation, figée. */

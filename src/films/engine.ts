@@ -9,6 +9,7 @@
  * attente où l'enfant doit toucher une zone. Le film dessine chaque image à partir de l'état ci-dessous.
  */
 import type { FilmAudio } from './audio';
+import { PACE } from '../videos/pacing';
 
 /** Taille logique de la scène : tout est dessiné dans ce repère, puis mis à l'échelle de l'écran. */
 export const W = 960;
@@ -119,6 +120,11 @@ export function hash(...n: number[]): number {
 }
 
 /* ───────────── Courbes de temps ───────────── */
+
+/** Fin d'un beat sans pause active, au rythme lent (videos/pacing.ts) : au moins PACE.minShot, et PACE.pauseAfterLine après la phrase. */
+export function beatEnd(b: Beat, beatStart: number, spoken: number): number {
+  return Math.max(beatStart + Math.max(b.min ?? 0, PACE.minShot), spoken + Math.max(b.hold ?? 0.6, PACE.pauseAfterLine));
+}
 
 export const clamp = (v: number, a = 0, b = 1) => Math.max(a, Math.min(b, v));
 export const lerp = (a: number, b: number, u: number) => a + (b - a) * u;

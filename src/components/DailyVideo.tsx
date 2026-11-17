@@ -16,6 +16,7 @@ import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
 import { VideoStage, videoPaper, videoPoster } from './VideoStage';
 import { sayScene, stopVoice, videoClip } from '../videos/voice';
+import { PACE } from '../videos/pacing';
 import { Vignette } from './Vignette';
 import { KaraokeText } from './KaraokeText';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
@@ -99,10 +100,12 @@ export function VideoPlayer({
     if (!playing || finished) return;
     setImgOk(true);
     let advanced = false;
+    let pause: ReturnType<typeof setTimeout> | undefined;
+    // Après chaque phrase, une pause (PACE.pauseAfterLine) avant la suivante ; elle est annulée si l'enfant change de scène.
     const advance = () => {
       if (advanced) return;
       advanced = true;
-      setTimeout(next, 700);
+      pause = setTimeout(next, PACE.pauseAfterLine * 1000);
     };
     // La voix de Christine (prise enregistrée) si la scène en a une, sinon la voix du navigateur.
     const recorded = !!videoClip(video.id, index);
@@ -115,6 +118,7 @@ export function VideoPlayer({
     if (!recorded && !('speechSynthesis' in window)) fallbackTimer.current = setTimeout(advance, readingMs(text) * (age === 'petit' ? 1.3 : 1));
     return () => {
       clearTimeout(fallbackTimer.current);
+      clearTimeout(pause);
       advanced = true;
       stopVoice();
     };
@@ -249,13 +253,10 @@ export function VideoPlayer({
                 className="absolute inset-0 flex flex-col overflow-y-auto"
                 style={{ background: paper.dark ? '#14121c' : paper.paper, color: paper.dark ? '#fff8ea' : paper.text }}
               >
-                {/* Le dessin animé de la vidéo, rendu en code dans son style (un des 66). */}
+                {/* Le dessin animé de la vidéo, rendu en code dans son style livre d'enfant (pacing.ts). */}
                 <div
                   className="relative cursor-pointer"
-                  onPointerDown={(e) => {
-                    soundEffects.playSparkle();
-                    burst(e.clientX, e.clientY, ['✨', '⭐'], 6);
-                  }}
+                  onPointerDown={() => soundEffects.playSparkle()}
                 >
                   <VideoStage video={video.mini} scene={index} playing={playing} />
                 </div>
