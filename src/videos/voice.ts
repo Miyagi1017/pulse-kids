@@ -1,5 +1,5 @@
 /**
- * Voix des vidéos du jour et des 66 dessins animés.
+ * Voix des vidéos du jour (les 10 dessins animés).
  * Prises enregistrées dans src/assets/voix/<id>/<n° de scène>.mp3 : voix de Christine (ElevenLabs),
  * prolongée par clonage de timbre OpenVoice V2 (MIT) sur une voix française Piper (scripts/voix-openvoice.md).
  * Sans prise, la synthèse vocale du navigateur prend le relais.

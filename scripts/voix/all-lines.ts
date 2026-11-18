@@ -5,7 +5,6 @@
 import { readFileSync } from 'node:fs';
 import { FILMS } from '../../src/films/index';
 import { VIDEOS } from '../../src/data/videos';
-import { CAPSULES } from '../../src/videos/capsules';
 import { withoutName } from '../../src/voice/bank';
 
 type Line = { key: string; text: string };
@@ -18,7 +17,7 @@ for (const f of FILMS) {
   if (f.id === 'film-fraise') continue;
   f.beats.forEach((b, i) => b.text && media.push({ key: `films/${f.id}/${String(i + 1).padStart(2, '0')}`, text: withoutName(b.text) }));
 }
-for (const v of [...VIDEOS, ...CAPSULES]) {
+for (const v of VIDEOS) {
   [`${v.title} !`, ...v.scenes].forEach((t, i) => media.push({ key: `voix/${v.id}/${String(i).padStart(2, '0')}`, text: withoutName(t) }));
 }
 

@@ -11,11 +11,11 @@ const finite = (f: Figure, what: string) => {
   for (const s of f.shapes) for (const [x, y] of s.pts) assert.ok(Number.isFinite(x) && Number.isFinite(y), `${what} : coordonnées valides`);
 };
 
-test('66 styles, tous différents et reconnus', () => {
-  assert.equal(STYLE_IDS.length, 66);
-  assert.equal(new Set(STYLE_IDS).size, 66);
+test('10 styles, tous différents et reconnus', () => {
+  assert.equal(STYLE_IDS.length, 10);
+  assert.equal(new Set(STYLE_IDS).size, 10);
   for (const id of STYLE_IDS) assert.ok(isStyle(id), id);
-  assert.equal(Object.keys(SPECS).length, 59);
+  assert.equal(Object.keys(SPECS).length, 7);
 });
 
 test('les fiches transforment toutes les couleurs en couleurs valides', () => {
@@ -28,7 +28,7 @@ test('les fiches transforment toutes les couleurs en couleurs valides', () => {
 test('deux comptines voisines n’ont jamais le même style', () => {
   const styles = COMPTINES.map(styleForComptine);
   for (let i = 1; i < styles.length; i++) assert.notEqual(styles[i], styles[i - 1]);
-  assert.ok(new Set(styles).size >= Math.min(30, COMPTINES.length));
+  assert.ok(new Set(styles).size >= Math.min(10, COMPTINES.length));
 });
 
 test('tous les décors, objets et personnages des comptines se construisent', () => {
@@ -40,7 +40,7 @@ test('tous les décors, objets et personnages des comptines se construisent', ()
   finite(cat({ t: 1, tail: 4, tilt: 3 }), 'Mila');
 });
 
-test('chacun des 66 styles a sa peau de jeu', async () => {
+test('chacun des 10 styles a sa peau de jeu', async () => {
   const { skinFor } = await import('./skins');
   for (const id of STYLE_IDS) {
     const skin = skinFor(id);
