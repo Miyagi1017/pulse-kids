@@ -290,11 +290,12 @@ export function createVideoScene(video: CodedVideo, style: StyleId = videoStyleF
           const e = easeInOut(clamp(t / 2.2));
           const sx = 140 + (480 - 140) * e,
             sy = 200 + (y0 - 200) * e,
-            r = 130 + 900 * clamp((t - 2.2) / 0.8) ** 2;
+            r = 220 + 900 * clamp((t - 2.2) / 0.8) ** 2;
           curG.save();
+          // Nuit douce, jamais un écran noir (les gestes sont ralentis : le rond reste petit plus longtemps).
           const grd = curG.createRadialGradient(sx, sy, r * 0.6, sx, sy, r);
           grd.addColorStop(0, 'rgba(5,4,12,0)');
-          grd.addColorStop(1, 'rgba(5,4,12,0.82)');
+          grd.addColorStop(1, 'rgba(5,4,12,0.6)');
           curG.fillStyle = grd;
           curG.fillRect(0, 0, W0, H0);
           curG.restore();
