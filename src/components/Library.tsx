@@ -98,7 +98,7 @@ export function Library({ section, items: allItems, done, onBack, onPick, catego
                   {item.image && !item.paint ? (
                     <img src={item.image} alt="" loading="lazy" decoding="async" className="w-full aspect-[4/3] object-cover rounded-2xl" />
                   ) : (
-                    // Vignette dessinée en code (plus d'emoji) : un style par contenu, parmi les 66.
+                    // Vignette dessinée en code (plus d'emoji) : un style par contenu, parmi les 10.
                     <Vignette id={`lib-${item.id}`} paint={item.paint ?? itemPainter(item.id, item.title, dark)} className="w-full rounded-2xl" ratio="4 / 3" />
                   )}
                   <span className="text-lg font-bold leading-snug">{item.title}</span>

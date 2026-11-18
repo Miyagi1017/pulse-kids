@@ -1,5 +1,5 @@
 /**
- * Les héros des 50 vidéos du jour, dessinés en code (formes des kits, geom.ts).
+ * Les héros des vidéos du jour, dessinés en code (formes des kits, geom.ts).
  * Chaque héros est centré sur (0, 0), hauteur ≈ 240, pieds vers y = +110 ; t anime son geste propre
  * (battre des ailes, souffler, cligner des yeux, rouler…). `act` (0 → 1) est son « action » du gros plan :
  * l'éléphant se douche, le volcan crache, la fusée décolle, le cœur bat plus fort…
