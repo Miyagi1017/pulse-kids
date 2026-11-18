@@ -1,0 +1,35 @@
+1
+00:00:00,820 --> 00:00:02,192
+Poussée de la Plante !
+
+2
+00:00:05,060 --> 00:00:07,552
+On a planté une petite graine dans la terre.
+
+3
+00:00:10,238 --> 00:00:12,324
+On l'arrose un peu, chaque jour.
+
+4
+00:00:15,238 --> 00:00:17,746
+Le premier jour, rien ne se passe.
+
+5
+00:00:20,390 --> 00:00:22,977
+Puis une petite pousse verte sort de la terre.
+
+6
+00:00:25,702 --> 00:00:28,473
+Jour après jour, elle grandit vers le soleil.
+
+7
+00:00:31,198 --> 00:00:34,174
+Elle devient une grande fleur jaune : un tournesol !
+
+8
+00:00:37,020 --> 00:00:37,642
+Et toi
+
+9
+00:00:39,550 --> 00:00:41,402
+tu as déjà planté une graine ?

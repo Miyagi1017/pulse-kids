@@ -27,5 +27,9 @@ Certains soirs, elle est toute ronde. D'autres soirs, c'est un fin croissant.
 Un jour, des astronautes ont marché sur la Lune !
 
 8
-00:00:40,630 --> 00:00:44,386
-Et toi, ce soir, tu regarderas la forme de la Lune ?
+00:00:40,650 --> 00:00:41,272
+Et toi
+
+9
+00:00:43,259 --> 00:00:46,225
+ce soir, tu regarderas la forme de la Lune ?

@@ -1,0 +1,35 @@
+1
+00:00:00,880 --> 00:00:01,904
+Le désert !
+
+2
+00:00:05,100 --> 00:00:08,772
+Voici le désert, un endroit où il ne pleut presque jamais.
+
+3
+00:00:11,436 --> 00:00:15,125
+Du sable partout, et de grandes dunes qui ressemblent à des vagues.
+
+4
+00:00:17,809 --> 00:00:20,974
+Un chameau avance lentement, avec ses deux bosses.
+
+5
+00:00:23,597 --> 00:00:25,772
+Il peut marcher très longtemps sans boire.
+
+6
+00:00:28,616 --> 00:00:31,205
+Le jour, il fait très chaud sous le soleil.
+
+7
+00:00:34,009 --> 00:00:36,839
+Mais la nuit, dans le désert, il fait froid !
+
+8
+00:00:39,584 --> 00:00:40,205
+Et toi
+
+9
+00:00:42,092 --> 00:00:44,408
+tu aimerais faire une balade à dos de chameau ?

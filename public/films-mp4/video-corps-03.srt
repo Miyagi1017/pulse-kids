@@ -1,0 +1,35 @@
+1
+00:00:00,861 --> 00:00:01,828
+Bien manger !
+
+2
+00:00:05,040 --> 00:00:08,389
+Pour grandir et avoir de l'énergie, il faut bien manger.
+
+3
+00:00:11,133 --> 00:00:13,565
+Voici une assiette de toutes les couleurs.
+
+4
+00:00:16,291 --> 00:00:19,160
+Les légumes et les fruits donnent de la force à ton corps.
+
+5
+00:00:21,804 --> 00:00:24,332
+Le pain et les pâtes t'aident à courir et à jouer.
+
+6
+00:00:27,076 --> 00:00:30,173
+Et pour boire, la meilleure boisson, c'est l'eau.
+
+7
+00:00:32,859 --> 00:00:35,024
+Un grand verre d'eau, et c'est reparti !
+
+8
+00:00:37,900 --> 00:00:38,521
+Et toi
+
+9
+00:00:40,407 --> 00:00:42,320
+quel fruit vas-tu manger aujourd'hui ?

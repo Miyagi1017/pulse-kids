@@ -1,0 +1,35 @@
+1
+00:00:00,880 --> 00:00:02,268
+De la Graine à la Pomme !
+
+2
+00:00:05,060 --> 00:00:07,311
+On plante une petite graine dans la terre.
+
+3
+00:00:10,080 --> 00:00:12,693
+On l'arrose, et le soleil la réchauffe.
+
+4
+00:00:15,379 --> 00:00:17,847
+Une pousse sort, puis un petit arbre.
+
+5
+00:00:20,552 --> 00:00:23,104
+Les années passent, l'arbre devient grand.
+
+6
+00:00:25,770 --> 00:00:28,666
+Au printemps, il se couvre de fleurs blanches.
+
+7
+00:00:31,292 --> 00:00:34,021
+Et à l'automne, c'est un pommier plein de pommes !
+
+8
+00:00:36,746 --> 00:00:37,367
+Et toi
+
+9
+00:00:39,254 --> 00:00:40,380
+tu aimes les pommes ?

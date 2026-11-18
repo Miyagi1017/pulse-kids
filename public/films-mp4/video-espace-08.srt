@@ -1,0 +1,35 @@
+1
+00:00:00,901 --> 00:00:01,925
+Les aurores !
+
+2
+00:00:05,040 --> 00:00:08,816
+Très loin au nord, près du pôle Nord, la nuit est longue.
+
+3
+00:00:11,541 --> 00:00:13,606
+Il fait froid, et tout est calme.
+
+4
+00:00:16,521 --> 00:00:18,973
+Et soudain, le ciel se met à danser !
+
+5
+00:00:21,720 --> 00:00:24,566
+Des lumières vertes, roses et violettes ondulent.
+
+6
+00:00:27,228 --> 00:00:28,877
+On les appelle des aurores.
+
+7
+00:00:32,269 --> 00:00:34,878
+C'est un des plus beaux spectacles de la nature.
+
+8
+00:00:37,582 --> 00:00:38,204
+Et toi
+
+9
+00:00:40,151 --> 00:00:42,074
+de quelle couleur serait ton aurore ?

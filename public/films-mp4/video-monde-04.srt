@@ -1,0 +1,35 @@
+1
+00:00:00,880 --> 00:00:01,943
+La banquise !
+
+2
+00:00:05,100 --> 00:00:07,864
+Voici la banquise, très loin au nord.
+
+3
+00:00:10,607 --> 00:00:13,383
+C'est de l'eau de mer gelée, blanche et brillante.
+
+4
+00:00:16,071 --> 00:00:17,801
+Il y fait très froid toute l'année.
+
+5
+00:00:21,091 --> 00:00:24,145
+Un ours polaire marche sur la glace avec son petit.
+
+6
+00:00:26,952 --> 00:00:28,682
+Ils cherchent à manger près de l'eau.
+
+7
+00:00:31,951 --> 00:00:35,698
+Il faut protéger la banquise pour que les ours polaires restent chez eux.
+
+8
+00:00:38,362 --> 00:00:38,983
+Et toi
+
+9
+00:00:40,869 --> 00:00:43,057
+tu sais marcher comme un ours polaire ?

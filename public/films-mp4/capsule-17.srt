@@ -1,0 +1,35 @@
+1
+00:00:00,861 --> 00:00:01,870
+Lune Endormie !
+
+2
+00:00:05,101 --> 00:00:08,257
+La Lune est toute ronde, mais elle n'arrive pas à dormir.
+
+3
+00:00:11,024 --> 00:00:13,228
+Elle se tourne et se retourne dans le ciel.
+
+4
+00:00:16,064 --> 00:00:18,574
+Léo l'entend soupirer depuis sa fenêtre.
+
+5
+00:00:21,299 --> 00:00:23,648
+Il monte sur le toit, tout doucement.
+
+6
+00:00:26,333 --> 00:00:28,760
+Et il lui chante une berceuse, tout doux.
+
+7
+00:00:31,444 --> 00:00:34,337
+La Lune ferme les yeux et devient un fin croissant.
+
+8
+00:00:37,002 --> 00:00:37,624
+Et toi
+
+9
+00:00:39,511 --> 00:00:41,137
+quelle chanson te fait dormir ?

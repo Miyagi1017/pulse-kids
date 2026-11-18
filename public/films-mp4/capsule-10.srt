@@ -1,0 +1,35 @@
+1
+00:00:00,840 --> 00:00:01,866
+Pont de Blocs !
+
+2
+00:00:05,100 --> 00:00:08,646
+Voici la rivière, et de l'autre côté, l'école.
+
+3
+00:00:11,368 --> 00:00:13,399
+Mais il n'y a pas de pont pour traverser !
+
+4
+00:00:16,368 --> 00:00:20,419
+On essaie d'abord un pont en bois. Oh, il bouge un peu…
+
+5
+00:00:23,121 --> 00:00:26,014
+Alors on pose des blocs de pierre, un par un.
+
+6
+00:00:28,720 --> 00:00:30,788
+Le pont en pierre est bien plus solide.
+
+7
+00:00:33,680 --> 00:00:36,957
+Bravo ! Tout le monde peut traverser.
+
+8
+00:00:39,704 --> 00:00:40,326
+Et toi
+
+9
+00:00:42,212 --> 00:00:44,016
+tu as déjà traversé un pont ?

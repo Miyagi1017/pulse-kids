@@ -1,0 +1,35 @@
+1
+00:00:00,820 --> 00:00:01,505
+Paris !
+
+2
+00:00:05,080 --> 00:00:08,138
+Bienvenue à Paris, la capitale de la France !
+
+3
+00:00:10,784 --> 00:00:13,954
+Une grande rivière traverse la ville : c'est la Seine.
+
+4
+00:00:16,698 --> 00:00:19,555
+Des bateaux glissent doucement sur l'eau, sous les ponts.
+
+5
+00:00:22,182 --> 00:00:25,506
+Et là-bas, toute en fer, voici la tour Eiffel !
+
+6
+00:00:28,287 --> 00:00:30,761
+Elle est haute comme un immeuble de cent étages.
+
+7
+00:00:33,428 --> 00:00:36,777
+Le soir, elle s'allume et scintille comme des étoiles.
+
+8
+00:00:39,500 --> 00:00:40,122
+Et toi
+
+9
+00:00:42,050 --> 00:00:43,921
+as-tu déjà vu la tour Eiffel ?

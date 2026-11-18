@@ -1,0 +1,35 @@
+1
+00:00:00,840 --> 00:00:02,353
+Terre depuis l'Espace !
+
+2
+00:00:05,100 --> 00:00:08,287
+Voici notre planète, vue de très, très haut.
+
+3
+00:00:10,910 --> 00:00:13,396
+Elle est toute ronde, et elle tourne doucement.
+
+4
+00:00:16,098 --> 00:00:20,804
+Le bleu, c'est la mer. Le vert, ce sont les forêts.
+
+5
+00:00:23,425 --> 00:00:25,993
+On s'approche… voici une grande forêt.
+
+6
+00:00:28,637 --> 00:00:32,308
+On s'approche encore… voici une montagne avec de la neige.
+
+7
+00:00:34,992 --> 00:00:38,364
+Et là, tout près, une petite maison au bord de l'eau.
+
+8
+00:00:41,110 --> 00:00:41,731
+Et toi
+
+9
+00:00:43,617 --> 00:00:45,983
+tu habites près de la mer ou des montagnes ?

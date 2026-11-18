@@ -1,0 +1,35 @@
+1
+00:00:00,881 --> 00:00:01,666
+La mer !
+
+2
+00:00:05,100 --> 00:00:09,251
+Voici la mer, immense et bleue. Son eau est salée.
+
+3
+00:00:11,994 --> 00:00:16,779
+Les vagues vont et viennent sur la plage : chhh… chhh…
+
+4
+00:00:19,561 --> 00:00:21,312
+C'est le vent qui pousse les vagues.
+
+5
+00:00:24,500 --> 00:00:28,386
+Et la Lune, de très loin, fait monter et descendre la mer.
+
+6
+00:00:31,209 --> 00:00:34,517
+Dans l'eau vivent des poissons, des crabes et des coquillages.
+
+7
+00:00:37,179 --> 00:00:40,033
+Un petit crabe marche de côté sur le sable mouillé.
+
+8
+00:00:42,860 --> 00:00:43,481
+Et toi
+
+9
+00:00:45,368 --> 00:00:47,251
+tu fais le bruit des vagues avec moi ?

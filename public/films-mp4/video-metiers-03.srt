@@ -1,0 +1,35 @@
+1
+00:00:00,880 --> 00:00:02,064
+L'agriculteur !
+
+2
+00:00:05,040 --> 00:00:08,776
+Cocorico ! Le jour se lève sur la ferme.
+
+3
+00:00:11,481 --> 00:00:15,268
+Voici l'agriculteur. Il cultive les champs.
+
+4
+00:00:17,890 --> 00:00:21,215
+Il sème le blé, et l'arrose en attendant qu'il pousse.
+
+5
+00:00:23,898 --> 00:00:27,315
+Dans le potager, il fait pousser des légumes et des fruits.
+
+6
+00:00:30,042 --> 00:00:32,589
+Il donne aussi à manger aux vaches et aux poules.
+
+7
+00:00:35,292 --> 00:00:38,910
+Grâce à lui, nous avons du pain, des légumes et du lait.
+
+8
+00:00:41,576 --> 00:00:42,198
+Et toi
+
+9
+00:00:44,065 --> 00:00:46,059
+quel légume aimerais-tu faire pousser ?
