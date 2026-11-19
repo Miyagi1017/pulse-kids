@@ -1,0 +1,35 @@
+1
+00:00:00,881 --> 00:00:01,726
+Les pandas !
+
+2
+00:00:05,101 --> 00:00:08,056
+Dans les montagnes de Chine vit un animal très doux.
+
+3
+00:00:10,702 --> 00:00:14,195
+C'est Mei, une panda géante, noire et blanche.
+
+4
+00:00:16,879 --> 00:00:20,552
+Mei a faim. Elle cherche sa plante préférée.
+
+5
+00:00:23,317 --> 00:00:25,225
+Ça y est : voici du bambou !
+
+6
+00:00:28,256 --> 00:00:31,293
+Elle passe presque toute la journée à manger du bambou.
+
+7
+00:00:34,020 --> 00:00:36,776
+Le panda est rare : il faut le protéger.
+
+8
+00:00:39,524 --> 00:00:40,145
+Et toi
+
+9
+00:00:42,031 --> 00:00:44,076
+tu sais faire une roulade comme Mei ?

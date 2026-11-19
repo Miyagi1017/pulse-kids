@@ -1,0 +1,35 @@
+1
+00:00:00,900 --> 00:00:01,924
+Les girafes !
+
+2
+00:00:05,100 --> 00:00:10,207
+Voici Lili, une girafe. Elle a le cou le plus long de tous les animaux.
+
+3
+00:00:12,928 --> 00:00:16,723
+Lili a faim. Mais l'herbe ne lui fait pas envie.
+
+4
+00:00:19,468 --> 00:00:22,021
+Elle lève la tête, tout en haut de l'arbre.
+
+5
+00:00:24,688 --> 00:00:27,181
+Là, elle trouve les feuilles les plus tendres.
+
+6
+00:00:29,847 --> 00:00:32,692
+Elle les attrape avec sa longue langue violette.
+
+7
+00:00:35,434 --> 00:00:40,406
+Miam ! Lili mange les feuilles tout en haut, là où personne n'arrive.
+
+8
+00:00:43,190 --> 00:00:43,811
+Et toi
+
+9
+00:00:45,758 --> 00:00:48,749
+mets-toi sur la pointe des pieds pour être grand comme Lili !

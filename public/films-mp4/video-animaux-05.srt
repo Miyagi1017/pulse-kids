@@ -1,0 +1,35 @@
+1
+00:00:00,881 --> 00:00:01,807
+Les dauphins !
+
+2
+00:00:05,100 --> 00:00:07,891
+Voici Flip, un dauphin qui vit dans la mer.
+
+3
+00:00:10,696 --> 00:00:13,493
+Flip nage vite, mais ce n'est pas un poisson.
+
+4
+00:00:16,260 --> 00:00:19,446
+De temps en temps, il doit remonter à la surface.
+
+5
+00:00:22,108 --> 00:00:25,980
+Pourquoi ? Pour respirer de l'air, comme nous !
+
+6
+00:00:28,643 --> 00:00:31,274
+Il siffle pour parler avec ses amis dauphins.
+
+7
+00:00:33,938 --> 00:00:36,743
+Et quand il est content, il saute très haut hors de l'eau !
+
+8
+00:00:39,486 --> 00:00:40,108
+Et toi
+
+9
+00:00:41,994 --> 00:00:43,768
+tu sais siffler comme un dauphin ?
