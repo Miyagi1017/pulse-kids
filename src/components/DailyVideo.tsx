@@ -16,6 +16,9 @@ import { Mascot } from './Mascot';
 import { mascotForScene } from '../lib/mascots';
 import { VideoStage, videoPaper, videoPoster } from './VideoStage';
 import { sayScene, stopVoice, videoClip } from '../videos/voice';
+import { PACE } from '../videos/pacing';
+import { pickSource } from '../videos/source';
+import { FilmMp4 } from './FilmMp4';
 import { Vignette } from './Vignette';
 import { KaraokeText } from './KaraokeText';
 import { float, SPRING_SOFT, sway } from '../lib/motion';
@@ -70,6 +73,9 @@ export function VideoPlayer({
   const [bigText, setBigText] = useState(age === 'petit');
   const [replayTick, setReplayTick] = useState(0);
   const [quizSolved, setQuizSolved] = useState(false);
+  // Le film MP4 Lemo-Opuscar s'il existe et si l'on est en ligne, sinon le dessin animé en code.
+  const online = () => typeof navigator === 'undefined' || navigator.onLine !== false;
+  const [mode, setMode] = useState<'mp4' | 'code'>(() => pickSource(playlist[Math.max(0, Math.min(startIndex, playlist.length - 1))].id, online()));
   const fallbackTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const video = playlist[videoIndex];
@@ -89,20 +95,24 @@ export function VideoPlayer({
     setCountdown(null);
     setQuizSolved(false);
     setVideoIndex(vi);
+    setMode(pickSource(playlist[vi].id, online()));
     setIndex(0);
     setPlaying(true);
-  }, []);
+  }, [playlist]);
 
   // Narration + avance automatique des scènes.
   useEffect(() => {
     clearTimeout(fallbackTimer.current);
-    if (!playing || finished) return;
+    // Le film MP4 porte sa propre voix : pas de narration par-dessus.
+    if (!playing || finished || mode === 'mp4') return;
     setImgOk(true);
     let advanced = false;
+    let pause: ReturnType<typeof setTimeout> | undefined;
+    // Après chaque phrase, une pause (PACE.pauseAfterLine) avant la suivante ; elle est annulée si l'enfant change de scène.
     const advance = () => {
       if (advanced) return;
       advanced = true;
-      setTimeout(next, 700);
+      pause = setTimeout(next, PACE.pauseAfterLine * 1000);
     };
     // La voix de Christine (prise enregistrée) si la scène en a une, sinon la voix du navigateur.
     const recorded = !!videoClip(video.id, index);
@@ -115,10 +125,11 @@ export function VideoPlayer({
     if (!recorded && !('speechSynthesis' in window)) fallbackTimer.current = setTimeout(advance, readingMs(text) * (age === 'petit' ? 1.3 : 1));
     return () => {
       clearTimeout(fallbackTimer.current);
+      clearTimeout(pause);
       advanced = true;
       stopVoice();
     };
-  }, [videoIndex, index, playing, finished, text, next, replayTick, age, video.id]);
+  }, [videoIndex, index, playing, finished, text, next, replayTick, age, video.id, mode]);
 
   // Vidéo terminée : on la marque comme vue (sans couper la question qui suit).
   useEffect(() => {
@@ -252,32 +263,47 @@ export function VideoPlayer({
                 {/* Le dessin animé de la vidéo, rendu en code dans son style (un des 10). */}
                 <div
                   className="relative cursor-pointer"
-                  onPointerDown={(e) => {
-                    soundEffects.playSparkle();
-                    burst(e.clientX, e.clientY, ['✨', '⭐'], 6);
-                  }}
+                  onPointerDown={() => soundEffects.playSparkle()}
                 >
-                  <VideoStage video={video.mini} scene={index} playing={playing} />
+                  {mode === 'mp4' ? (
+                    <FilmMp4
+                      id={video.id}
+                      playing={playing}
+                      onScene={setIndex}
+                      onEnd={() => setIndex(scenes.length)}
+                      onFail={(i) => {
+                        setMode('code');
+                        setIndex(i);
+                      }}
+                    />
+                  ) : (
+                    <VideoStage video={video.mini} scene={index} playing={playing} />
+                  )}
                 </div>
                 <div className="flex-1 flex flex-col items-center justify-center gap-3 p-4 sm:p-5 text-center">
-                  <motion.p
-                    key={index}
-                    initial={{ y: 12, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
-                    aria-live="polite"
-                  >
-                    <KaraokeText text={text} />
-                  </motion.p>
-                  <button
-                    onClick={replay}
-                    className="press rounded-full px-4 py-2 text-base font-semibold flex items-center gap-2"
-                    style={{ background: paper.dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.07)' }}
-                    aria-label="Réécouter cette scène"
-                  >
-                    <Volume2 className="w-5 h-5" /> Réécouter
-                  </button>
+                  {/* Le film MP4 porte son propre sous-titre karaoké : le texte n'est affiché que pour le dessin animé en code. */}
+                  {mode === 'code' && (
+                    <>
+                      <motion.p
+                        key={index}
+                        initial={{ y: 12, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className={`${bigText ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'} font-semibold leading-snug max-w-xl`}
+                        aria-live="polite"
+                      >
+                        <KaraokeText text={text} />
+                      </motion.p>
+                      <button
+                        onClick={replay}
+                        className="press rounded-full px-4 py-2 text-base font-semibold flex items-center gap-2"
+                        style={{ background: paper.dark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.07)' }}
+                        aria-label="Réécouter cette scène"
+                      >
+                        <Volume2 className="w-5 h-5" /> Réécouter
+                      </button>
+                    </>
+                  )}
                 </div>
               </motion.section>
             ) : !finished ? (

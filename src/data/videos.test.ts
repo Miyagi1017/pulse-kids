@@ -7,12 +7,12 @@ const credits = JSON.parse(readFileSync(new URL('./videoCredits.json', import.me
 // « sang » est autorisé ici : la vidéo sur le cœur explique la circulation (vocabulaire du corps).
 const FORBIDDEN = /<[^>]+>|https?:\/\/|\bmort|tuer|guerre|\barme\b/i;
 
-test('les 10 mini-vidéos, ids uniques, 4 scènes courtes et sûres', () => {
+test('les 10 mini-vidéos, ids uniques, 6 à 8 scènes courtes et sûres', () => {
   assert.equal(VIDEOS.length, 10);
   assert.equal(new Set(VIDEOS.map((v) => v.style)).size, 10, 'un style différent par vidéo');
   assert.equal(new Set(VIDEOS.map((v) => v.id)).size, VIDEOS.length);
   for (const v of VIDEOS) {
-    assert.equal(v.scenes.length, 4, v.id);
+    assert.ok(v.scenes.length >= 6 && v.scenes.length <= 8, v.id);
     for (const s of v.scenes) {
       assert.ok(s.length <= 160, `${v.id} : scène trop longue`);
       assert.ok(!FORBIDDEN.test(s), `${v.id} : contenu interdit`);

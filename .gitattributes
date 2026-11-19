@@ -1,0 +1,2 @@
+# Scripts lancés par bash (WSL, Git Bash) : toujours des fins de ligne Unix, même avec core.autocrlf.
+*.sh text eol=lf

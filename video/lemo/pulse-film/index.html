@@ -1,0 +1,9 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pulse Kids — film</title>
+<link rel="stylesheet" href="film.css">
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+</head><body><canvas id="c" width="1280" height="720"></canvas>
+<script type="module">
+import { boot } from './film.js';
+const story = await (await fetch('story.json')).json();
+await boot(document.getElementById('c'), story);
+</script></body></html>

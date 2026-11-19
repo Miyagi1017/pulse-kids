@@ -12,6 +12,7 @@
 import type { Objet } from '../data/comptines';
 import { VIDEOS } from '../data/videos';
 import { back, clamp, easeInOut, easeOut } from '../films/engine';
+import { PACE, SLOW_TRANSITIONS, shotFor, videoStyleFor, type Shot } from './pacing';
 import { place, type Figure } from '../kits/geom';
 import { kid, objet } from '../kits/library';
 import type { Material } from '../kits/materials';
@@ -57,13 +58,15 @@ export function styleForVideo(id: string): StyleId {
 export interface CodedVideo {
   id: string;
   title: string;
+  /** Les phrases de l'histoire (6 à 8) : leur nombre fixe la grammaire des plans (pacing.ts). */
+  scenes?: string[];
   style?: StyleId;
   board?: Board;
 }
 
 export interface VideoScene {
   style: StyleId;
-  /** scene : 0 (titre) → 4 (la question) ; t : secondes depuis le début de la scène. */
+  /** scene : 0 (titre) → nombre de phrases (la question) ; t : secondes depuis le début de la scène. */
   render(ctx: CanvasRenderingContext2D, scene: number, t: number, still?: boolean): void;
   dispose(): void;
 }
@@ -71,10 +74,11 @@ export interface VideoScene {
 const W0 = 960,
   H0 = 540;
 /** Durée des transitions entre plans, et l'arrêt sur image du gros plan (vocabulaire video-shotcraft). */
-const TRANS = 0.55,
-  FREEZE_AT = 2.6,
-  FREEZE = 0.9;
-const TRANSITIONS = ['iris', 'whip', 'push', 'doors'] as const;
+const TRANS = PACE.transition;
+/** Rythme lent : tous les gestes et mouvements de caméra vont deux fois moins vite. */
+const SLOW = 0.5;
+/** Chaque rôle de plan reprend la mise en scène d'un des 5 plans d'origine (0 titre … 4 question). */
+const STAGE: Record<Shot, number> = { titre: 0, decouverte: 1, action: 2, detail: 3, calme: 3, question: 4 };
 /** Places des objets à la fin (« photo de groupe » autour du héros et des enfants). */
 const GROUP: [number, number][] = [
   [200, 250],
@@ -88,7 +92,8 @@ const SPOTS: [number, number][] = [
   [640, 90]
 ];
 
-export function createVideoScene(video: CodedVideo, style: StyleId = video.style ?? styleForVideo(video.id)): VideoScene {
+export function createVideoScene(video: CodedVideo, style: StyleId = videoStyleFor(video.id)): VideoScene {
+  const count = video.scenes?.length ?? 4;
   const board = video.board ?? boardFor(video.id) ?? B('etoile', 'ciel', ['etoile', 'nuage', 'etoile']);
   const mat: Material = materialFor(style);
   const s0 = board.s ?? 1,
@@ -110,22 +115,25 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
   const opening: 'spot' | 'crane' | 'push' = sw.dark ? 'spot' : vHash % 2 ? 'crane' : 'push';
   return {
     style,
-    render(ctx, scene, tReal, still) {
+    render(ctx, shotIndex, tSlow, still) {
+      // Le plan affiché garde son numéro (transitions) ; sa mise en scène vient de son rôle dans l'histoire.
+      const scene = STAGE[shotFor(shotIndex, count)];
+      const tReal = tSlow * SLOW;
       // Le plan change : on garde la dernière image du plan précédent pour la transition.
-      if (scene !== curScene) {
+      if (shotIndex !== curScene) {
         if (curScene >= 0 && !still) prevG.drawImage(cur, 0, 0);
         hadPrev = curScene >= 0 && !still;
-        curScene = scene;
+        curScene = shotIndex;
       }
       const fps = mat.fps || 24;
       // Arrêt sur image (une seule fois, au sommet de l'action du gros plan) : le temps du monde s'arrête.
-      const tw = scene === 2 && !still && tReal > FREEZE_AT ? (tReal < FREEZE_AT + FREEZE ? FREEZE_AT : tReal - FREEZE) : tReal;
+      // Plus d'arrêt sur image : trop brusque pour les petits.
+      const tw = tReal;
       const t = still ? tw : Math.floor(tw * fps) / fps;
-      const frozen = scene === 2 && !still && tReal > FREEZE_AT && tReal < FREEZE_AT + FREEZE;
-      const key = `${scene}:${t}:${frozen ? Math.floor(tReal * 12) : ''}`;
+      const key = `${shotIndex}:${t}`;
       if (key !== last || still) {
         last = key;
-        const T = scene * 20 + t; // temps continu pour les gestes
+        const T = shotIndex * 20 + t; // temps continu pour les gestes
         const heroY = board.hero === 'bouger' ? 400 : y0;
 
         // ── Caméra (vocabulaire de video-shotcraft, adapté aux enfants) ──
@@ -227,65 +235,25 @@ export function createVideoScene(video: CodedVideo, style: StyleId = video.style
           const e = easeInOut(clamp(t / 2.2));
           const sx = 140 + (480 - 140) * e,
             sy = 200 + (y0 - 200) * e,
-            r = 130 + 900 * clamp((t - 2.2) / 0.8) ** 2;
+            r = 220 + 900 * clamp((t - 2.2) / 0.8) ** 2;
           curG.save();
+          // Nuit douce, jamais un écran noir (les gestes sont ralentis : le rond reste petit plus longtemps).
           const grd = curG.createRadialGradient(sx, sy, r * 0.6, sx, sy, r);
           grd.addColorStop(0, 'rgba(5,4,12,0)');
-          grd.addColorStop(1, 'rgba(5,4,12,0.82)');
+          grd.addColorStop(1, 'rgba(5,4,12,0.6)');
           curG.fillStyle = grd;
           curG.fillRect(0, 0, W0, H0);
           curG.restore();
         }
-        // Coup de zoom : un éclair chaud à l'arrivée.
-        if (scene === 2 && t > 0.75 && t < 1.2) {
-          curG.fillStyle = `rgba(255,244,214,${0.55 * Math.exp(-(t - 0.75) * 9)})`;
-          curG.fillRect(0, 0, W0, H0);
-        }
-        // Arrêt sur image : coins de cadre, et un cercle dessiné à la main autour du héros.
-        if (frozen) {
-          const f = clamp((tReal - FREEZE_AT) / 0.35);
-          const sx = (480 - cx * k) + 480 * k,
-            sy = (270 - cy * k) + heroY * k;
-          curG.save();
-          curG.strokeStyle = sw.dark ? '#ffd36e' : '#e4372b';
-          curG.lineWidth = 6;
-          curG.lineCap = 'round';
-          curG.beginPath();
-          const R = 150 * Math.min(1.4, k),
-            a1 = -Math.PI / 2 + Math.PI * 2.15 * easeOut(f);
-          for (let a = -Math.PI / 2; a <= a1; a += 0.05) {
-            const rr = R * (1 + 0.05 * Math.sin(a * 3));
-            const px = sx + Math.cos(a) * rr * 1.25,
-              py = sy + Math.sin(a) * rr;
-            if (a === -Math.PI / 2) curG.moveTo(px, py);
-            else curG.lineTo(px, py);
-          }
-          curG.stroke();
-          curG.lineWidth = 5;
-          curG.strokeStyle = sw.dark ? '#fff8ea' : '#1d1a17';
-          const c = 22 * f;
-          for (const [x0, y0c, dx, dy] of [[24, 24, 1, 1], [W0 - 24, 24, -1, 1], [24, H0 - 24, 1, -1], [W0 - 24, H0 - 24, -1, -1]]) {
-            curG.beginPath();
-            curG.moveTo(x0, y0c + dy * c * 2);
-            curG.lineTo(x0, y0c);
-            curG.lineTo(x0 + dx * c * 2, y0c);
-            curG.stroke();
-          }
-          if (tReal - FREEZE_AT < 0.1) {
-            curG.fillStyle = 'rgba(255,255,255,0.6)';
-            curG.fillRect(0, 0, W0, H0);
-          }
-          curG.restore();
-        }
       }
 
-      // Transition (une demi-seconde au début du plan), sinon l'image du plan telle quelle.
-      const p = hadPrev ? clamp(tReal / TRANS) : 1;
+      // Transition douce (PACE.transition au début du plan), sinon l'image du plan telle quelle.
+      const p = hadPrev ? clamp(tSlow / TRANS) : 1;
       if (p >= 1) {
         ctx.drawImage(cur, 0, 0, W0, H0);
         return;
       }
-      const kind = TRANSITIONS[(vHash + scene) % TRANSITIONS.length];
+      const kind: string = SLOW_TRANSITIONS[(vHash + shotIndex) % SLOW_TRANSITIONS.length];
       const e = easeInOut(p);
       ctx.save();
       if (kind === 'iris') {

@@ -3,7 +3,7 @@ import '../films/fonts';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
-import { H, W, readingSeconds, type Film, type FilmScene, type FrameState } from '../films/engine';
+import { H, W, beatEnd, readingSeconds, type Film, type FilmScene, type FrameState } from '../films/engine';
 import { FilmAudio } from '../films/audio';
 import { sayLine, stopLine } from '../films/voice';
 import { personalize } from '../data/format';
@@ -116,7 +116,7 @@ export function FilmPlayer({ film, name, onBack, onDone, onNext }: { film: Film;
         let endTime = Infinity;
         if (b.tap) {
           if (c.tapAt !== null) endTime = c.tapAt + (b.hold ?? 2);
-        } else if (c.spoken !== null) endTime = Math.max(c.beatStart + (b.min ?? 0), c.spoken + (b.hold ?? 0.6));
+        } else if (c.spoken !== null) endTime = beatEnd(b, c.beatStart, c.spoken);
         if (t >= endTime) {
           if (c.beat + 1 < film.beats.length) {
             enter(c.beat + 1);
