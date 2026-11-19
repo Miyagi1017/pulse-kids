@@ -7,7 +7,6 @@
 import { readFileSync } from 'node:fs';
 import { FILMS } from '../../src/films/index';
 import { VIDEOS } from '../../src/data/videos';
-import { CAPSULES } from '../../src/videos/capsules';
 import { keyFile, sentenceKey, withoutName } from '../../src/voice/bank';
 import { splitAtName } from '../../src/voice/names';
 
@@ -23,7 +22,7 @@ for (const f of FILMS) {
   if (f.id === 'film-fraise') continue;
   f.beats.forEach((b, i) => b.text && media.push({ key: `films/${f.id}/${String(i + 1).padStart(2, '0')}`, text: withoutName(b.text) }));
 }
-for (const v of [...VIDEOS, ...CAPSULES]) {
+for (const v of VIDEOS) {
   [`${v.title} !`, ...v.scenes].forEach((t, i) => media.push({ key: `voix/${v.id}/${String(i).padStart(2, '0')}`, text: withoutName(t) }));
   // Morceaux autour du prénom (toute la scène est un seul texte) : Christine dit le prénom.
   for (const t of v.scenes) if (t.includes('{p}')) for (const seg of splitAtName(t)) media.push({ key: `banque/${keyFile(sentenceKey(seg))}`, text: seg });

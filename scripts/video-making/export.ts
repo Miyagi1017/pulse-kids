@@ -13,7 +13,6 @@ import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { VIDEOS } from '../../src/data/videos';
-import { CAPSULES } from '../../src/videos/capsules';
 import { keyFile, sentenceKey, withoutName } from '../../src/voice/bank';
 import { filmTimeline, type VoicePart } from '../../src/videos/filmTimeline';
 import { shotFor } from '../../src/videos/pacing';
@@ -43,7 +42,7 @@ await build({
   logLevel: 'warning'
 });
 
-const all = [...VIDEOS, ...CAPSULES].filter((v) => v.id.includes(filter));
+const all = VIDEOS.filter((v) => v.id.includes(filter));
 for (const v of all) {
   const dir = join(dest, v.id);
   mkdirSync(join(dir, 'assets'), { recursive: true });

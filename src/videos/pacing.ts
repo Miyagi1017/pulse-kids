@@ -1,10 +1,9 @@
 /**
  * Le rythme lent des dessins animés (5-8 ans) : une idée par plan, des plans d'au moins 3 s, une pause
- * après chaque phrase, des transitions douces. Et un style différent par vidéo, parmi les 66 du catalogue. Voir docs/superpowers/specs/2026-11-16-videos-lentes-lemo-design.md.
+ * après chaque phrase, des transitions douces. Et un style différent par vidéo, parmi les 10 gardés. Voir docs/superpowers/specs/2026-11-16-videos-lentes-lemo-design.md.
  */
 import { styleAt, type StyleId } from '../kits/styles';
 import { VIDEOS } from '../data/videos';
-import { CAPSULES } from './capsules';
 
 /** Le rôle d'un plan dans l'histoire : il choisit la caméra et ce que font les personnages. */
 export type Shot = 'titre' | 'decouverte' | 'action' | 'detail' | 'calme' | 'question';
@@ -30,9 +29,7 @@ export const SLOW_TRANSITIONS = ['iris', 'push', 'doors'] as const;
  * des 66 (décalée de 11), donc toutes différentes.
  */
 export function videoStyleFor(id: string): StyleId {
-  const c = CAPSULES.find((x) => x.id === id);
-  if (c) return c.style;
-  return styleAt(Math.max(0, VIDEOS.findIndex((v) => v.id === id)), 11);
+  return VIDEOS.find((v) => v.id === id)?.style ?? styleAt(0);
 }
 
 /** La phrase suivante quand l'enfant touche « suivant » : un appui pendant la pause l'annule et avance d'une seule phrase. */

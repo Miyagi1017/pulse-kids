@@ -1,11 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { VIDEOS } from './videos';
-import { CAPSULES } from '../videos/capsules';
 import { VIDEO_QUIZ } from './videoQuiz';
 import { cleanName } from '../voice/bank';
 
-const ALL = [...VIDEOS, ...CAPSULES];
+const ALL = VIDEOS;
 const plain = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 test('chaque histoire a 6 à 8 phrases', () => {

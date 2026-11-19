@@ -1,9 +1,8 @@
 // Planche de contrôle (dev) : un dessin animé joué dans l'ordre, images clés de chaque plan. ?id=video-animaux-01
 import '../src/films/fonts';
 import { VIDEOS, createVideoScene } from '../src/videos/videoScene';
-import { CAPSULES } from '../src/videos/capsules';
 const id = new URLSearchParams(location.search).get('id') ?? 'video-animaux-01';
-const v = [...VIDEOS, ...CAPSULES].find((x) => x.id === id)!;
+const v = VIDEOS.find((x) => x.id === id)!;
 await document.fonts.ready;
 const vs = createVideoScene(v as never);
 const work = document.createElement('canvas');

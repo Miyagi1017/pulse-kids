@@ -88,8 +88,28 @@ function camera(timing: ComptineTiming, t: number) {
   for (let i = 0; i < cuts.length; i++) if (t >= cuts[i]) idx = i;
   const cur = shots[Math.min(idx, shots.length - 1)];
   const prev = shots[Math.max(0, Math.min(idx - 1, shots.length - 1))];
-  const p = idx > 0 ? easeInOut(clamp((t - cuts[idx]) / 0.8)) : 1;
-  return { s: lerp(prev.s, cur.s, p), x: lerp(prev.x, cur.x, p), y: lerp(prev.y, cur.y, p) };
+  // Ligne 4 : coup de zoom (on fonce, léger rebond) au lieu d'un fondu ; les autres lignes glissent en douceur.
+  const crash = idx === 4;
+  const raw = clamp((t - cuts[idx]) / (crash ? 0.28 : 0.8));
+  let p = idx > 0 ? (crash ? raw * raw * raw : easeInOut(raw)) : 1;
+  if (crash) p += 0.35 * Math.sin(clamp((t - cuts[idx] - 0.28) / 0.3) * Math.PI) * (t > cuts[idx] + 0.28 ? 1 : 0);
+  let s = lerp(prev.s, cur.s, p),
+    x = lerp(prev.x, cur.x, p),
+    y = lerp(prev.y, cur.y, p);
+  // Ouverture en grue : on part au ras du sol, tout près, puis on s'élève (avant la première ligne).
+  if (idx === 0) {
+    const e = easeOut(clamp(t / Math.max(1.2, cuts[1] ?? 2)));
+    s = 1.32 - 0.32 * e;
+    y = 430 - (430 - y) * e;
+  }
+  // Cri final : on recule pour voir tout le monde.
+  const [fs] = timing.lines[4] ?? [Infinity];
+  if (t > fs) {
+    const e = easeInOut(clamp((t - fs) / 2.2));
+    s = lerp(s, 0.94, e);
+    y = lerp(y, 330, e);
+  }
+  return { s, x, y };
 }
 
 interface Live {
@@ -171,7 +191,11 @@ export function createComptineScene(c: Comptine, timing: ComptineTiming, style: 
         return place(fig, { x: p.x, y: p.y, s: s * cam.s, rot, sx });
       };
       mat.begin({ t, still });
-      mat.draw(place(decor(c.decor, t), { x: 480 - cam.x * cam.s, y: 270 - cam.y * cam.s, s: cam.s }));
+      // Profondeur : le décor (plan lointain) bouge et grossit moins que les personnages.
+      const ds = 1 + (cam.s - 1) * 0.5,
+        dx = 480 + (cam.x - 480) * 0.45,
+        dy = 270 + (cam.y - 270) * 0.6;
+      mat.draw(place(decor(c.decor, t), { x: 480 - dx * ds, y: 270 - dy * ds, s: ds }));
 
       // Mila se balance, puis saute de joie au cri final.
       let jump = 0,

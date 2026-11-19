@@ -1,6 +1,6 @@
 /**
- * Les 50 vidéos du jour, rendues en code (méthode claude-video / Lemo-Opuscar) au lieu de photos.
- * Chaque vidéo a son héros, son décor, ses petits objets et son style (un des 66, jamais deux fois le même).
+ * Les 10 vidéos du jour, rendues en code (méthode claude-video / Lemo-Opuscar) au lieu de photos.
+ * Chaque vidéo a son héros, son décor, ses petits objets et son style (un des 10, jamais deux fois le même).
  * La mise en scène suit les 5 scènes narrées :
  *  0. titre : le héros arrive (il « se dessine ») et le titre s'affiche ;
  *  1. présentation : le héros au centre, les objets flottent autour ;
@@ -31,85 +31,30 @@ export interface Board {
 
 const B = (hero: HeroName, decor: VideoDecor, extras: Objet[], s?: number, y?: number): Board => ({ hero, decor, extras, s, y });
 
-/** Le storyboard des 50 vidéos, dans l'ordre de src/data/videos.ts (par thème). */
-const BOARDS: Record<string, Board[]> = {
-  animaux: [
-    B('manchot', 'banquise', ['flocon', 'poisson', 'flocon']),
-    B('elephant', 'savane', ['oiseau', 'goutte', 'soleil'], 0.95),
-    B('girafe', 'savane', ['oiseau', 'feuille', 'soleil'], 1, 310),
-    B('abeille', 'jardin', ['fleur', 'fleur', 'papillon']),
-    B('dauphin', 'ocean', ['bulle', 'poisson', 'bulle']),
-    B('papillon', 'jardin', ['fleur', 'feuille', 'fleur']),
-    B('tortue', 'plage', ['coeur', 'etoile', 'feuille']),
-    B('chouette', 'nuit', ['etoile', 'lune', 'etoile']),
-    B('vache', 'ferme', ['fleur', 'nuage', 'soleil']),
-    B('ecureuil', 'foret', ['feuille', 'feuille', 'oiseau']),
-    B('lion', 'savane', ['soleil', 'oiseau', 'etoile'], 0.95),
-    B('grenouille', 'jardin', ['goutte', 'fleur', 'papillon']),
-    B('panda', 'foret', ['feuille', 'coeur', 'feuille']),
-    B('coccinelle', 'jardin', ['feuille', 'fleur', 'etoile']),
-    B('baleine', 'ocean', ['poisson', 'bulle', 'poisson'], 0.9)
-  ],
-  nature: [
-    B('arbre', 'jardin', ['oiseau', 'feuille', 'pomme'], 0.95, 300),
-    B('arcenciel', 'ciel', ['goutte', 'soleil', 'nuage']),
-    B('vagues', 'plage', ['poisson', 'bulle', 'nuage'], 1, 360),
-    B('volcan', 'montagnes', ['nuage', 'etoile', 'nuage'], 1, 320),
-    B('bonhomme', 'neige', ['flocon', 'flocon', 'etoile'], 0.95, 330),
-    B('automne', 'foret', ['feuille', 'feuille', 'nuage'], 0.95, 300),
-    B('printemps', 'jardin', ['papillon', 'fleur', 'oiseau'], 1, 310),
-    B('pluie', 'ville', ['goutte', 'nuage', 'goutte'], 1, 260),
-    B('montagne', 'ciel', ['oiseau', 'nuage', 'flocon'], 1.05, 320),
-    B('tournesol', 'jardin', ['papillon', 'soleil', 'fleur'], 1, 300)
-  ],
-  espace: [
-    B('lune', 'espace', ['etoile', 'fusee', 'etoile']),
-    B('soleil', 'ciel', ['nuage', 'fleur', 'oiseau']),
-    B('planete', 'espace', ['etoile', 'etoile', 'fusee']),
-    B('fusee', 'espace', ['etoile', 'lune', 'etoile'], 1, 300),
-    B('astronaute', 'espace', ['etoile', 'fusee', 'lune'], 1, 250),
-    B('etoile', 'nuit', ['etoile', 'lune', 'etoile'], 1, 230),
-    B('terre', 'espace', ['lune', 'etoile', 'nuage']),
-    B('aurore', 'neige', ['etoile', 'flocon', 'etoile'], 1, 300)
-  ],
-  metiers: [
-    B('camion', 'ville', ['goutte', 'etoile', 'nuage'], 0.95, 350),
-    B('docteur', 'chambre', ['coeur', 'etoile', 'brosse'], 0.9, 320),
-    B('tracteur', 'ferme', ['carotte', 'nuage', 'pomme'], 0.95, 340),
-    B('pain', 'cuisine', ['gateau', 'coeur', 'etoile'], 1, 300),
-    B('livres', 'ecole', ['note', 'pomme', 'etoile'], 0.9, 290),
-    B('bus', 'ville', ['etoile', 'nuage', 'oiseau'], 0.85, 350),
-    B('microscope', 'ecole', ['bulle', 'etoile', 'goutte'], 0.95, 310)
-  ],
-  corps: [
-    B('dent', 'chambre', ['etoile', 'bulle', 'coeur'], 0.95, 290),
-    B('coeur', 'jardin', ['coeur', 'etoile', 'coeur'], 0.9, 260),
-    B('fruits', 'cuisine', ['pomme', 'carotte', 'coeur'], 0.9, 330),
-    B('dodo', 'chambre', ['etoile', 'lune', 'etoile'], 0.9, 330),
-    B('bouger', 'jardin', ['balle', 'ballon', 'etoile'])
-  ],
-  monde: [
-    B('eiffel', 'ville', ['nuage', 'oiseau', 'coeur'], 0.95, 290),
-    B('chameau', 'desert', ['soleil', 'etoile', 'oiseau'], 0.95, 330),
-    B('palmier', 'foret', ['papillon', 'fleur', 'feuille'], 1, 300),
-    B('ours', 'banquise', ['flocon', 'poisson', 'flocon'], 1, 330),
-    B('chateau', 'ciel', ['nuage', 'oiseau', 'etoile'], 0.95, 300)
-  ]
+/** Le storyboard des 10 vidéos gardées (par identifiant). */
+const BOARDS: Record<string, Board> = {
+  'video-animaux-01': B('manchot', 'banquise', ['flocon', 'poisson', 'flocon']),
+  'video-nature-02': B('arcenciel', 'ciel', ['goutte', 'soleil', 'nuage']),
+  'video-animaux-02': B('elephant', 'savane', ['oiseau', 'goutte', 'soleil'], 0.95),
+  'video-espace-01': B('lune', 'espace', ['etoile', 'fusee', 'etoile']),
+  'video-animaux-05': B('dauphin', 'ocean', ['bulle', 'poisson', 'bulle']),
+  'video-corps-01': B('dent', 'chambre', ['etoile', 'bulle', 'coeur'], 0.95, 290),
+  'video-animaux-03': B('girafe', 'savane', ['oiseau', 'feuille', 'soleil'], 1, 310),
+  'video-espace-03': B('planete', 'espace', ['etoile', 'etoile', 'fusee']),
+  'video-animaux-13': B('panda', 'foret', ['feuille', 'coeur', 'feuille']),
+  'video-animaux-15': B('baleine', 'ocean', ['poisson', 'bulle', 'poisson'], 0.9)
 };
 
 export function boardFor(id: string): Board | undefined {
-  const m = /^video-([a-z]+)-(\d+)$/.exec(id);
-  if (!m) return undefined;
-  return BOARDS[m[1]]?.[Number(m[2]) - 1];
+  return BOARDS[id];
 }
 
-/** Le style de chaque vidéo : son rang dans la suite des 50 (toutes différentes, décalées des comptines). */
+/** Le style de chaque vidéo : celui qui lui est attribué dans src/data/videos.ts (un des 10). */
 export function styleForVideo(id: string): StyleId {
-  const i = VIDEOS.findIndex((v) => v.id === id);
-  return styleAt(Math.max(0, i), 11);
+  return VIDEOS.find((v) => v.id === id)?.style ?? styleAt(0);
 }
 
-/** Ce qu'il faut pour rendre un dessin animé codé : une mini-vidéo du jour ou un des 66 du catalogue. */
+/** Ce qu'il faut pour rendre un dessin animé codé : une des 10 mini-vidéos. */
 export interface CodedVideo {
   id: string;
   title: string;

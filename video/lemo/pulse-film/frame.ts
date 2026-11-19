@@ -7,7 +7,6 @@
  */
 import { createVideoScene, type CodedVideo } from '../../../src/videos/videoScene';
 import { VIDEOS } from '../../../src/data/videos';
-import { CAPSULES } from '../../../src/videos/capsules';
 import { swatch } from '../../../src/kits/styles';
 import { videoStyleFor } from '../../../src/videos/pacing';
 import { FILM_PACE } from '../../../src/videos/filmTimeline';
@@ -56,7 +55,7 @@ function grains(dark: boolean): HTMLCanvasElement[] {
 
 /** Prépare le dessin d'un film ; render(ctx, t) dessine l'image de l'instant t sur un canevas 1280×720. */
 export function filmFrame(story: Story): { render: (ctx: CanvasRenderingContext2D, t: number) => void } {
-  const video: CodedVideo | undefined = [...VIDEOS, ...CAPSULES].find((v) => v.id === story.id);
+  const video: CodedVideo | undefined = VIDEOS.find((v) => v.id === story.id);
   if (!video) throw new Error(`vidéo inconnue : ${story.id}`);
   const style = videoStyleFor(story.id);
   const sw = swatch(style);

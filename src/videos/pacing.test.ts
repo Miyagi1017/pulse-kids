@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { VIDEOS } from '../data/videos';
-import { CAPSULES } from './capsules';
 import { STYLE_IDS } from '../kits/styles';
 import { PACE, SLOW_TRANSITIONS, nextIndex, shotFor, videoStyleFor } from './pacing';
 
@@ -23,11 +22,10 @@ test('rythme lent : pas de whip, plans ≥ 3 s, pause de 0,8 à 1,2 s', () => {
   assert.ok(PACE.pauseAfterLine >= 0.8 && PACE.pauseAfterLine <= 1.2);
 });
 
-test('un style différent par vidéo, parmi les 66 du catalogue', () => {
-  for (const v of [...VIDEOS, ...CAPSULES]) assert.ok(STYLE_IDS.includes(videoStyleFor(v.id)), v.id);
-  assert.equal(new Set(CAPSULES.map((c) => videoStyleFor(c.id))).size, CAPSULES.length, 'les 66 dessins animés');
-  assert.equal(new Set(VIDEOS.map((v) => videoStyleFor(v.id))).size, VIDEOS.length, 'les 50 vidéos du jour');
-  for (const c of CAPSULES) assert.equal(videoStyleFor(c.id), c.style, `${c.id} garde son style du catalogue`);
+test('un style différent par vidéo, parmi les 10 gardés', () => {
+  for (const v of VIDEOS) assert.ok(STYLE_IDS.includes(videoStyleFor(v.id)), v.id);
+  assert.equal(new Set(VIDEOS.map((v) => videoStyleFor(v.id))).size, VIDEOS.length, 'les 10 vidéos');
+  for (const v of VIDEOS) assert.equal(videoStyleFor(v.id), v.style, `${v.id} garde son style`);
 });
 
 test('nextIndex : un appui pendant la pause avance d’une seule phrase', () => {

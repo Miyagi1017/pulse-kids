@@ -1,12 +1,11 @@
-// Planche de contrôle (dev) : les 50 vidéos du jour. ?scene=0..4&t=secondes&only=id
+// Planche de contrôle (dev) : les 10 vidéos. ?scene=0..4&t=secondes&only=id
 import '../src/films/fonts';
 import { VIDEOS, createVideoScene } from '../src/videos/videoScene';
-import { CAPSULES } from '../src/videos/capsules';
 import { styleLabel } from '../src/kits/styles';
 const q = new URLSearchParams(location.search);
 const scene = Number(q.get('scene') ?? 2), t = Number(q.get('t') ?? 3), only = q.get('only');
 await document.fonts.ready;
-const list = q.get('set') === 'capsules' ? CAPSULES : VIDEOS;
+const list = VIDEOS;
 for (const v of (list as { id: string; title: string }[]).filter((v) => !only || v.id === only)) {
   const f = document.createElement('figure');
   const cv = document.createElement('canvas');

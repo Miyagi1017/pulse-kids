@@ -7,8 +7,9 @@ const credits = JSON.parse(readFileSync(new URL('./videoCredits.json', import.me
 // « sang » est autorisé ici : la vidéo sur le cœur explique la circulation (vocabulaire du corps).
 const FORBIDDEN = /<[^>]+>|https?:\/\/|\bmort|tuer|guerre|\barme\b/i;
 
-test('au moins 50 mini-vidéos, ids uniques, 6 à 8 scènes courtes et sûres', () => {
-  assert.ok(VIDEOS.length >= 50, `${VIDEOS.length} vidéos`);
+test('les 10 mini-vidéos, ids uniques, 6 à 8 scènes courtes et sûres', () => {
+  assert.equal(VIDEOS.length, 10);
+  assert.equal(new Set(VIDEOS.map((v) => v.style)).size, 10, 'un style différent par vidéo');
   assert.equal(new Set(VIDEOS.map((v) => v.id)).size, VIDEOS.length);
   for (const v of VIDEOS) {
     assert.ok(v.scenes.length >= 6 && v.scenes.length <= 8, v.id);
@@ -29,7 +30,7 @@ test('la suite de vidéos alterne les thèmes', () => {
 
 test('chaque photo publiée existe et a un crédit avec licence libre', () => {
   const ids = Object.keys(credits);
-  assert.ok(ids.length >= 45, `${ids.length} photos créditées`);
+  assert.ok(ids.length >= 9, `${ids.length} photos créditées`);
   for (const id of ids) {
     assert.ok(VIDEOS.some((v) => v.id === id), `crédit orphelin : ${id}`);
     assert.ok(existsSync(new URL(`../assets/video-images/${id}.webp`, import.meta.url)), `photo manquante : ${id}`);

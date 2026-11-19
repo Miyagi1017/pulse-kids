@@ -6,13 +6,12 @@ import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { VIDEOS } from '../../src/data/videos';
-import { CAPSULES } from '../../src/videos/capsules';
 import { keyFile, sentenceKey } from '../../src/voice/bank';
 import { filmTimeline, type VoicePart } from '../../src/videos/filmTimeline';
 import { videoStyleFor } from '../../src/videos/pacing';
 
 const [id, dir] = process.argv.slice(2);
-const video = [...VIDEOS, ...CAPSULES].find((v) => v.id === id);
+const video = VIDEOS.find((v) => v.id === id);
 if (!video || !dir) throw new Error('usage : make_story.ts <id> <dossier>');
 const ROOT = path.resolve(import.meta.dirname, '../..');
 const TPL = path.join(ROOT, 'video/lemo/pulse-film');
